@@ -26,8 +26,8 @@ return new class extends Migration
             $table->timestamp('published_at')->nullable();
             $table->string('meta_description', 160)->nullable();
             $table->json('meta_data')->nullable(); // SEO, Open Graph, etc.
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->constrained('users');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // Indexes for performance

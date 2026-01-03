@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('credit')->nullable();
             $table->json('tags')->nullable();
             $table->foreignId('folder_id')->nullable()->constrained('cms_media_folders')->nullOnDelete();
-            $table->foreignId('uploaded_by')->constrained('users');
+            $table->unsignedBigInteger('uploaded_by')->nullable();
             $table->timestamps();
 
             // Indexes for performance

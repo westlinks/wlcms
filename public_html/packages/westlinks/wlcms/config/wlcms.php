@@ -119,16 +119,50 @@ return [
     |--------------------------------------------------------------------------
     | User Model Integration
     |--------------------------------------------------------------------------
+    |
+    | Configure how the package integrates with your User model.
+    | The package adapts to different User model schemas.
+    |
     */
     'user' => [
-        // User model class
+        // User model class (set to null to disable user integration)
         'model' => App\Models\User::class,
 
-        // User name field
-        'name_field' => 'name',
+        // Primary key field (usually 'id')
+        'primary_key' => 'id',
 
-        // User avatar field (optional)
-        'avatar_field' => null,
+        // How to display the user's name - choose one approach:
+        
+        // Option 1: Combine multiple fields (default for West Links applications)
+        'display_name' => [
+            'type' => 'fields',
+            'fields' => ['firstname', 'lastname'], // Standard West Links schema
+            'separator' => ' ',
+        ],
+        
+        // Option 2: Single field name
+        // 'display_name' => [
+        //     'type' => 'field',
+        //     'field' => 'name', // 'name', 'username', 'display_name', etc.
+        // ],
+        
+        // Option 3: Use a model accessor/method
+        // 'display_name' => [
+        //     'type' => 'method',
+        //     'method' => 'getFullNameAttribute', // or 'full_name' accessor
+        // ],
+        
+        // Option 4: Custom format string
+        // 'display_name' => [
+        //     'type' => 'format',
+        //     'format' => '{firstname} {lastname}', // Available: {fieldName}
+        // ],
+
+        // User avatar field (optional) - field name or null
+        'avatar_field' => null, // 'avatar', 'profile_photo_path', etc.
+        
+        // User email field (for admin notifications, etc.)
+        'email_field' => 'email',
     ],
 
     /*

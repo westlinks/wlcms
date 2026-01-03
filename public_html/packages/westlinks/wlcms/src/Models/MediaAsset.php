@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
+use Westlinks\Wlcms\Services\UserService;
 
 class MediaAsset extends Model
 {
@@ -43,7 +44,8 @@ class MediaAsset extends Model
     protected static function booted(): void
     {
         static::creating(function (MediaAsset $asset) {
-            if (auth()->check()) {
+            // Only set user fields if user integration is enabled and user is authenticated
+            if (UserService::isUserIntegrationEnabled() && auth()->check()) {
                 $asset->uploaded_by = auth()->id();
             }
         });
@@ -109,8 +111,22 @@ class MediaAsset extends Model
      */
     public function uploader(): BelongsTo
     {
-        $userModel = config('wlcms.user.model', \App\Models\User::class);
+        $userModel = UserService::getUserModelClass();
+        
+        // If no user model configured, return a null relationship
+        if (!$userModel) {
+            return $this->belongsTo(self::class, 'uploaded_by')->whereRaw('1 = 0');
+        }
+        
         return $this->belongsTo($userModel, 'uploaded_by');
+    }
+
+    /**
+     * Get the uploader's display name.
+     */
+    public function getUploaderNameAttribute(): string
+    {
+        return UserService::getDisplayName($this->uploader);
     }
 
     /**

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cms_content_revisions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('content_id')->constrained('cms_content_items')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->json('content_data'); // Store all content item fields
             $table->string('revision_note')->nullable();
             $table->boolean('is_autosave')->default(false);

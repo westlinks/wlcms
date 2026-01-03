@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Westlinks\Wlcms\Services\UserService;
 
 class ContentItem extends Model
 {
@@ -47,14 +48,17 @@ class ContentItem extends Model
             if (empty($item->slug)) {
                 $item->slug = Str::slug($item->title);
             }
-            if (auth()->check()) {
+            
+            // Only set user fields if user integration is enabled and user is authenticated
+            if (UserService::isUserIntegrationEnabled() && auth()->check()) {
                 $item->created_by = auth()->id();
                 $item->updated_by = auth()->id();
             }
         });
 
         static::updating(function (ContentItem $item) {
-            if (auth()->check()) {
+            // Only set user fields if user integration is enabled and user is authenticated
+            if (UserService::isUserIntegrationEnabled() && auth()->check()) {
                 $item->updated_by = auth()->id();
             }
         });
@@ -126,7 +130,13 @@ class ContentItem extends Model
      */
     public function creator(): BelongsTo
     {
-        $userModel = config('wlcms.user.model', \App\Models\User::class);
+        $userModel = UserService::getUserModelClass();
+        
+        // If no user model configured, return a null relationship
+        if (!$userModel) {
+            return $this->belongsTo(self::class, 'created_by')->whereRaw('1 = 0'); // Always empty
+        }
+        
         return $this->belongsTo($userModel, 'created_by');
     }
 
@@ -135,8 +145,30 @@ class ContentItem extends Model
      */
     public function updater(): BelongsTo
     {
-        $userModel = config('wlcms.user.model', \App\Models\User::class);
+        $userModel = UserService::getUserModelClass();
+        
+        // If no user model configured, return a null relationship
+        if (!$userModel) {
+            return $this->belongsTo(self::class, 'updated_by')->whereRaw('1 = 0'); // Always empty
+        }
+        
         return $this->belongsTo($userModel, 'updated_by');
+    }
+
+    /**
+     * Get the creator's display name.
+     */
+    public function getCreatorNameAttribute(): string
+    {
+        return UserService::getDisplayName($this->creator);
+    }
+
+    /**
+     * Get the updater's display name.
+     */
+    public function getUpdaterNameAttribute(): string
+    {
+        return UserService::getDisplayName($this->updater);
     }
 
     /**

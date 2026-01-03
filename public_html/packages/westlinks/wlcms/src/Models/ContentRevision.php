@@ -5,6 +5,7 @@ namespace Westlinks\Wlcms\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Westlinks\Wlcms\Services\UserService;
 
 class ContentRevision extends Model
 {
@@ -47,8 +48,22 @@ class ContentRevision extends Model
      */
     public function user(): BelongsTo
     {
-        $userModel = config('wlcms.user.model', \App\Models\User::class);
+        $userModel = UserService::getUserModelClass();
+        
+        // If no user model configured, return a null relationship
+        if (!$userModel) {
+            return $this->belongsTo(self::class, 'user_id')->whereRaw('1 = 0');
+        }
+        
         return $this->belongsTo($userModel, 'user_id');
+    }
+
+    /**
+     * Get the user's display name.
+     */
+    public function getUserNameAttribute(): string
+    {
+        return UserService::getDisplayName($this->user);
     }
 
     /**
