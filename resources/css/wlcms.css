@@ -115,3 +115,27 @@
     margin: 0.25rem 0;
     flex-shrink: 0;
 }
+
+/* Content Preview Styling */
+.prose p {
+    margin: 1.25em 0 !important;
+}
+
+.prose p + p {
+    margin-top: 1.5em !important;
+}
+
+.prose h1 + p,
+.prose h2 + p,
+.prose h3 + p,
+.prose h4 + p,
+.prose h5 + p,
+.prose h6 + p {
+    margin-top: 0.75em !important;
+}
+
+.prose ul + p,
+.prose ol + p,
+.prose blockquote + p {
+    margin-top: 1.25em !important;
+}

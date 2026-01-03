@@ -8,7 +8,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- WLCMS Package Assets -->
-    <link rel="stylesheet" href="{{ asset('vendor/wlcms/assets/wlcms-845b9339.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/wlcms/assets/wlcms-d15d8dce.css') }}">
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex">
