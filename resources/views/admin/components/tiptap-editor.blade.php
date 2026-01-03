@@ -5,10 +5,12 @@
     min-height: 300px;
     padding: 12px;
     border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border-radius: 0 0 0.375rem 0.375rem;
+    border-top: none;
     outline: none;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 100%;
 }
 
 .ProseMirror:focus {
@@ -48,15 +50,25 @@
     padding: 0;
 }
 
+.tiptap-editor-wrapper {
+    width: 100%;
+}
+
+.editor-container {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
 .editor-toolbar {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-bottom: none;
-    border-radius: 0.375rem 0.375rem 0 0;
+    border-bottom: 1px solid #d1d5db;
     background: #f9fafb;
+    width: 100%;
 }
 
 .editor-toolbar button {
