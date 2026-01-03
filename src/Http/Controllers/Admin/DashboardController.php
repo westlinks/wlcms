@@ -20,10 +20,6 @@ class DashboardController extends Controller
             'recent_media' => MediaAsset::latest()->take(5)->get(),
         ];
 
-        return response()->json([
-            'message' => 'WLCMS Dashboard',
-            'stats' => $stats,
-            'version' => '1.0.0'
-        ]);
+        return view('wlcms::admin.dashboard', compact('stats'));
     }
 }
