@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8fc5fcf0cd39600191d58a4edc469bb8",
+    "content-hash": "d8f6f55e8e74bbed699f3e412ba49471",
     "packages": [
         {
             "name": "brick/math",
@@ -6381,6 +6381,62 @@
                 }
             ],
             "time": "2024-11-21T01:49:47+00:00"
+        },
+        {
+            "name": "westlinks/wlcms",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "./packages/westlinks/wlcms",
+                "reference": "6c59025c086e33ee0c64b8421489664b010d8e96"
+            },
+            "require": {
+                "intervention/image-laravel": "^1.0",
+                "laravel/framework": "^12.0",
+                "php": "^8.4",
+                "spatie/laravel-permission": "^6.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Westlinks\\Wlcms\\WlcmsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Westlinks\\Wlcms\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Westlinks\\Wlcms\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "West Links",
+                    "email": "developers@westlinks.com"
+                }
+            ],
+            "description": "Professional Content Management System for Laravel - WordPress-level functionality for SaaS applications",
+            "keywords": [
+                "cms",
+                "content-management",
+                "laravel",
+                "westlinks"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         }
     ],
     "packages-dev": [
@@ -9949,11 +10005,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "westlinks/wlcms": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.4"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
