@@ -120,17 +120,45 @@
 </style>
 
 <!-- Tiptap Editor Scripts -->
-<script src="https://unpkg.com/@tiptap/pm@2.1.13/dist/index.umd.js"></script>
 <script src="https://unpkg.com/@tiptap/core@2.1.13/dist/index.umd.js"></script>
 <script src="https://unpkg.com/@tiptap/starter-kit@2.1.13/dist/index.umd.js"></script>
 
 <script>
 function initTiptapEditor(elementId, initialContent = '') {
-    const { Editor } = Tiptap.Core;
-    const { StarterKit } = Tiptap.StarterKit;
+    // Debug logging to help troubleshoot
+    console.log('Initializing Tiptap editor for:', elementId);
+    console.log('Available globals:', { TiptapCore: window.TiptapCore, TiptapStarterKit: window.TiptapStarterKit });
+    
+    // Check if libraries are loaded
+    if (!window.TiptapCore || !window.TiptapStarterKit) {
+        console.error('Tiptap libraries not loaded properly');
+        return;
+    }
+    
+    const { Editor } = window.TiptapCore;
+    const { StarterKit } = window.TiptapStarterKit;
+    
+    const editorElement = document.querySelector(`#${elementId}-editor`);
+    const textareaElement = document.querySelector(`#${elementId}`);
+    const toolbarElement = document.querySelector(`#${elementId}-toolbar`);
+    
+    if (!editorElement) {
+        console.error('Editor element not found:', `#${elementId}-editor`);
+        return;
+    }
+    
+    if (!textareaElement) {
+        console.error('Textarea element not found:', `#${elementId}`);
+        return;
+    }
+    
+    if (!toolbarElement) {
+        console.error('Toolbar element not found:', `#${elementId}-toolbar`);
+        return;
+    }
     
     const editor = new Editor({
-        element: document.querySelector(`#${elementId}-editor`),
+        element: editorElement,
         extensions: [
             StarterKit.configure({
                 history: false,
@@ -139,12 +167,12 @@ function initTiptapEditor(elementId, initialContent = '') {
         content: initialContent,
         onUpdate: ({ editor }) => {
             // Update the hidden textarea
-            document.querySelector(`#${elementId}`).value = editor.getHTML();
+            textareaElement.value = editor.getHTML();
         },
     });
     
     // Toolbar button handlers
-    const toolbar = document.querySelector(`#${elementId}-toolbar`);
+    const toolbar = toolbarElement;
     
     // Bold
     toolbar.querySelector('[data-action="bold"]').addEventListener('click', () => {
@@ -221,6 +249,7 @@ function initTiptapEditor(elementId, initialContent = '') {
         if (editor.isActive('codeBlock')) toolbar.querySelector('[data-action="code-block"]').classList.add('is-active');
     });
     
+    console.log('Tiptap editor initialized successfully');
     return editor;
 }
 </script>
