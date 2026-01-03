@@ -120,23 +120,33 @@
 </style>
 
 <!-- Tiptap Editor Scripts -->
-<script src="https://unpkg.com/@tiptap/core@2.1.13/dist/index.umd.js"></script>
-<script src="https://unpkg.com/@tiptap/starter-kit@2.1.13/dist/index.umd.js"></script>
+<script src="https://unpkg.com/@tiptap/core@2.1.13/dist/index.global.js"></script>
+<script src="https://unpkg.com/@tiptap/starter-kit@2.1.13/dist/index.global.js"></script>
 
 <script>
 function initTiptapEditor(elementId, initialContent = '') {
     // Debug logging to help troubleshoot
     console.log('Initializing Tiptap editor for:', elementId);
-    console.log('Available globals:', { TiptapCore: window.TiptapCore, TiptapStarterKit: window.TiptapStarterKit });
+    console.log('Available globals:', { 
+        TiptapCore: window.TiptapCore, 
+        TiptapStarterKit: window.TiptapStarterKit,
+        Tiptap: window.Tiptap 
+    });
     
-    // Check if libraries are loaded
-    if (!window.TiptapCore || !window.TiptapStarterKit) {
+    // Try different global access patterns
+    let Editor, StarterKit;
+    
+    if (window.TiptapCore && window.TiptapStarterKit) {
+        Editor = window.TiptapCore.Editor;
+        StarterKit = window.TiptapStarterKit.StarterKit;
+    } else if (window.Tiptap) {
+        // Sometimes it's nested under Tiptap
+        Editor = window.Tiptap.Editor;
+        StarterKit = window.Tiptap.StarterKit;
+    } else {
         console.error('Tiptap libraries not loaded properly');
         return;
     }
-    
-    const { Editor } = window.TiptapCore;
-    const { StarterKit } = window.TiptapStarterKit;
     
     const editorElement = document.querySelector(`#${elementId}-editor`);
     const textareaElement = document.querySelector(`#${elementId}`);
