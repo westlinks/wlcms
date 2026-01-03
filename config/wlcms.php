@@ -200,4 +200,23 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Frontend Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for frontend content display
+    |
+    */
+    'frontend' => [
+        // Enable frontend routes (disabled by default to avoid conflicts)
+        'enabled' => false,
+        
+        // Route prefix for frontend content
+        'prefix' => 'cms-content',
+        
+        // Middleware for frontend routes
+        'middleware' => ['web'],
+    ],
+
 ];

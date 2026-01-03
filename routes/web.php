@@ -29,16 +29,13 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
     });
 
 // Frontend routes (will be registered if enabled in config)
-if (config('wlcms.frontend.enabled', true)) {
+if (config('wlcms.frontend.enabled', false)) {
     Route::middleware(['web'])
+        ->prefix('cms-content')
+        ->name('wlcms.frontend.')
         ->group(function () {
-            // Catch-all route for content pages (should be registered last)
-            Route::get('/{parent?}/{content?}', [
-                \Westlinks\Wlcms\Http\Controllers\ContentController::class, 
-                'show'
-            ])->where([
-                'parent' => '[a-zA-Z0-9\-]+',
-                'content' => '[a-zA-Z0-9\-]+',
-            ])->name('wlcms.content.show');
+            // Specific CMS content routes with prefix to avoid conflicts
+            Route::get('/', [\Westlinks\Wlcms\Http\Controllers\ContentController::class, 'index'])->name('index');
+            Route::get('/{slug}', [\Westlinks\Wlcms\Http\Controllers\ContentController::class, 'show'])->name('show');
         });
 }
