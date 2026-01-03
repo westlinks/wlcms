@@ -10,8 +10,8 @@
         @method('PUT')
         
         <div class="bg-white rounded-lg shadow p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="lg:col-span-3 space-y-6">
                     <!-- Title -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
