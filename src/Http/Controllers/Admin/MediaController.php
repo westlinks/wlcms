@@ -23,12 +23,9 @@ class MediaController extends Controller
         }
 
         $media = $query->latest()->paginate(24);
+        $folders = MediaFolder::all();
 
-        return response()->json([
-            'media' => $media,
-            'folders' => MediaFolder::all(),
-            'message' => 'Media list retrieved successfully'
-        ]);
+        return view('wlcms::admin.media.index', compact('media', 'folders'));
     }
 
     public function show(MediaAsset $media)

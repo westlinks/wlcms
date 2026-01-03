@@ -13,18 +13,17 @@ class ContentController extends Controller
     {
         $content = ContentItem::with('revisions')->latest()->paginate(15);
         
-        return response()->json([
-            'content' => $content,
-            'message' => 'Content list retrieved successfully'
-        ]);
+        return view('wlcms::admin.content.index', compact('content'));
+    }
+
+    public function create()
+    {
+        return view('wlcms::admin.content.create');
     }
 
     public function show(ContentItem $content)
     {
-        return response()->json([
-            'content' => $content->load(['revisions', 'mediaAssets']),
-            'message' => 'Content retrieved successfully'
-        ]);
+        return view('wlcms::admin.content.show', compact('content'));
     }
 
     public function store(Request $request)
@@ -40,10 +39,13 @@ class ContentController extends Controller
 
         $content = ContentItem::create($validated);
 
-        return response()->json([
-            'content' => $content,
-            'message' => 'Content created successfully'
-        ], 201);
+        return redirect()->route('wlcms.admin.content.index')
+                        ->with('success', 'Content created successfully!');
+    }
+
+    public function edit(ContentItem $content)
+    {
+        return view('wlcms::admin.content.edit', compact('content'));
     }
 
     public function update(Request $request, ContentItem $content)
@@ -59,19 +61,16 @@ class ContentController extends Controller
 
         $content->update($validated);
 
-        return response()->json([
-            'content' => $content,
-            'message' => 'Content updated successfully'
-        ]);
+        return redirect()->route('wlcms.admin.content.index')
+                        ->with('success', 'Content updated successfully!');
     }
 
     public function destroy(ContentItem $content)
     {
         $content->delete();
 
-        return response()->json([
-            'message' => 'Content deleted successfully'
-        ]);
+        return redirect()->route('wlcms.admin.content.index')
+                        ->with('success', 'Content deleted successfully!');
     }
 
     public function publish(ContentItem $content)
@@ -81,10 +80,8 @@ class ContentController extends Controller
             'published_at' => now()
         ]);
 
-        return response()->json([
-            'content' => $content,
-            'message' => 'Content published successfully'
-        ]);
+        return redirect()->back()
+                        ->with('success', 'Content published successfully!');
     }
 
     public function unpublish(ContentItem $content)
@@ -94,10 +91,8 @@ class ContentController extends Controller
             'published_at' => null
         ]);
 
-        return response()->json([
-            'content' => $content,
-            'message' => 'Content unpublished successfully'
-        ]);
+        return redirect()->back()
+                        ->with('success', 'Content moved to draft!');
     }
 
     public function preview(ContentItem $content)
