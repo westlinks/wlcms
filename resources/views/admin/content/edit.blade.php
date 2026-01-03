@@ -4,7 +4,7 @@
 @section('page-title', 'Edit Content')
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-7xl mx-auto">
     <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" class="space-y-6">
         @csrf
         @method('PUT')

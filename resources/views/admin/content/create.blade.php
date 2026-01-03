@@ -4,7 +4,7 @@
 @section('page-title', 'Create New Content')
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-7xl mx-auto">
     <form method="POST" action="{{ route('wlcms.admin.content.store') }}" class="space-y-6">
         @csrf
         
