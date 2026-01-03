@@ -41,6 +41,11 @@ class WlcmsServiceProvider extends ServiceProvider
             __DIR__.'/../resources/views' => resource_path('views/vendor/wlcms'),
         ], 'wlcms-views');
 
+        // Publish built assets
+        $this->publishes([
+            __DIR__.'/../public/build' => public_path('vendor/wlcms'),
+        ], 'wlcms-assets');
+
         // Load package views
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wlcms');
 
