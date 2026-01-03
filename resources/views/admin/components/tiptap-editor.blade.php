@@ -1,18 +1,23 @@
 <!-- Tiptap Editor CSS -->
 <link rel="stylesheet" href="https://unpkg.com/@tiptap/pm/style/style.css">
 <style>
+/* Main wrapper ensures full width */
 .tiptap-editor-wrapper {
     width: 100% !important;
+    display: block;
 }
 
+/* Editor container holds toolbar and editor */
 .editor-container {
     width: 100% !important;
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
     overflow: hidden;
     background: white;
+    display: block;
 }
 
+/* Toolbar styling */
 .editor-toolbar {
     display: flex !important;
     flex-wrap: wrap;
@@ -22,8 +27,11 @@
     background: #f9fafb;
     width: 100% !important;
     box-sizing: border-box;
+    position: relative;
+    z-index: 1;
 }
 
+/* Editor area styling */
 .ProseMirror {
     min-height: 300px !important;
     padding: 12px !important;
@@ -34,13 +42,17 @@
     width: 100% !important;
     box-sizing: border-box !important;
     background: white;
+    display: block !important;
+    position: relative;
 }
 
+/* Focus styling for the container */
 .editor-container:focus-within {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* Typography styles */
 .ProseMirror h1 { font-size: 2.25rem; font-weight: 700; margin: 1.5rem 0 1rem 0; }
 .ProseMirror h2 { font-size: 1.875rem; font-weight: 600; margin: 1.25rem 0 0.75rem 0; }
 .ProseMirror h3 { font-size: 1.5rem; font-weight: 600; margin: 1rem 0 0.5rem 0; }
@@ -73,6 +85,7 @@
     padding: 0;
 }
 
+/* Toolbar button styling */
 .editor-toolbar button {
     padding: 0.375rem 0.75rem;
     background: white;
@@ -83,6 +96,7 @@
     color: #374151;
     cursor: pointer;
     transition: all 0.15s ease;
+    flex-shrink: 0;
 }
 
 .editor-toolbar button:hover {
@@ -100,37 +114,9 @@
     width: 1px;
     background: #d1d5db;
     margin: 0.25rem 0;
+    flex-shrink: 0;
 }
 </style>
-
-.editor-toolbar button {
-    padding: 0.375rem 0.75rem;
-    background: white;
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.editor-toolbar button:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
-}
-
-.editor-toolbar button.is-active {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    color: white;
-}
-
-.editor-toolbar .separator {
-    width: 1px;
-    background: #d1d5db;
-    margin: 0.25rem 0;
-}
 </style>
 
 <!-- Tiptap Editor Scripts -->
