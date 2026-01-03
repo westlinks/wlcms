@@ -33,18 +33,12 @@ class ContentItem extends Model
         'created_by',
         'updated_by',
     ];
-        'published_at',
-        'meta_description',
-        'meta_data',
-        'created_by',
-        'updated_by',
-    ];
 
     protected $casts = [
-        'published' => 'boolean',
         'published_at' => 'datetime',
-        'meta_data' => 'array',
-        'sort' => 'integer',
+        'meta' => 'array',
+        'sort_order' => 'integer',
+        'is_featured' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -74,11 +68,19 @@ class ContentItem extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('published', true)
+        return $query->where('status', 'published')
             ->where(function ($q) {
                 $q->whereNull('published_at')
                   ->orWhere('published_at', '<=', now());
             });
+    }
+
+    /**
+     * Scope for ordered content items.
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('title');
     }
 
     /**
@@ -87,14 +89,6 @@ class ContentItem extends Model
     public function scopeTopLevel(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
-    }
-
-    /**
-     * Scope for ordered content items.
-     */
-    public function scopeOrdered(Builder $query): Builder
-    {
-        return $query->orderBy('sort')->orderBy('title');
     }
 
     /**
@@ -211,7 +205,7 @@ class ContentItem extends Model
      */
     public function isPublished(): bool
     {
-        if (!$this->published) {
+        if ($this->status !== 'published') {
             return false;
         }
 
