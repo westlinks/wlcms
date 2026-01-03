@@ -1,0 +1,16 @@
+{
+  "name": "wlcms-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^4.5.0"
+  },
+  "dependencies": {
+    "@tiptap/core": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13"
+  }
+}
