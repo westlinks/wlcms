@@ -10,6 +10,7 @@ function initTiptapEditor(elementId, initialContent = '') {
     const editorElement = document.querySelector(`#${elementId}-editor`);
     const textareaElement = document.querySelector(`#${elementId}`);
     const toolbarElement = document.querySelector(`#${elementId}-toolbar`);
+    const sourceElement = document.querySelector(`#${elementId}-source`);
     
     if (!editorElement) {
         console.error('Editor element not found:', `#${elementId}-editor`);
@@ -25,6 +26,13 @@ function initTiptapEditor(elementId, initialContent = '') {
         console.error('Toolbar element not found:', `#${elementId}-toolbar`);
         return;
     }
+    if (!sourceElement) {
+        console.error('Source element not found:', `#${elementId}-source`);
+        return;
+    }
+    
+    // Source view toggle state
+    let isSourceMode = false;
     
     const editor = new Editor({
         element: editorElement,
@@ -98,6 +106,36 @@ function initTiptapEditor(elementId, initialContent = '') {
     toolbar.querySelector('[data-action="redo"]').addEventListener('click', () => {
         editor.chain().focus().redo().run();
     });
+    
+    // Source View Toggle
+    function toggleSourceView() {
+        isSourceMode = !isSourceMode;
+        const sourceButton = toolbar.querySelector('[data-action="source"]');
+        
+        if (isSourceMode) {
+            // Switch to source mode
+            editorElement.style.display = 'none';
+            sourceElement.style.display = 'block';
+            sourceElement.classList.remove('hidden');
+            sourceElement.value = editor.getHTML();
+            sourceButton.classList.add('is-active');
+            
+            // Update on source change
+            sourceElement.addEventListener('input', () => {
+                textareaElement.value = sourceElement.value;
+            });
+        } else {
+            // Switch to visual mode
+            editor.commands.setContent(sourceElement.value);
+            editorElement.style.display = 'block';
+            sourceElement.style.display = 'none';
+            sourceElement.classList.add('hidden');
+            sourceButton.classList.remove('is-active');
+            editor.commands.focus();
+        }
+    }
+    
+    toolbar.querySelector('[data-action="source"]').addEventListener('click', toggleSourceView);
     
     // Update toolbar button states
     editor.on('selectionUpdate', () => {

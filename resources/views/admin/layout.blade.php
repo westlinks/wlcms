@@ -76,6 +76,6 @@
     @stack('scripts')
     
     <!-- WLCMS Package JavaScript -->
-    <script src="{{ asset('vendor/wlcms/assets/wlcms-6296b6d0.js') }}"></script>
+    <script src="{{ asset('vendor/wlcms/assets/wlcms-01bc0dea.js') }}"></script>
 </body>
 </html>

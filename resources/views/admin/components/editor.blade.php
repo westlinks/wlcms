@@ -56,10 +56,20 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
             <!-- History -->
             <button type="button" data-action="undo" title="Undo">↶</button>
             <button type="button" data-action="redo" title="Redo">↷</button>
+            
+            <div class="separator"></div>
+            
+            <!-- Source View -->
+            <button type="button" data-action="source" title="Source View">&lt;/&gt;</button>
         </div>
         
         <!-- Editor -->
         <div id="{{ $editorId }}-editor" class="prose max-w-none"></div>
+        
+        <!-- Source View Textarea (hidden by default) -->
+        <textarea id="{{ $editorId }}-source" 
+                  class="hidden w-full h-80 p-3 border border-gray-300 rounded font-mono text-sm"
+                  placeholder="HTML source code..."></textarea>
     </div>
     
     <!-- Hidden textarea for form submission -->
