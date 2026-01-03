@@ -1,19 +1,42 @@
 <!-- Tiptap Editor CSS -->
 <link rel="stylesheet" href="https://unpkg.com/@tiptap/pm/style/style.css">
 <style>
-.ProseMirror {
-    min-height: 300px;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 0 0 0.375rem 0.375rem;
-    border-top: none;
-    outline: none;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    width: 100%;
+.tiptap-editor-wrapper {
+    width: 100% !important;
 }
 
-.ProseMirror:focus {
+.editor-container {
+    width: 100% !important;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: white;
+}
+
+.editor-toolbar {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid #d1d5db;
+    background: #f9fafb;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.ProseMirror {
+    min-height: 300px !important;
+    padding: 12px !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: white;
+}
+
+.editor-container:focus-within {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
@@ -50,26 +73,35 @@
     padding: 0;
 }
 
-.tiptap-editor-wrapper {
-    width: 100%;
-}
-
-.editor-container {
-    width: 100%;
+.editor-toolbar button {
+    padding: 0.375rem 0.75rem;
+    background: white;
     border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    overflow: hidden;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.editor-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border-bottom: 1px solid #d1d5db;
-    background: #f9fafb;
-    width: 100%;
+.editor-toolbar button:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
 }
+
+.editor-toolbar button.is-active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.editor-toolbar .separator {
+    width: 1px;
+    background: #d1d5db;
+    margin: 0.25rem 0;
+}
+</style>
 
 .editor-toolbar button {
     padding: 0.375rem 0.75rem;
