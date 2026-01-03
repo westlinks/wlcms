@@ -4,7 +4,7 @@
 @section('page-title', $content->title)
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-7xl mx-auto">
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg font-semibold">Content Details</h3>

@@ -4,7 +4,7 @@
 @section('page-title', 'Content Preview')
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-7xl mx-auto">
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg font-semibold">Previewing Content</h3>
@@ -37,7 +37,7 @@
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
-            <div class="max-w-3xl">
+            <div class="max-w-5xl">
                 <h1 class="text-4xl font-bold mb-4">{{ $content->title }}</h1>
                 
                 @if($content->excerpt)
@@ -69,7 +69,7 @@
 
         <!-- Content Body -->
         <div class="p-8">
-            <div class="max-w-3xl mx-auto">
+            <div class="max-w-5xl mx-auto">
                 <div class="prose prose-lg max-w-none">
                     @if($content->content)
                         {!! $content->content !!}
