@@ -97,19 +97,13 @@ class ContentController extends Controller
 
     public function preview(ContentItem $content)
     {
-        return response()->json([
-            'content' => $content->load('mediaAssets'),
-            'message' => 'Content preview retrieved successfully'
-        ]);
+        return view('wlcms::admin.content.preview', compact('content'));
     }
 
     public function revisions(ContentItem $content)
     {
         $revisions = $content->revisions()->latest()->get();
 
-        return response()->json([
-            'revisions' => $revisions,
-            'message' => 'Content revisions retrieved successfully'
-        ]);
+        return view('wlcms::admin.content.revisions', compact('content', 'revisions'));
     }
 }
