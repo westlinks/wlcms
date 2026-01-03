@@ -25,20 +25,12 @@
 
                     <!-- Content -->
                     <div>
-                        <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
-                        <div class="mt-1">
-                            <textarea name="content" id="content" rows="20"
-                                      class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                      placeholder="Write your content here...">{{ old('content', $content->content) }}</textarea>
-                        </div>
-                        @error('content')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        
-                        <!-- Rich Text Editor will be enhanced here -->
-                        <p class="mt-2 text-sm text-gray-500">
-                            💡 Rich text editor coming soon! For now, you can use HTML tags.
-                        </p>
+                        @include('wlcms::admin.components.editor', [
+                            'name' => 'content',
+                            'value' => old('content', $content->content),
+                            'label' => 'Content',
+                            'required' => false
+                        ])
                     </div>
 
                     <!-- Excerpt -->

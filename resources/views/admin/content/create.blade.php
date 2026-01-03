@@ -21,10 +21,12 @@
 
                     <!-- Content -->
                     <div>
-                        <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
-                        <textarea name="content" id="content" rows="15"
-                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="Write your content here..."></textarea>
+                        @include('wlcms::admin.components.editor', [
+                            'name' => 'content',
+                            'value' => old('content'),
+                            'label' => 'Content',
+                            'required' => false
+                        ])
                     </div>
 
                     <!-- Excerpt -->
