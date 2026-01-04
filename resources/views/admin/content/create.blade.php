@@ -1,12 +1,10 @@
 @if(config('wlcms.layout.mode') === 'embedded')
-    <x-dynamic-component :component="config('wlcms.layout.host_layout')" title="Create Content - WLCMS Admin">
-        @isset('Create Content')
-            <x-slot name="header">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Create Content
-                </h2>
-            </x-slot>
-        @endisset
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')">
+        <x-slot name="header">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                Create Content
+            </h2>
+        </x-slot>
 @else
     <x-wlcms::admin-layout title="Create Content - WLCMS Admin" page-title="Create Content">
 @endif
