@@ -16,8 +16,8 @@ return [
         // Layout mode: 'standalone' or 'embedded'
         'mode' => env('WLCMS_LAYOUT_MODE', 'standalone'),
         
-        // Custom layout view for embedded mode
-        'custom_layout' => env('WLCMS_CUSTOM_LAYOUT', null), // e.g., 'layouts.admin'
+        // Host layout component for embedded mode (default matches standard Laravel admin layout)
+        'host_layout' => env('WLCMS_HOST_LAYOUT', 'layouts.admin-layout'),
         
         // Enable navigation integration for host apps
         'navigation_integration' => env('WLCMS_NAVIGATION_INTEGRATION', false),

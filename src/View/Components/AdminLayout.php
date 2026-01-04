@@ -19,12 +19,12 @@ class AdminLayout extends Component
     {
         // Check if we should use embedded mode
         if (config('wlcms.layout.mode') === 'embedded') {
-            $customLayout = config('wlcms.layout.custom_layout');
+            $hostLayout = config('wlcms.layout.host_layout');
             
-            if ($customLayout) {
+            if ($hostLayout) {
                 // Use host application's layout component
                 return view('wlcms::components.embedded-wrapper', [
-                    'customLayout' => $customLayout
+                    'customLayout' => $hostLayout
                 ]);
             }
         }

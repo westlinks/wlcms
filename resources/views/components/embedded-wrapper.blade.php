@@ -8,14 +8,20 @@
         </x-slot>
     @endisset
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{ $slot }}
-        </div>
+    {{-- Content with host app compatible styling --}}
+    <div class="space-y-6 dark:text-gray-300">
+        {{ $slot }}
     </div>
 
     @push('styles')
         @vite(['resources/vendor/wlcms/css/wlcms.css'])
+        <style>
+            /* Dark mode compatibility for embedded WLCMS */
+            .dark .bg-white { background-color: rgb(30 41 59); }
+            .dark .text-gray-900 { color: rgb(203 213 225); }
+            .dark .border-gray-200 { border-color: rgb(71 85 105); }
+            .dark .shadow { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3); }
+        </style>
     @endpush
 
     @push('scripts')
