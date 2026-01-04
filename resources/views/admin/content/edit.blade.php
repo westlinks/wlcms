@@ -1,4 +1,15 @@
-<x-wlcms::admin-layout :title="'Edit: ' . $content->title . ' - WLCMS Admin'" page-title="Edit Content">
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')" :title="'Edit: ' . $content->title . ' - WLCMS Admin'">
+        @isset('Edit Content')
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Edit Content
+                </h2>
+            </x-slot>
+        @endisset
+@else
+    <x-wlcms::admin-layout :title="'Edit: ' . $content->title . ' - WLCMS Admin'" page-title="Edit Content">
+@endif
     <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -126,4 +137,8 @@
             </div>
         </div>
     </form>
-</x-wlcms::admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms::admin-layout>
+@endif

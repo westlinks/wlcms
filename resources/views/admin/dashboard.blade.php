@@ -1,4 +1,15 @@
-<x-wlcms::admin-layout title="Dashboard - WLCMS Admin" page-title="Dashboard">
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')" title="Dashboard - WLCMS Admin">
+        @isset('Dashboard')
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Dashboard
+                </h2>
+            </x-slot>
+        @endisset
+@else
+    <x-wlcms::admin-layout title="Dashboard - WLCMS Admin" page-title="Dashboard">
+@endif
     <div class="space-y-6">
         {{-- Stats Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -149,4 +160,8 @@
             </div>
         </div>
     </div>
-</x-wlcms::admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms::admin-layout>
+@endif

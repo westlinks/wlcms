@@ -1,4 +1,15 @@
-<x-wlcms::admin-layout title="Test Layout - WLCMS Admin" page-title="Layout Test">
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')" title="Test Layout - WLCMS Admin">
+        @isset('Layout Test')
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Layout Test
+                </h2>
+            </x-slot>
+        @endisset
+@else
+    <x-wlcms::admin-layout title="Test Layout - WLCMS Admin" page-title="Layout Test">
+@endif
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-xl font-semibold mb-4">Modern Laravel Layout Test</h2>
         
@@ -52,4 +63,8 @@
             </div>
         </div>
     </div>
-</x-wlcms::admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms::admin-layout>
+@endif

@@ -1,4 +1,15 @@
-<x-wlcms::admin-layout title="Media Library - WLCMS Admin" page-title="Media Library">
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')" title="Media Library - WLCMS Admin">
+        @isset('Media Library')
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Media Library
+                </h2>
+            </x-slot>
+        @endisset
+@else
+    <x-wlcms::admin-layout title="Media Library - WLCMS Admin" page-title="Media Library">
+@endif
     <div class="mb-6">
         <div class="flex justify-between items-center">
             {{-- Upload Button --}}
@@ -372,4 +383,8 @@
         });
     </script>
     @endpush
-</x-wlcms::admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms::admin-layout>
+@endif

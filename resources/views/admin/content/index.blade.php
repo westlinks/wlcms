@@ -1,4 +1,15 @@
-<x-wlcms::admin-layout title="Content Management - WLCMS Admin" page-title="Content Management">
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout')" title="Content Management - WLCMS Admin">
+        @isset('Content Management')
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Content Management
+                </h2>
+            </x-slot>
+        @endisset
+@else
+    <x-wlcms::admin-layout title="Content Management - WLCMS Admin" page-title="Content Management">
+@endif
     <div class="mb-6">
         <div class="flex justify-between items-center">
             <div class="flex space-x-4">
@@ -172,4 +183,8 @@
             </div>
         @endif
     </div>
-</x-wlcms::admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms::admin-layout>
+@endif
