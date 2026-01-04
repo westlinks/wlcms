@@ -270,22 +270,20 @@ export class MediaModal {
     async saveMetadata() {
         if (!this.currentMediaId) return;
         
-        const data = {
-            alt_text: this.getElementValue('modal-alt-text'),
-            caption: this.getElementValue('modal-caption'),
-            description: this.getElementValue('modal-description'),
-            _token: this.getCsrfToken(),
-            _method: 'PUT'
-        };
+        const formData = new FormData();
+        formData.append('alt_text', this.getElementValue('modal-alt-text'));
+        formData.append('caption', this.getElementValue('modal-caption'));
+        formData.append('description', this.getElementValue('modal-description'));
+        formData.append('_token', this.getCsrfToken());
         
         try {
             const response = await fetch(`/admin/cms/media/${this.currentMediaId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-HTTP-Method-Override': 'PUT'
                 },
-                body: JSON.stringify(data)
+                body: formData
             });
 
             const result = await response.json();
