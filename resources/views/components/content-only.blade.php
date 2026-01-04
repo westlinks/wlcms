@@ -1,4 +1,4 @@
-{{-- Pure content-only embedded wrapper - no package layout/navigation --}}
+{{-- Pure content-only mode - NO package layout/navigation whatsoever --}}
 <x-dynamic-component :component="$customLayout" :title="$title">
     @isset($pageTitle)
         <x-slot name="header">
@@ -8,7 +8,7 @@
         </x-slot>
     @endisset
 
-    {{-- Raw content only - let host handle all styling --}}
+    {{-- Just the content, nothing else --}}
     {{ $slot }}
 
     @push('styles')
