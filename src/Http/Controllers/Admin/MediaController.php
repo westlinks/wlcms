@@ -8,6 +8,7 @@ use Westlinks\Wlcms\Models\MediaAsset;
 use Westlinks\Wlcms\Models\MediaFolder;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Log;
 
 class MediaController extends Controller
 {
@@ -253,8 +254,19 @@ class MediaController extends Controller
     protected function generateThumbnails(string $disk, string $originalPath, string $filename): ?array
     {
         try {
-            $fullPath = Storage::disk($disk)->path($originalPath);
-            $image = \Intervention\Image\Laravel\Facades\Image::read($fullPath);
+            // Check if disk is local or remote (S3, etc.)
+            $diskDriver = Storage::disk($disk);
+            $isLocalDisk = method_exists($diskDriver, 'path');
+            
+            if ($isLocalDisk) {
+                $fullPath = Storage::disk($disk)->path($originalPath);
+                $image = \Intervention\Image\Laravel\Facades\Image::read($fullPath);
+            } else {
+                // For S3/remote: download to temp file first
+                $tempFile = tempnam(sys_get_temp_dir(), 'wlcms_thumb_');
+                file_put_contents($tempFile, Storage::disk($disk)->get($originalPath));
+                $image = \Intervention\Image\Laravel\Facades\Image::read($tempFile);
+            }
             
             $thumbnails = [];
             $thumbnailSizes = [
@@ -275,23 +287,46 @@ class MediaController extends Controller
                 // Resize image maintaining aspect ratio
                 $resized = $image->scale($width, $height);
                 
-                // Save thumbnail
-                $thumbnailFullPath = Storage::disk($disk)->path($thumbnailPath);
-                
-                // Ensure directory exists
-                $thumbnailDir = dirname($thumbnailFullPath);
-                if (!is_dir($thumbnailDir)) {
-                    mkdir($thumbnailDir, 0755, true);
+                if ($isLocalDisk) {
+                    // Local storage: create directory and save directly
+                    $thumbnailFullPath = Storage::disk($disk)->path($thumbnailPath);
+                    
+                    // Ensure directory exists
+                    $thumbnailDir = dirname($thumbnailFullPath);
+                    if (!is_dir($thumbnailDir)) {
+                        mkdir($thumbnailDir, 0755, true);
+                    }
+                    
+                    $resized->save($thumbnailFullPath);
+                } else {
+                    // S3/remote storage: save to temp file then upload
+                    $tempThumbFile = tempnam(sys_get_temp_dir(), 'wlcms_thumb_' . $size . '_');
+                    $resized->save($tempThumbFile, quality: config('wlcms.media.image.quality', 85));
+                    
+                    // Upload to storage disk
+                    Storage::disk($disk)->put($thumbnailPath, file_get_contents($tempThumbFile));
+                    
+                    // Clean up temp file
+                    unlink($tempThumbFile);
                 }
                 
-                $resized->save($thumbnailFullPath);
                 $thumbnails[$size] = $thumbnailPath;
+            }
+
+            // Clean up temp files for remote storage
+            if (!$isLocalDisk && isset($tempFile)) {
+                unlink($tempFile);
             }
 
             return $thumbnails;
 
         } catch (\Exception $e) {
-            // Return null if thumbnail generation fails, original image still works
+            // Log error but don't fail upload completely
+            Log::error('WLCMS Thumbnail generation failed: ' . $e->getMessage(), [
+                'disk' => $disk,
+                'original_path' => $originalPath,
+                'filename' => $filename
+            ]);
             return null;
         }
     }
