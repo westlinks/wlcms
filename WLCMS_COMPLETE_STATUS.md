@@ -174,6 +174,47 @@ php artisan vendor:publish --tag=wlcms-assets
 /admin/wlcms/dashboard
 ```
 
+## ⚠️ INTEGRATION REQUIREMENT: Host Application Layout Compatibility
+
+### Current Issue: Isolated Admin Interface
+The WLCMS package currently provides its own complete admin layout, which creates a **separate admin environment** when accessed. This means:
+
+- ❌ **Navigation Isolation**: Package admin pages use their own layout, losing host app's navigation
+- ❌ **User Experience Disruption**: Users are taken "outside" the host application's admin interface  
+- ❌ **Styling Inconsistency**: Package may not match host application's admin theme
+- ❌ **Lost Context**: Users lose access to host app's admin features while using CMS
+
+### Required Solution: Layout Integration Options
+**CRITICAL FOR PUBLIC PACKAGE**: Most Laravel applications will want to integrate WLCMS admin functionality into their existing admin layouts rather than using the package's standalone interface.
+
+**Implementation Needed:**
+1. **Layout Configuration**: Allow host apps to specify their admin layout
+   ```php
+   // config/wlcms.php
+   'admin_layout' => 'layouts.admin-layout', // Host app's admin layout
+   ```
+
+2. **Content-Only Views**: Provide views that render only content (no layout wrapper)
+   ```blade
+   {{-- Package should offer both: --}}
+   wlcms::admin.content.index           {{-- Full layout version --}}
+   wlcms::admin.content.index-content   {{-- Content-only version --}}
+   ```
+
+3. **Navigation Integration**: Package should expose navigation items for host app integration
+   ```php
+   // Package config/navigation.php
+   return [
+       ['label' => 'CMS Dashboard', 'route' => 'wlcms.admin.dashboard', 'icon' => 'squares-2x2'],
+       ['label' => 'Content', 'route' => 'wlcms.admin.content.index', 'icon' => 'document-text'],
+       ['label' => 'Media Library', 'route' => 'wlcms.admin.media.index', 'icon' => 'photo'],
+   ];
+   ```
+
+**Impact**: Without this integration capability, the package will have limited adoption as most Laravel applications require admin functionality to integrate seamlessly with existing admin interfaces.
+
+**Priority**: High - Essential for public package viability
+
 ## 📝 Next Session Action Items
 1. **File Upload System Implementation**:
    - Create MediaController with S3 integration

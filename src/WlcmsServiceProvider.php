@@ -14,6 +14,7 @@ class WlcmsServiceProvider extends ServiceProvider
     {
         // Merge package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/wlcms.php', 'wlcms');
+        $this->mergeConfigFrom(__DIR__.'/../config/navigation.php', 'wlcms.navigation');
 
         // Register package services
         $this->app->singleton('wlcms', function () {
@@ -30,6 +31,11 @@ class WlcmsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/wlcms.php' => config_path('wlcms.php'),
         ], 'wlcms-config');
+
+        // Publish navigation configuration
+        $this->publishes([
+            __DIR__.'/../config/navigation.php' => config_path('wlcms-navigation.php'),
+        ], 'wlcms-navigation');
 
         // Publish migrations
         $this->publishes([

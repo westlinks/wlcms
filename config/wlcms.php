@@ -4,6 +4,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Layout Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure how WLCMS integrates with your application's admin interface.
+    | 'standalone' mode provides complete admin interface with navigation.
+    | 'embedded' mode provides content-only views for integration with existing admins.
+    |
+    */
+    'layout' => [
+        // Layout mode: 'standalone' or 'embedded'
+        'mode' => env('WLCMS_LAYOUT_MODE', 'standalone'),
+        
+        // Custom layout view for embedded mode
+        'custom_layout' => env('WLCMS_CUSTOM_LAYOUT', null), // e.g., 'layouts.admin'
+        
+        // Enable navigation integration for host apps
+        'navigation_integration' => env('WLCMS_NAVIGATION_INTEGRATION', false),
+        
+        // Route prefix for embedded mode (helps avoid conflicts)
+        'embedded_prefix' => env('WLCMS_EMBEDDED_PREFIX', 'cms'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | User Model Integration
     |--------------------------------------------------------------------------
     |
