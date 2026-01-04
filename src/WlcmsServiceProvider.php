@@ -66,6 +66,7 @@ class WlcmsServiceProvider extends ServiceProvider
             $this->commands([
                 Commands\InstallCommand::class,
                 Commands\MigrateContentCommand::class,
+                Commands\RegenerateThumbnailsCommand::class,
             ]);
         }
     }

@@ -7,3 +7,9 @@ public/build/
 node_modules/
 .DS_Store
 *.log
+
+# Thumbnail quality test files
+quality-test.php
+quality_tests/
+test-thumbnail.php
+thumbnail-method-test.php

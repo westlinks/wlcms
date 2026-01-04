@@ -336,16 +336,20 @@ class MediaController extends Controller
             $directory = dirname($originalPath);
             $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            
+            // Get quality settings from config
+            $quality = config('wlcms.media.image.quality', 90); // Increased default quality
 
             foreach ($thumbnailSizes as $size => [$width, $height]) {
                 $thumbnailFilename = "{$nameWithoutExt}_{$size}.{$extension}";
                 $thumbnailPath = "{$directory}/thumbs/{$thumbnailFilename}";
                 
-                // Resize image maintaining aspect ratio
-                $resized = $image->scale($width, $height);
+                // Use fit() method for better quality and proper aspect ratio handling
+                // This prevents pixelation and ensures sharp thumbnails
+                $resized = $image->cover($width, $height);
                 
                 if ($isLocalDisk) {
-                    // Local storage: create directory and save directly
+                    // Local storage: create directory and save with quality
                     $thumbnailFullPath = Storage::disk($disk)->path($thumbnailPath);
                     
                     // Ensure directory exists
@@ -354,17 +358,13 @@ class MediaController extends Controller
                         mkdir($thumbnailDir, 0755, true);
                     }
                     
-                    $resized->save($thumbnailFullPath);
+                    // Encode with quality for better results
+                    $resized = $resized->toJpeg($quality);
+                    file_put_contents($thumbnailFullPath, (string) $resized);
                 } else {
-                    // S3/remote storage: save to temp file then upload
-                    $tempThumbFile = tempnam(sys_get_temp_dir(), 'wlcms_thumb_' . $size . '_');
-                    $resized->save($tempThumbFile, quality: config('wlcms.media.image.quality', 85));
-                    
-                    // Upload to storage disk
-                    Storage::disk($disk)->put($thumbnailPath, file_get_contents($tempThumbFile));
-                    
-                    // Clean up temp file
-                    unlink($tempThumbFile);
+                    // S3/remote storage: encode with quality then upload
+                    $encoded = $resized->toJpeg($quality);
+                    Storage::disk($disk)->put($thumbnailPath, (string) $encoded);
                 }
                 
                 $thumbnails[$size] = $thumbnailPath;
