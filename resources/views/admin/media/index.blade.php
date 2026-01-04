@@ -232,17 +232,64 @@
     </div>
 </div>
 
+<!-- Media Modal -->
+<div id="media-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-75">
+    <div class="max-w-4xl max-h-[90vh] w-full mx-4 bg-white rounded-lg overflow-hidden">
+        <div class="flex">
+            <!-- Image Preview -->
+            <div class="flex-1 bg-gray-100 flex items-center justify-center min-h-96">
+                <div id="image-preview" class="max-w-full max-h-full">
+                    <!-- Loading state -->
+                    <div class="text-center p-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                        <p class="mt-2 text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metadata Panel -->
+            <div class="w-80 p-6 bg-white">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Media Details</h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="media-details" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                
+                <div class="mt-6 pt-6 border-t">
+                    <button id="save-metadata" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Initialize WLCMS Media functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-initialize will be handled by wlcms.js
     console.log('Media page loaded - WLCMS components auto-initialized');
-    
-    // Connect upload button to file upload component
-    const uploadButton = document.querySelector('button[onclick*="file-upload"]');
-    if (uploadButton) {
-        uploadButton.onclick = () => window.triggerFileUpload();
-    }
 });
+
+// Global function for media card clicks
+function openMediaModal(mediaId) {
+    if (window.wlcmsMediaModal) {
+        window.wlcmsMediaModal.open(mediaId);
+    }
+}
+
+// Global function for file upload
+function triggerFileUpload() {
+    if (window.wlcmsFileUpload) {
+        window.wlcmsFileUpload.triggerUpload();
+    }
+}
 </script>
 @endsection

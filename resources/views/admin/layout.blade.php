@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'WLCMS Admin')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <!-- WLCMS Package Assets - Development Mode -->
-    <style>
-        @import url("{{ asset('vendor/wlcms/css/wlcms.css') }}");
-    </style>
+    <!-- Include WLCMS CSS via Vite -->
+    @vite('resources/vendor/wlcms/css/wlcms.css')
     
     <!-- Required for component functionality -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
