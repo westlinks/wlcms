@@ -268,9 +268,10 @@ export class MediaModal {
      * Save media metadata
      */
     async saveMetadata() {
-        if (!this.currentMediaId) return;
+        if (!this.currentMediaId || !this.currentMediaData) return;
         
         const formData = new FormData();
+        formData.append('name', this.currentMediaData.name); // Include required name field
         formData.append('alt_text', this.getElementValue('modal-alt-text'));
         formData.append('caption', this.getElementValue('modal-caption'));
         formData.append('description', this.getElementValue('modal-description'));
