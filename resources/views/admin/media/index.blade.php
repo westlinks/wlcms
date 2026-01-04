@@ -100,7 +100,7 @@
 
 <script>
 function openMediaModal(id) {
-    // Placeholder - will be enhanced with actual media details
+    // TODO: Fetch and display media details
     document.getElementById('media-modal').classList.remove('hidden');
 }
 
@@ -108,11 +108,166 @@ function closeMediaModal() {
     document.getElementById('media-modal').classList.add('hidden');
 }
 
-// File upload handler (placeholder)
+// File upload handler with progress and error handling
 document.getElementById('file-upload').addEventListener('change', function(e) {
-    if (e.target.files.length > 0) {
-        alert('File upload functionality coming soon! Selected ' + e.target.files.length + ' files.');
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    // Show upload progress
+    showUploadProgress();
+    
+    const formData = new FormData();
+    files.forEach(file => formData.append('files[]', file));
+    
+    // Add CSRF token
+    formData.append('_token', '{{ csrf_token() }}');
+
+    fetch('{{ route("wlcms.admin.media.upload") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideUploadProgress();
+        
+        if (data.uploaded_media && data.uploaded_media.length > 0) {
+            // Show success message
+            showMessage(data.message || 'Files uploaded successfully!', 'success');
+            
+            // Check for any errors
+            const hasErrors = data.uploaded_media.some(item => item.error);
+            if (hasErrors) {
+                const errorFiles = data.uploaded_media.filter(item => item.error);
+                showMessage(`Some files failed to upload: ${errorFiles.map(f => f.name).join(', ')}`, 'error');
+            }
+            
+            // Reload the page after a short delay to show the new files
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showMessage('No files were uploaded. Please check file size and format.', 'error');
+        }
+    })
+    .catch(error => {
+        hideUploadProgress();
+        console.error('Upload error:', error);
+        showMessage('Upload failed. Please try again.', 'error');
+    });
+    
+    // Clear the input
+    e.target.value = '';
+});
+
+function showUploadProgress() {
+    // Create and show a progress overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'upload-progress';
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+    overlay.innerHTML = `
+        <div class="bg-white rounded-lg p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Uploading files...</p>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+function hideUploadProgress() {
+    const overlay = document.getElementById('upload-progress');
+    if (overlay) overlay.remove();
+}
+
+function showMessage(message, type = 'success') {
+    // Create message element
+    const messageEl = document.createElement('div');
+    messageEl.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+        type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+    }`;
+    messageEl.innerHTML = `
+        <div class="flex items-center">
+            <span class="mr-2">${type === 'success' ? '✅' : '❌'}</span>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" 
+                    class="ml-4 text-gray-400 hover:text-gray-600">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(messageEl);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (messageEl.parentNode) messageEl.remove();
+    }, 5000);
+}
+
+// Drag and drop functionality
+let dragCounter = 0;
+
+document.addEventListener('dragenter', function(e) {
+    e.preventDefault();
+    dragCounter++;
+    showDropZone();
+});
+
+document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener('dragleave', function(e) {
+    dragCounter--;
+    if (dragCounter <= 0) {
+        hideDropZone();
     }
 });
+
+document.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dragCounter = 0;
+    hideDropZone();
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+        // Trigger upload with dropped files
+        triggerUpload(files);
+    }
+});
+
+function showDropZone() {
+    let dropZone = document.getElementById('drop-zone');
+    if (!dropZone) {
+        dropZone = document.createElement('div');
+        dropZone.id = 'drop-zone';
+        dropZone.className = 'fixed inset-0 bg-blue-100 bg-opacity-75 z-40 flex items-center justify-center border-4 border-dashed border-blue-400';
+        dropZone.innerHTML = `
+            <div class="text-center">
+                <span class="text-6xl">📁</span>
+                <p class="text-xl font-semibold text-blue-800 mt-4">Drop files here to upload</p>
+                <p class="text-blue-600">Images, documents, videos supported</p>
+            </div>
+        `;
+        document.body.appendChild(dropZone);
+    }
+}
+
+function hideDropZone() {
+    const dropZone = document.getElementById('drop-zone');
+    if (dropZone) dropZone.remove();
+}
+
+function triggerUpload(files) {
+    // Create temporary input and trigger upload
+    const input = document.getElementById('file-upload');
+    const dt = new DataTransfer();
+    
+    files.forEach(file => dt.items.add(file));
+    input.files = dt.files;
+    
+    // Trigger the change event
+    input.dispatchEvent(new Event('change'));
+}
 </script>
 @endsection

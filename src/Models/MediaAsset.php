@@ -17,28 +17,30 @@ class MediaAsset extends Model
     protected $table = 'cms_media_assets';
 
     protected $fillable = [
+        'name',
+        'original_name',
         'filename',
-        'original_filename',
         'path',
         'disk',
         'mime_type',
-        'filesize',
-        'width',
-        'height',
+        'type',
+        'size',
+        'metadata',
         'alt_text',
-        'description',
         'caption',
-        'credit',
-        'tags',
+        'description',
         'folder_id',
+        'is_featured',
+        'thumbnails',
+        'user_id',
         'uploaded_by',
     ];
 
     protected $casts = [
-        'filesize' => 'integer',
-        'width' => 'integer',
-        'height' => 'integer',
-        'tags' => 'array',
+        'size' => 'integer',
+        'metadata' => 'array',
+        'thumbnails' => 'array',
+        'is_featured' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -56,7 +58,7 @@ class MediaAsset extends Model
      */
     public function scopeImages(Builder $query): Builder
     {
-        return $query->where('mime_type', 'like', 'image/%');
+        return $query->where('type', 'image');
     }
 
     /**
@@ -64,13 +66,7 @@ class MediaAsset extends Model
      */
     public function scopeDocuments(Builder $query): Builder
     {
-        return $query->whereIn('mime_type', [
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        return $query->where('type', 'document');
     }
 
     /**
@@ -78,7 +74,7 @@ class MediaAsset extends Model
      */
     public function scopeAudio(Builder $query): Builder
     {
-        return $query->where('mime_type', 'like', 'audio/%');
+        return $query->where('type', 'audio');
     }
 
     /**
@@ -86,7 +82,7 @@ class MediaAsset extends Model
      */
     public function scopeVideo(Builder $query): Builder
     {
-        return $query->where('mime_type', 'like', 'video/%');
+        return $query->where('type', 'video');
     }
 
     /**

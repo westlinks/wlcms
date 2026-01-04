@@ -74,29 +74,32 @@ return [
     */
     'media' => [
         // Storage disk for media files
-        'disk' => 'public',
+        'disk' => env('WLCMS_STORAGE_DISK', 'public'),
         
         // Base path for media uploads
-        'base_path' => 'cms/media',
+        'base_path' => 'wlcms',
         
-        // Maximum file size in KB
-        'max_file_size' => 10240, // 10MB
+        // Maximum file size in KB (20MB)
+        'max_file_size' => env('WLCMS_MAX_FILE_SIZE', 20480),
         
         // Allowed file types
         'allowed_types' => [
             'image' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-            'document' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
-            'video' => ['mp4', 'mov', 'avi', 'wmv', 'flv'],
-            'audio' => ['mp3', 'wav', 'ogg', 'aac'],
+            'document' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf'],
+            'video' => ['mp4', 'mov', 'avi', 'wmv', 'flv', 'webm'],
+            'audio' => ['mp3', 'wav', 'ogg', 'aac', 'flac'],
         ],
         
         // Image processing settings
         'image' => [
             'quality' => 85,
+            'generate_thumbnails' => true,
+            'extract_exif' => true,
             'thumbnails' => [
-                'small' => [150, 150],
-                'medium' => [300, 300], 
-                'large' => [800, 600],
+                'thumb' => [150, 150],
+                'small' => [300, 300],
+                'medium' => [600, 600],
+                'large' => [1200, 1200],
             ],
         ],
     ],
