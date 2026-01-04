@@ -226,19 +226,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Media page loaded - WLCMS components auto-initialized');
 });
-
-// Global function for media card clicks
-function openMediaModal(mediaId) {
-    if (window.wlcmsMediaModal) {
-        window.wlcmsMediaModal.open(mediaId);
-    }
-}
-
-// Global function for file upload
-function triggerFileUpload() {
-    if (window.wlcmsFileUpload) {
-        window.wlcmsFileUpload.triggerUpload();
-    }
-}
 </script>
 @endsection
