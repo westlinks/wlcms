@@ -16,7 +16,10 @@ class DashboardController extends Controller
             'published_content' => ContentItem::where('status', 'published')->count(),
             'draft_content' => ContentItem::where('status', 'draft')->count(),
             'total_media' => MediaAsset::count(),
-            'recent_content' => ContentItem::with('author')
+            'recent_content' => ContentItem::when(
+                    config('wlcms.user.model'), 
+                    fn($query) => $query->with('creator')
+                )
                 ->latest('updated_at')
                 ->take(5)
                 ->get(),

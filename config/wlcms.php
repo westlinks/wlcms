@@ -45,8 +45,10 @@ return [
         // Primary key column name in user table
         'primary_key' => 'id',
         
-        // User name field for attribution
-        'name_field' => 'name',
+        // User name field for attribution (can be a field name or accessor)
+        // For firstname + lastname, use 'full_name' and add accessor to your User model:
+        // public function getFullNameAttribute() { return $this->firstname . ' ' . $this->lastname; }
+        'name_field' => 'name', // Examples: 'name', 'full_name', 'display_name'
         
         // User email field for attribution  
         'email_field' => 'email',

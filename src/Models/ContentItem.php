@@ -155,6 +155,14 @@ class ContentItem extends Model
     }
 
     /**
+     * Alias for creator relationship (for backwards compatibility).
+     */
+    public function author(): BelongsTo
+    {
+        return $this->creator();
+    }
+
+    /**
      * Get the creator's display name.
      */
     public function getCreatorNameAttribute(): string

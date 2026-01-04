@@ -11,7 +11,10 @@ class ContentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ContentItem::with('author');
+        $query = ContentItem::when(
+            config('wlcms.user.model'), 
+            fn($q) => $q->with('creator')
+        );
 
         // Apply filters
         if ($request->filled('status')) {

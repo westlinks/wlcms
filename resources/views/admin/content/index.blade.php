@@ -116,8 +116,8 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                @if(isset($item->author))
-                                    {{ $item->author->name ?? 'Unknown' }}
+                                @if($item->creator ?? null)
+                                    {{ $item->creator_name }}
                                 @else
                                     System
                                 @endif
