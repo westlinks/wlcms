@@ -46,18 +46,7 @@
                  onclick="openMediaModal({{ $item->id }})">
                 <div class="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center overflow-hidden">
                     @if($item->type === 'image')
-                        @php
-                            $thumbnailUrl = null;
-                            if ($item->thumbnails && isset($item->thumbnails['medium'])) {
-                                $thumbnailUrl = Storage::disk($item->disk)->url($item->thumbnails['medium']);
-                            } elseif ($item->thumbnails && isset($item->thumbnails['small'])) {
-                                $thumbnailUrl = Storage::disk($item->disk)->url($item->thumbnails['small']);
-                            } else {
-                                // Fallback to original image if no thumbnails
-                                $thumbnailUrl = Storage::disk($item->disk)->url($item->path);
-                            }
-                        @endphp
-                        <img src="{{ $thumbnailUrl }}" 
+                        <img src="{{ $item->getThumbnailUrl('medium') ?: $item->url }}" 
                              alt="{{ $item->alt_text }}"
                              class="w-full h-full object-cover"
                              onerror="this.parentElement.innerHTML='<span class=\'text-4xl\'>🖼️</span>'">

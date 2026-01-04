@@ -26,6 +26,7 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('media/upload', [MediaController::class, 'upload'])->name('media.upload');
         Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
         Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
+        Route::get('media/{media}/serve/{size?}', [MediaController::class, 'serve'])->name('media.serve');
     });
 
 // Frontend routes (will be registered if enabled in config)

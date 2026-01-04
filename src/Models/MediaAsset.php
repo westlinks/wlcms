@@ -130,7 +130,7 @@ class MediaAsset extends Model
      */
     public function getUrlAttribute(): string
     {
-        return Storage::disk($this->disk)->url($this->path);
+        return route('wlcms.admin.media.serve', ['media' => $this->id, 'size' => 'original']);
     }
 
     /**
@@ -197,10 +197,9 @@ class MediaAsset extends Model
             return null;
         }
 
-        $thumbnailPath = $this->getThumbnailPath($size);
-        
-        if (Storage::disk($this->disk)->exists($thumbnailPath)) {
-            return Storage::disk($this->disk)->url($thumbnailPath);
+        // Check if thumbnail exists in the thumbnails array
+        if ($this->thumbnails && isset($this->thumbnails[$size])) {
+            return route('wlcms.admin.media.serve', ['media' => $this->id, 'size' => $size]);
         }
 
         return $this->url; // Return original if thumbnail doesn't exist

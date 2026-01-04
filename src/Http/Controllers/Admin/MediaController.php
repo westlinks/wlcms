@@ -39,39 +39,6 @@ class MediaController extends Controller
                 'error' => 'Media file path not found'
             ], 404);
         }
-
-        try {
-            // Generate all possible URLs for the media
-            $urls = [
-                'original' => Storage::disk($media->disk)->url($media->path),
-            ];
-            
-            // Add thumbnail URLs if they exist
-            if ($media->thumbnails) {
-                foreach ($media->thumbnails as $size => $path) {
-                    if ($path) {
-                        try {
-                            $urls[$size] = Storage::disk($media->disk)->url($path);
-                        } catch (\Exception $e) {
-                            // Skip thumbnail if URL generation fails
-                            continue;
-                        }
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error('Failed to generate media URLs', [
-                'media_id' => $media->id,
-                'disk' => $media->disk,
-                'path' => $media->path,
-                'error' => $e->getMessage()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'error' => 'Failed to generate media URLs'
-            ], 500);
-        }
         
         // Format file size
         $fileSize = $media->size;
@@ -84,6 +51,20 @@ class MediaController extends Controller
             $height = $media->metadata['height'] ?? null;
             if ($width && $height) {
                 $dimensions = "{$width} × {$height} px";
+            }
+        }
+
+        // Use Laravel routes for URLs instead of direct storage URLs
+        $routeUrls = [
+            'original' => route('wlcms.admin.media.serve', ['media' => $media->id, 'size' => 'original']),
+        ];
+        
+        // Add thumbnail route URLs if they exist
+        if ($media->thumbnails) {
+            foreach ($media->thumbnails as $size => $path) {
+                if ($path) {
+                    $routeUrls[$size] = route('wlcms.admin.media.serve', ['media' => $media->id, 'size' => $size]);
+                }
             }
         }
 
@@ -104,7 +85,7 @@ class MediaController extends Controller
                 'uploaded_by' => $media->uploaded_by,
                 'created_at' => $media->created_at->format('M j, Y g:i A'),
                 'updated_at' => $media->updated_at->format('M j, Y g:i A'),
-                'urls' => $urls,
+                'urls' => $routeUrls,
                 'folder' => $media->folder ? [
                     'id' => $media->folder->id,
                     'name' => $media->folder->name
@@ -436,6 +417,56 @@ class MediaController extends Controller
         }
     }
     
+    /**
+     * Serve media files through Laravel instead of direct storage URLs
+     */
+    public function serve(MediaAsset $media, string $size = 'original')
+    {
+        try {
+            // Determine which file path to serve
+            $filePath = null;
+            
+            if ($size === 'original') {
+                $filePath = $media->path;
+            } elseif ($media->thumbnails && isset($media->thumbnails[$size])) {
+                $filePath = $media->thumbnails[$size];
+            } else {
+                // If requested size doesn't exist, fallback to original
+                $filePath = $media->path;
+            }
+            
+            if (!$filePath) {
+                abort(404, 'Media file not found');
+            }
+            
+            // Check if file exists on disk
+            if (!Storage::disk($media->disk)->exists($filePath)) {
+                abort(404, 'Media file not found on disk');
+            }
+            
+            // Get file contents and metadata
+            $fileContents = Storage::disk($media->disk)->get($filePath);
+            $mimeType = Storage::disk($media->disk)->mimeType($filePath);
+            $lastModified = Storage::disk($media->disk)->lastModified($filePath);
+            
+            return response($fileContents)
+                ->header('Content-Type', $mimeType)
+                ->header('Cache-Control', 'public, max-age=31536000') // Cache for 1 year
+                ->header('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified) . ' GMT')
+                ->header('Etag', md5($fileContents));
+                
+        } catch (\Exception $e) {
+            \Log::error('Failed to serve media file', [
+                'media_id' => $media->id,
+                'size' => $size,
+                'disk' => $media->disk,
+                'error' => $e->getMessage()
+            ]);
+            
+            abort(500, 'Failed to serve media file');
+        }
+    }
+
     /**
      * Format file size in human readable format
      */
