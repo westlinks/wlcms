@@ -32,16 +32,45 @@ class MediaController extends Controller
 
     public function show(MediaAsset $media)
     {
-        // Generate all possible URLs for the media
-        $urls = [
-            'original' => Storage::disk($media->disk)->url($media->path),
-        ];
-        
-        // Add thumbnail URLs if they exist
-        if ($media->thumbnails) {
-            foreach ($media->thumbnails as $size => $path) {
-                $urls[$size] = Storage::disk($media->disk)->url($path);
+        // Validate that the file path exists
+        if (!$media->path) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Media file path not found'
+            ], 404);
+        }
+
+        try {
+            // Generate all possible URLs for the media
+            $urls = [
+                'original' => Storage::disk($media->disk)->url($media->path),
+            ];
+            
+            // Add thumbnail URLs if they exist
+            if ($media->thumbnails) {
+                foreach ($media->thumbnails as $size => $path) {
+                    if ($path) {
+                        try {
+                            $urls[$size] = Storage::disk($media->disk)->url($path);
+                        } catch (\Exception $e) {
+                            // Skip thumbnail if URL generation fails
+                            continue;
+                        }
+                    }
+                }
             }
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate media URLs', [
+                'media_id' => $media->id,
+                'disk' => $media->disk,
+                'path' => $media->path,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to generate media URLs'
+            ], 500);
         }
         
         // Format file size
