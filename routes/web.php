@@ -22,7 +22,7 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::get('content/{content}/revisions', [ContentController::class, 'revisions'])->name('content.revisions');
 
         // Media management
-        Route::resource('media', MediaController::class);
+        Route::resource('media', MediaController::class)->parameters(['media' => 'media']);
         Route::post('media/upload', [MediaController::class, 'upload'])->name('media.upload');
         Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
         Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
