@@ -32,9 +32,56 @@ class MediaController extends Controller
 
     public function show(MediaAsset $media)
     {
+        // Generate all possible URLs for the media
+        $urls = [
+            'original' => Storage::disk($media->disk)->url($media->path),
+        ];
+        
+        // Add thumbnail URLs if they exist
+        if ($media->thumbnails) {
+            foreach ($media->thumbnails as $size => $path) {
+                $urls[$size] = Storage::disk($media->disk)->url($path);
+            }
+        }
+        
+        // Format file size
+        $fileSize = $media->size;
+        $sizeFormatted = $this->formatFileSize($fileSize);
+        
+        // Extract dimensions for images
+        $dimensions = null;
+        if ($media->type === 'image' && $media->metadata) {
+            $width = $media->metadata['width'] ?? null;
+            $height = $media->metadata['height'] ?? null;
+            if ($width && $height) {
+                $dimensions = "{$width} × {$height} px";
+            }
+        }
+
         return response()->json([
-            'media' => $media->load('folder'),
-            'message' => 'Media retrieved successfully'
+            'success' => true,
+            'media' => [
+                'id' => $media->id,
+                'name' => $media->name,
+                'original_name' => $media->original_name,
+                'type' => $media->type,
+                'mime_type' => $media->mime_type,
+                'size' => $fileSize,
+                'size_formatted' => $sizeFormatted,
+                'dimensions' => $dimensions,
+                'alt_text' => $media->alt_text,
+                'caption' => $media->caption,
+                'description' => $media->description,
+                'uploaded_by' => $media->uploaded_by,
+                'created_at' => $media->created_at->format('M j, Y g:i A'),
+                'updated_at' => $media->updated_at->format('M j, Y g:i A'),
+                'urls' => $urls,
+                'folder' => $media->folder ? [
+                    'id' => $media->folder->id,
+                    'name' => $media->folder->name
+                ] : null,
+                'metadata' => $media->metadata,
+            ]
         ]);
     }
 
@@ -357,6 +404,22 @@ class MediaController extends Controller
 
         } catch (\Exception $e) {
             return [];
+        }
+    }
+    
+    /**
+     * Format file size in human readable format
+     */
+    protected function formatFileSize(int $bytes): string
+    {
+        if ($bytes >= 1073741824) {
+            return round($bytes / 1073741824, 1) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return round($bytes / 1048576, 1) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return round($bytes / 1024, 1) . ' KB';
+        } else {
+            return $bytes . ' B';
         }
     }
 }
