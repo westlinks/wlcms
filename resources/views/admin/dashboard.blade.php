@@ -104,9 +104,17 @@
                     @foreach($stats['recent_media'] as $media)
                         <div class="flex items-center justify-between py-2 border-b last:border-0">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
                                     @if($media->type === 'image')
-                                        <span class="text-lg">🖼️</span>
+                                        @if($media->getThumbnailUrl('thumb'))
+                                            <img src="{{ $media->getThumbnailUrl('thumb') }}" 
+                                                 alt="{{ $media->name }}" 
+                                                 class="w-full h-full object-cover rounded">
+                                        @else
+                                            <img src="{{ $media->url }}" 
+                                                 alt="{{ $media->name }}" 
+                                                 class="w-full h-full object-cover rounded">
+                                        @endif
                                     @elseif($media->type === 'document')
                                         <span class="text-lg">📄</span>
                                     @else
