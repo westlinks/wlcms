@@ -43,6 +43,18 @@ export class MediaModal {
                 this.close();
             }
         });
+
+        // Close button
+        const closeButton = this.modal.querySelector('#close-modal');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => this.close());
+        }
+
+        // Save button
+        const saveButton = this.modal.querySelector('#save-metadata');
+        if (saveButton) {
+            saveButton.addEventListener('click', () => this.saveMetadata());
+        }
     }
 
     /**

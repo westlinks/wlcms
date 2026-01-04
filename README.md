@@ -23,8 +23,41 @@ php artisan migrate
 
 # Publish assets (CSS/JS bundles)
 php artisan vendor:publish --tag=wlcms-assets
+```
 
-# Visit the admin interface
+### Vite Configuration (Required)
+
+Add WLCMS JavaScript and CSS to your application's `vite.config.js`:
+
+```javascript
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/vendor/wlcms/js/wlcms.js',    // Add this line
+                'resources/vendor/wlcms/css/wlcms.css'   // Add this line
+            ],
+            refresh: true,
+        }),
+    ],
+    // ... rest of your config
+});
+```
+
+Then rebuild your assets:
+
+```bash
+npm run build
+```
+
+### Access Admin Interface
+
+```
 # Navigate to: /admin/wlcms/dashboard
 ```
 
