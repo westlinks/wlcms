@@ -1,13 +1,16 @@
-@if(config('wlcms.layout.mode') === 'embedded')
-    <x-dynamic-component :component="config('wlcms.layout.host_layout')">
-        <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ $content->title }}
-            </h2>
-        </x-slot>
-@else
-    <x-wlcms::admin-layout :title="$content->title . ' - WLCMS Admin'" :page-title="$content->title">
-@endif
+{{-- TEMPORARY: Force simple layout without navigation --}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WLCMS View Content</title>
+    @vite(['resources/vendor/wlcms/css/wlcms.css'])
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <header class="bg-white shadow-sm border-b p-4">
+            <h1 class="text-2xl font-semibold text-gray-800">{{ $content->title }}</h1>
+        </header>
+        <main class="p-6">
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg font-semibold">Content Details</h3>
@@ -144,8 +147,7 @@
             </div>
         </div>
     </div>
-@if(config('wlcms.layout.mode') === 'embedded')
-    </x-dynamic-component>
-@else
-    </x-wlcms::admin-layout>
-@endif
+        </main>
+    </div>
+</body>
+</html>
