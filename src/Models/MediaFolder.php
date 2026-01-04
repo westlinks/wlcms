@@ -97,4 +97,12 @@ class MediaFolder extends Model
         
         return $count;
     }
+
+    /**
+     * Alias for mediaAssets relationship (for backwards compatibility).
+     */
+    public function files(): HasMany
+    {
+        return $this->mediaAssets();
+    }
 }

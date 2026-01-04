@@ -4,6 +4,8 @@ namespace Westlinks\Wlcms;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Blade;
+use Westlinks\Wlcms\View\Components\AdminLayout;
 
 class WlcmsServiceProvider extends ServiceProvider
 {
@@ -66,6 +68,10 @@ class WlcmsServiceProvider extends ServiceProvider
 
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+        // Register Blade components
+        Blade::component('admin-layout', AdminLayout::class);
+        Blade::componentNamespace('Westlinks\\Wlcms\\View\\Components', 'wlcms');
 
         // Register commands if running in console
         if ($this->app->runningInConsole()) {
