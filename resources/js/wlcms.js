@@ -205,7 +205,7 @@ function initWlcms(config = {}) {
     
     // Initialize file upload if upload input exists on page
     if (document.getElementById('file-upload')) {
-        const uploadUrl = config.uploadUrl || '/admin/wlcms/media/upload';
+        const uploadUrl = config.uploadUrl || '/admin/cms/media/upload';
         const csrfToken = config.csrfToken || '';
         initFileUpload(uploadUrl, csrfToken);
     }

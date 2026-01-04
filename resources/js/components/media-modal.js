@@ -92,7 +92,7 @@ export class MediaModal {
      */
     async fetchMediaData(id) {
         try {
-            const response = await fetch(`/admin/wlcms/media/${id}`, {
+            const response = await fetch(`/admin/cms/media/${id}`, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -279,7 +279,7 @@ export class MediaModal {
         };
         
         try {
-            const response = await fetch(`/admin/wlcms/media/${this.currentMediaId}`, {
+            const response = await fetch(`/admin/cms/media/${this.currentMediaId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ export class MediaModal {
      */
     downloadMedia() {
         if (!this.currentMediaId) return;
-        window.open(`/admin/wlcms/media/${this.currentMediaId}/download`, '_blank');
+        window.open(`/admin/cms/media/${this.currentMediaId}/download`, '_blank');
     }
 
     /**
@@ -324,7 +324,7 @@ export class MediaModal {
         }
 
         try {
-            const response = await fetch(`/admin/wlcms/media/${this.currentMediaId}`, {
+            const response = await fetch(`/admin/cms/media/${this.currentMediaId}`, {
                 method: 'DELETE',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
