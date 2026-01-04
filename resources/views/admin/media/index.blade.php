@@ -46,13 +46,27 @@
                  onclick="openMediaModal({{ $item->id }})">
                 <div class="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center overflow-hidden">
                     @if($item->type === 'image')
-                        <img src="{{ Storage::disk($item->disk)->url($item->path) }}" 
+                        @php
+                            $thumbnailUrl = null;
+                            if ($item->thumbnails && isset($item->thumbnails['medium'])) {
+                                $thumbnailUrl = Storage::disk($item->disk)->url($item->thumbnails['medium']);
+                            } elseif ($item->thumbnails && isset($item->thumbnails['small'])) {
+                                $thumbnailUrl = Storage::disk($item->disk)->url($item->thumbnails['small']);
+                            } else {
+                                // Fallback to original image if no thumbnails
+                                $thumbnailUrl = Storage::disk($item->disk)->url($item->path);
+                            }
+                        @endphp
+                        <img src="{{ $thumbnailUrl }}" 
                              alt="{{ $item->alt_text }}"
-                             class="w-full h-full object-cover">
+                             class="w-full h-full object-cover"
+                             onerror="this.parentElement.innerHTML='<span class=\'text-4xl\'>🖼️</span>'">
                     @elseif($item->type === 'document')
                         <span class="text-4xl">📄</span>
                     @elseif($item->type === 'video')
                         <span class="text-4xl">🎥</span>
+                    @elseif($item->type === 'audio')
+                        <span class="text-4xl">🎵</span>
                     @else
                         <span class="text-4xl">📁</span>
                     @endif
