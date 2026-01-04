@@ -1,13 +1,16 @@
-@if(config('wlcms.layout.mode') === 'embedded')
-    <x-dynamic-component :component="config('wlcms.layout.host_layout')">
-        <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Dashboard
-            </h2>
-        </x-slot>
-@else
-    <x-wlcms::admin-layout title="Dashboard - WLCMS Admin" page-title="Dashboard">
-@endif
+{{-- TEMPORARY: Force simple layout without navigation --}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WLCMS Dashboard</title>
+    @vite(['resources/vendor/wlcms/css/wlcms.css'])
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <header class="bg-white shadow-sm border-b p-4">
+            <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
+        </header>
+        <main class="p-6">
     <div class="space-y-6">
         {{-- Stats Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -158,8 +161,7 @@
             </div>
         </div>
     </div>
-@if(config('wlcms.layout.mode') === 'embedded')
-    </x-dynamic-component>
-@else
-    </x-wlcms::admin-layout>
-@endif
+        </main>
+    </div>
+</body>
+</html>
