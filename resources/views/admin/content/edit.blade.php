@@ -1,11 +1,5 @@
-@extends('wlcms::admin.layout')
-
-@section('title', 'Edit: ' . $content->title . ' - WLCMS Admin')
-@section('page-title', 'Edit Content')
-
-@section('content')
-<div class="max-w-7xl mx-auto">
-    <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" class="space-y-6">
+<x-wlcms::admin-layout :title="'Edit: ' . $content->title . ' - WLCMS Admin'" page-title="Edit Content">
+    <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -132,5 +126,4 @@
             </div>
         </div>
     </form>
-</div>
-@endsection
+</x-wlcms::admin-layout>

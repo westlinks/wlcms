@@ -14,20 +14,50 @@ class MediaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = MediaAsset::with('folder');
-
-        if ($request->has('folder_id')) {
-            $query->where('folder_id', $request->folder_id);
+        // Get current folder
+        $currentFolder = null;
+        if ($request->filled('folder')) {
+            $currentFolder = MediaFolder::find($request->folder);
         }
 
-        if ($request->has('type')) {
+        // Build folder path for breadcrumbs
+        $folderPath = collect();
+        if ($currentFolder) {
+            $folder = $currentFolder;
+            while ($folder) {
+                $folderPath->prepend($folder);
+                $folder = $folder->parent;
+            }
+        }
+
+        // Get folders in current location
+        $folders = MediaFolder::withCount('files')
+            ->where('parent_id', $currentFolder->id ?? null)
+            ->orderBy('name')
+            ->get();
+
+        // Get media files
+        $query = MediaAsset::with('folder');
+
+        // Filter by current folder
+        if ($currentFolder) {
+            $query->where('folder_id', $currentFolder->id);
+        } else {
+            $query->whereNull('folder_id'); // Root folder
+        }
+
+        // Apply filters
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        $media = $query->latest()->paginate(24);
-        $folders = MediaFolder::all();
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
 
-        return view('wlcms::admin.media.index', compact('media', 'folders'));
+        $media = $query->latest('created_at')->paginate(24);
+
+        return view('wlcms::admin.media.index', compact('media', 'folders', 'currentFolder', 'folderPath'));
     }
 
     public function show(MediaAsset $media)

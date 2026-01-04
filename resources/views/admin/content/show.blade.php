@@ -1,10 +1,4 @@
-@extends('wlcms::admin.layout')
-
-@section('title', $content->title . ' - WLCMS Admin')
-@section('page-title', $content->title)
-
-@section('content')
-<div class="max-w-7xl mx-auto">
+<x-wlcms::admin-layout :title="$content->title . ' - WLCMS Admin'" :page-title="$content->title">
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg font-semibold">Content Details</h3>
@@ -141,5 +135,4 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-wlcms::admin-layout>

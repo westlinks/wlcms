@@ -9,11 +9,38 @@ use Westlinks\Wlcms\Models\ContentRevision;
 
 class ContentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $content = ContentItem::with('revisions')->latest()->paginate(15);
-        
-        return view('wlcms::admin.content.index', compact('content'));
+        $query = ContentItem::with('author');
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('content', 'like', '%' . $request->search . '%')
+                  ->orWhere('excerpt', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $content = $query->latest('updated_at')->paginate(20);
+
+        // Calculate stats for filter buttons
+        $stats = [
+            'total' => ContentItem::count(),
+            'published' => ContentItem::where('status', 'published')->count(),
+            'draft' => ContentItem::where('status', 'draft')->count(),
+            'archived' => ContentItem::where('status', 'archived')->count(),
+        ];
+
+        return view('wlcms::admin.content.index', compact('content', 'stats'));
     }
 
     public function create()

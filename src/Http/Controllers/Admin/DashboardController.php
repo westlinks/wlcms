@@ -16,8 +16,13 @@ class DashboardController extends Controller
             'published_content' => ContentItem::where('status', 'published')->count(),
             'draft_content' => ContentItem::where('status', 'draft')->count(),
             'total_media' => MediaAsset::count(),
-            'recent_content' => ContentItem::latest()->take(5)->get(),
-            'recent_media' => MediaAsset::latest()->take(5)->get(),
+            'recent_content' => ContentItem::with('author')
+                ->latest('updated_at')
+                ->take(5)
+                ->get(),
+            'recent_media' => MediaAsset::latest('created_at')
+                ->take(5)
+                ->get(),
         ];
 
         return view('wlcms::admin.dashboard', compact('stats'));
