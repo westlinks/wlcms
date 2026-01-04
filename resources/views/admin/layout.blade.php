@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'WLCMS Admin')</title>
     
-    <!-- Include WLCMS CSS via Vite -->
-    @vite('resources/vendor/wlcms/css/wlcms.css')
+    <!-- Include WLCMS styles -->
+    @vite(['resources/vendor/wlcms/css/wlcms.css', 'resources/vendor/wlcms/js/wlcms.js'])
     
     <!-- Required for component functionality -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -75,8 +75,5 @@
     </div>
     
     @stack('scripts')
-    
-    <!-- Include WLCMS JavaScript via Vite -->
-    @vite('resources/vendor/wlcms/js/wlcms.js')
 </body>
 </html>
