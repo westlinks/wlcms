@@ -41,10 +41,16 @@ class WlcmsServiceProvider extends ServiceProvider
             __DIR__.'/../resources/views' => resource_path('views/vendor/wlcms'),
         ], 'wlcms-views');
 
-        // Publish built assets
+        // Publish raw assets for consumer to build
         $this->publishes([
-            __DIR__.'/../public/build' => public_path('vendor/wlcms'),
+            __DIR__.'/../resources' => resource_path('vendor/wlcms'),
         ], 'wlcms-assets');
+
+        // Publish package configuration for consumer's build process  
+        $this->publishes([
+            __DIR__.'/../package.json' => base_path('vendor/westlinks/wlcms-package.json'),
+            __DIR__.'/../vite.config.js' => base_path('vendor/westlinks/wlcms-vite.config.js'),
+        ], 'wlcms-build-config');
 
         // Load package views
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wlcms');

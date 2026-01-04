@@ -1,7 +1,17 @@
 // WLCMS Package JavaScript
-// Tiptap Editor for WLCMS
+// Modern Laravel 11-12 compliant package
+
+// Tiptap Editor imports
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
+
+// WLCMS Component imports
+import { MediaModal } from './components/media-modal.js'
+import { FileUpload } from './components/file-upload.js'
+
+// Global instances
+let mediaModalInstance = null;
+let fileUploadInstance = null;
 
 // Initialize Tiptap Editor
 function initTiptapEditor(elementId, initialContent = '') {
@@ -160,5 +170,106 @@ function initTiptapEditor(elementId, initialContent = '') {
     return editor;
 }
 
-// Make initTiptapEditor available globally
+/**
+ * Initialize Media Modal Component
+ */
+function initMediaModal() {
+    if (!mediaModalInstance) {
+        mediaModalInstance = new MediaModal();
+        mediaModalInstance.init();
+    }
+    return mediaModalInstance;
+}
+
+/**
+ * Initialize File Upload Component
+ */
+function initFileUpload(uploadUrl, csrfToken) {
+    if (!fileUploadInstance) {
+        fileUploadInstance = new FileUpload(uploadUrl, csrfToken);
+        fileUploadInstance.init();
+    }
+    return fileUploadInstance;
+}
+
+/**
+ * Initialize all WLCMS components
+ */
+function initWlcms(config = {}) {
+    console.log('Initializing WLCMS components...');
+    
+    // Initialize media modal if modal exists on page
+    if (document.getElementById('media-modal')) {
+        initMediaModal();
+    }
+    
+    // Initialize file upload if upload input exists on page
+    if (document.getElementById('file-upload')) {
+        const uploadUrl = config.uploadUrl || '/admin/wlcms/media/upload';
+        const csrfToken = config.csrfToken || '';
+        initFileUpload(uploadUrl, csrfToken);
+    }
+}
+
+// Global function exports for template usage
 window.initTiptapEditor = initTiptapEditor;
+window.initMediaModal = initMediaModal;
+window.initFileUpload = initFileUpload;
+window.initWlcms = initWlcms;
+
+// Global component access for template functions
+window.wlcmsMediaModal = () => mediaModalInstance;
+window.wlcmsFileUpload = () => fileUploadInstance;
+
+// Global helper functions for Blade templates
+window.openMediaModal = (id) => {
+    const modal = mediaModalInstance || initMediaModal();
+    modal.open(id);
+};
+
+window.closeMediaModal = () => {
+    if (mediaModalInstance) {
+        mediaModalInstance.close();
+    }
+};
+
+window.saveMediaMetadata = () => {
+    if (mediaModalInstance) {
+        mediaModalInstance.saveMetadata();
+    }
+};
+
+window.downloadMedia = () => {
+    if (mediaModalInstance) {
+        mediaModalInstance.downloadMedia();
+    }
+};
+
+window.deleteMedia = () => {
+    if (mediaModalInstance) {
+        mediaModalInstance.deleteMedia();
+    }
+};
+
+window.copyUrl = (size) => {
+    if (mediaModalInstance) {
+        mediaModalInstance.copyUrl(size);
+    }
+};
+
+window.triggerFileUpload = () => {
+    if (fileUploadInstance) {
+        fileUploadInstance.triggerFileSelect();
+    }
+};
+
+// Auto-initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto-detect CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
+    // Initialize with default config
+    initWlcms({
+        csrfToken: csrfToken
+    });
+});

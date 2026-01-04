@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     build: {
-        outDir: 'public/build',
+        outDir: 'dist',
         rollupOptions: {
             input: {
                 wlcms: 'resources/js/wlcms.js',
@@ -14,5 +14,6 @@ export default defineConfig({
                 assetFileNames: 'assets/[name]-[hash].[ext]'
             }
         }
-    }
+    },
+    publicDir: false, // Disable public directory copying for packages
 });

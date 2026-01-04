@@ -1,3 +1,9 @@
 node_modules/
 package-lock.json
 # public/build/
+# Ignore build outputs - these should be built by consuming applications
+dist/
+public/build/
+node_modules/
+.DS_Store
+*.log
