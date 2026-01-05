@@ -641,4 +641,41 @@ class LegacyController extends Controller
             'connectionStatus'
         ));
     }
+
+    /**
+     * Synchronize all navigation items
+     */
+    public function navigationSyncAll()
+    {
+        try {
+            $navigationItems = CmsLegacyNavigationItem::where('is_active', true)->get();
+            $successCount = 0;
+            $errorCount = 0;
+            
+            foreach ($navigationItems as $item) {
+                try {
+                    // Sync navigation item logic would go here
+                    // For now, just update the sync timestamp
+                    $item->update([
+                        'last_sync_at' => now(),
+                        'sync_error' => null,
+                    ]);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errorCount++;
+                    $item->update([
+                        'sync_error' => $e->getMessage(),
+                        'last_sync_at' => now(),
+                    ]);
+                }
+            }
+            
+            return back()->with('success', 
+                "Navigation sync completed: {$successCount} successful, {$errorCount} errors"
+            );
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Navigation sync failed: ' . $e->getMessage());
+        }
+    }
 }

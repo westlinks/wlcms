@@ -1,4 +1,8 @@
-@extends('wlcms::admin.layout')
+@if(config('wlcms.layout.mode') === 'embedded')
+    @extends(config('wlcms.layout.host_layout', 'layouts.admin-layout'))
+@else
+    @extends('wlcms::admin.layout')
+@endif
 
 @section('title', 'Migration Activity')
 
