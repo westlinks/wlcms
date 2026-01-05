@@ -58,10 +58,11 @@
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Content</h3>
                     
-                    @include('wlcms::admin.components.tiptap-editor', [
+                    @include('wlcms::admin.components.editor', [
                         'name' => 'content',
                         'value' => old('content'),
-                        'placeholder' => 'Write your content here...'
+                        'label' => 'Content',
+                        'required' => false
                     ])
                     
                     @error('content')
