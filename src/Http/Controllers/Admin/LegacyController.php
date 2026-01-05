@@ -569,4 +569,70 @@ class LegacyController extends Controller
 
         return response()->json($data, 200, $headers);
     }
+
+    /**
+     * Show migration activity and job tracking
+     */
+    public function migrationActivity()
+    {
+        // Get migration job statistics
+        $jobStats = [
+            'total_jobs' => 0,
+            'running_jobs' => 0,
+            'completed_jobs' => 0,
+            'failed_jobs' => 0,
+        ];
+
+        $recentJobs = [];
+        $activeJobs = [];
+
+        // Check if migration progress service is available
+        if (class_exists(\Westlinks\Wlcms\Services\MigrationProgressService::class)) {
+            try {
+                $progressService = app(\Westlinks\Wlcms\Services\MigrationProgressService::class);
+                $jobStats = $progressService->getMigrationSummary();
+                $recentJobs = $progressService->getJobHistory(15);
+                $activeJobs = $progressService->getActiveJobs();
+            } catch (\Exception $e) {
+                // Fallback if progress service isn't available
+                logger('Migration progress service error: ' . $e->getMessage());
+            }
+        }
+
+        // Get recent article mappings activity
+        $recentMappings = CmsLegacyArticleMapping::with(['contentItem'])
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($mapping) {
+                return [
+                    'id' => $mapping->id,
+                    'legacy_article_id' => $mapping->legacy_article_id,
+                    'content_title' => $mapping->contentItem->title ?? 'Unknown',
+                    'status' => $mapping->is_active ? 'active' : 'inactive',
+                    'last_sync' => $mapping->last_sync_at?->diffForHumans(),
+                    'created_at' => $mapping->created_at->diffForHumans(),
+                ];
+            });
+
+        // Get legacy database connection status
+        $connectionStatus = 'unknown';
+        try {
+            if (class_exists(\Westlinks\Wlcms\Services\LegacyDatabaseService::class)) {
+                $legacyDb = app(\Westlinks\Wlcms\Services\LegacyDatabaseService::class);
+                $testResult = $legacyDb->testConnection();
+                $connectionStatus = $testResult['status'];
+            }
+        } catch (\Exception $e) {
+            $connectionStatus = 'error';
+        }
+
+        return view('wlcms::admin.legacy.migration.activity', compact(
+            'jobStats',
+            'recentJobs', 
+            'activeJobs',
+            'recentMappings',
+            'connectionStatus'
+        ));
+    }
 }
