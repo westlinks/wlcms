@@ -70,10 +70,6 @@ class MediaController extends Controller
             ], 404);
         }
         
-        // Format file size
-        $fileSize = $media->size;
-        $sizeFormatted = $this->formatFileSize($fileSize);
-        
         // Extract dimensions for images
         $dimensions = null;
         if ($media->type === 'image' && $media->metadata) {
@@ -84,44 +80,27 @@ class MediaController extends Controller
             }
         }
 
-        // Use Laravel routes for URLs instead of direct storage URLs
-        $routeUrls = [
-            'original' => route('wlcms.admin.media.serve', ['media' => $media->id, 'size' => 'original']),
-        ];
-        
-        // Add thumbnail route URLs if they exist
-        if ($media->thumbnails) {
-            foreach ($media->thumbnails as $size => $path) {
-                if ($path) {
-                    $routeUrls[$size] = route('wlcms.admin.media.serve', ['media' => $media->id, 'size' => $size]);
-                }
-            }
-        }
-
         return response()->json([
-            'success' => true,
-            'media' => [
-                'id' => $media->id,
-                'name' => $media->name,
-                'original_name' => $media->original_name,
-                'type' => $media->type,
-                'mime_type' => $media->mime_type,
-                'size' => $fileSize,
-                'size_formatted' => $sizeFormatted,
-                'dimensions' => $dimensions,
-                'alt_text' => $media->alt_text,
-                'caption' => $media->caption,
-                'description' => $media->description,
-                'uploaded_by' => $media->uploaded_by,
-                'created_at' => $media->created_at->format('M j, Y g:i A'),
-                'updated_at' => $media->updated_at->format('M j, Y g:i A'),
-                'urls' => $routeUrls,
-                'folder' => $media->folder ? [
-                    'id' => $media->folder->id,
-                    'name' => $media->folder->name
-                ] : null,
-                'metadata' => $media->metadata,
-            ]
+            'id' => $media->id,
+            'name' => $media->name,
+            'original_name' => $media->original_name,
+            'type' => $media->type,
+            'mime_type' => $media->mime_type,
+            'size' => $media->size,
+            'human_size' => $this->formatFileSize($media->size),
+            'dimensions' => $dimensions,
+            'alt_text' => $media->alt_text,
+            'caption' => $media->caption,
+            'description' => $media->description,
+            'uploaded_by' => $media->uploaded_by,
+            'created_at' => $media->created_at->format('M j, Y g:i A'),
+            'updated_at' => $media->updated_at->format('M j, Y g:i A'),
+            'url' => Storage::disk($media->disk)->url($media->path),
+            'folder' => $media->folder ? [
+                'id' => $media->folder->id,
+                'name' => $media->folder->name
+            ] : null,
+            'metadata' => $media->metadata,
         ]);
     }
 
@@ -180,11 +159,13 @@ class MediaController extends Controller
         $maxSize = config('wlcms.media.max_file_size', 20480);
         
         $request->validate([
+            'files' => 'required|array|min:1',
             'files.*' => "required|file|max:{$maxSize}",
             'folder_id' => 'nullable|exists:cms_media_folders,id',
         ]);
 
         $uploadedMedia = [];
+        $errors = [];
         $disk = config('wlcms.media.disk', 'public');
 
         foreach ($request->file('files', []) as $file) {
@@ -238,17 +219,24 @@ class MediaController extends Controller
                 ];
 
             } catch (\Exception $e) {
-                $uploadedMedia[] = [
+                $errors[] = [
                     'name' => $file->getClientOriginalName(),
                     'error' => 'Upload failed: ' . $e->getMessage()
                 ];
             }
         }
 
+        $successCount = count($uploadedMedia);
+        $errorCount = count($errors);
+        
         return response()->json([
+            'success' => $errorCount === 0,
             'uploaded_media' => $uploadedMedia,
-            'message' => count($uploadedMedia) . ' file(s) processed successfully'
-        ]);
+            'errors' => $errors,
+            'message' => $successCount > 0 
+                ? "{$successCount} file(s) uploaded successfully" . ($errorCount > 0 ? ", {$errorCount} failed" : "")
+                : "Upload failed for all files"
+        ], $successCount > 0 ? 200 : 422);
     }
 
     public function bulkDelete(Request $request)

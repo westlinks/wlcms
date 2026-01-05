@@ -107,8 +107,8 @@
                     {{-- Media Files --}}
                     @foreach($media as $file)
                         <div class="group relative media-item" data-id="{{ $file->id }}">
-                            <div class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                                 onclick="openMediaViewer({{ $file->id }})">
+                            <div class="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer media-preview"
+                                 data-media-id="{{ $file->id }}">
                                 <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                                     @if($file->type === 'image')
                                         @if($file->getThumbnailUrl('medium'))
@@ -278,7 +278,7 @@
         
         function uploadFile(file, index) {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('files[]', file);
             formData.append('folder_id', {{ $currentFolder->id ?? 'null' }});
             formData.append('_token', '{{ csrf_token() }}');
             
@@ -348,7 +348,7 @@
         
         // Media viewer functionality
         function openMediaViewer(mediaId) {
-            fetch(`{{ route("wlcms.admin.media.show", ":id") }}`.replace(':id', mediaId))
+            fetch(`{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`)
                 .then(response => response.json())
                 .then(data => {
                     const modal = document.getElementById('media-viewer-modal');
@@ -378,6 +378,18 @@
         
         document.getElementById('close-media-viewer').addEventListener('click', () => {
             document.getElementById('media-viewer-modal').classList.add('hidden');
+        });
+        
+        // Add click listeners to all media preview items
+        document.addEventListener('click', function(e) {
+            const mediaPreview = e.target.closest('.media-preview');
+            if (mediaPreview) {
+                e.preventDefault();
+                const mediaId = mediaPreview.getAttribute('data-media-id');
+                if (mediaId) {
+                    openMediaViewer(mediaId);
+                }
+            }
         });
     </script>
     @endpush
