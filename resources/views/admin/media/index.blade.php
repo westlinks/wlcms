@@ -3,15 +3,11 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Media Library') }}
         </h2>
+        
+        {{-- WLCMS Assets --}}
+        <link href="{{ asset('build/assets/wlcms-d15d8dce.css') }}" rel="stylesheet">
+        <script src="{{ asset('build/assets/wlcms-01bc0dea.js') }}" defer></script>
     </x-slot>
-
-    @push('styles')
-        @vite(['resources/vendor/wlcms/css/wlcms.css'])
-    @endpush
-
-    @push('scripts')
-        @vite(['resources/vendor/wlcms/js/wlcms.js'])
-    @endpush
     <div class="mb-6">
         <div class="flex justify-between items-center">
             {{-- Upload Button --}}
