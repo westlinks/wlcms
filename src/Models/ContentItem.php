@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -134,11 +135,13 @@ class ContentItem extends Model
 
     /**
      * Get the primary legacy article mapping for this content item.
-     * This is an alias/convenience method for getting the first active mapping.
+     * This returns a proper Laravel relationship.
      */
-    public function legacyMapping()
+    public function legacyMapping(): HasOne
     {
-        return $this->legacyArticleMappings()->where('is_active', true)->first();
+        return $this->hasOne(CmsLegacyArticleMapping::class, 'cms_content_item_id')
+            ->where('is_active', true)
+            ->latest();
     }
 
     /**
