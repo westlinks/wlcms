@@ -193,13 +193,38 @@ class MediaController extends Controller
             'max_file_uploads' => ini_get('max_file_uploads')
         ]);
         
-        $maxSize = config('wlcms.media.max_file_size', 20480);
+        $maxSize = config('wlcms.media.max_file_size', 20480); // KB
         
-        $request->validate([
-            'files' => 'required|array|min:1',
-            'files.*' => "required|file|max:{$maxSize}",
-            'folder_id' => 'nullable|exists:cms_media_folders,id',
+        // Log the configuration and file details for debugging
+        Log::info('WLCMS Upload validation setup', [
+            'max_size_config' => $maxSize . ' KB',
+            'request_files' => $request->hasFile('files') ? collect($request->file('files'))->map(fn($f) => [
+                'name' => $f->getClientOriginalName(),
+                'size_bytes' => $f->getSize(),
+                'size_kb' => round($f->getSize() / 1024, 2)
+            ])->toArray() : []
         ]);
+        
+        try {
+            $request->validate([
+                'files' => 'required|array|min:1',
+                'files.*' => "required|file|max:{$maxSize}",
+                'folder_id' => 'nullable|exists:cms_media_folders,id',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('WLCMS Upload validation failed', [
+                'errors' => $e->errors(),
+                'max_size_kb' => $maxSize
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . collect($e->errors())->flatten()->first(),
+                'errors' => collect($e->errors())->map(function($errors, $field) {
+                    return ['name' => 'Validation error', 'error' => implode(', ', $errors)];
+                })->values()->toArray()
+            ], 422);
+        }
 
         $uploadedMedia = [];
         $errors = [];
