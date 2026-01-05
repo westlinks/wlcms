@@ -180,14 +180,32 @@
                     formData.append('parent_id', {{ $currentFolder->id ?? 'null' }});
                     formData.append('_token', '{{ csrf_token() }}');
                     
+                    console.log('📤 Sending request to:', '{{ route("wlcms.admin.media.folder.store") }}');
+                    console.log('📦 Form data:', Object.fromEntries(formData));
+                    
                     fetch('{{ route("wlcms.admin.media.folder.store") }}', {
                         method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
                         body: formData,
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('📡 Response status:', response.status);
+                        console.log('📡 Response headers:', response.headers);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        return response.json();
+                    })
                     .then(data => {
                         console.log('📁 Folder creation result:', data);
                         if (data.success !== false) {
+                            newFolderModal.classList.add('hidden');
                             location.reload();
                         } else {
                             alert(data.message || 'Failed to create folder');
@@ -195,7 +213,7 @@
                     })
                     .catch(error => {
                         console.error('❌ Folder creation error:', error);
-                        alert('Error creating folder');
+                        alert('Error creating folder: ' + error.message);
                     });
                 });
             }

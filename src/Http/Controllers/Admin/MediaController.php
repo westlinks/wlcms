@@ -599,24 +599,41 @@ class MediaController extends Controller
             ]);
 
             // Return JSON response for AJAX requests
-            if ($request->wantsJson() || $request->ajax()) {
+            if ($request->wantsJson() || $request->ajax() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => true,
                     'message' => 'Folder created successfully.',
-                    'folder' => $folder
+                    'folder' => [
+                        'id' => $folder->id,
+                        'name' => $folder->name,
+                        'slug' => $folder->slug
+                    ]
                 ]);
             }
 
             return back()->with('success', 'Folder created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error creating folder: ' . json_encode($e->errors()));
+            
+            // Return JSON error for AJAX requests
+            if ($request->wantsJson() || $request->ajax() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed: ' . implode(', ', array_flatten($e->errors())),
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            
+            return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             \Log::error('Error creating folder: ' . $e->getMessage());
             
             // Return JSON error for AJAX requests
-            if ($request->wantsJson() || $request->ajax()) {
+            if ($request->wantsJson() || $request->ajax() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error creating folder: ' . $e->getMessage()
-                ], 400);
+                ], 500);
             }
             
             return back()->with('error', 'Error creating folder.');
