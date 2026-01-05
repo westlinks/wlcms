@@ -42,14 +42,20 @@
             function uploadFile(file, index) {
                 const formData = new FormData();
                 formData.append('files[]', file);
-                formData.append('folder_id', {{ $currentFolder->id ?? 'null' }});
+                
+                // Handle folder_id properly - don't append if null
+                const folderId = {{ $currentFolder->id ?? 'null' }};
+                if (folderId !== null) {
+                    formData.append('folder_id', folderId);
+                }
+                
                 formData.append('_token', '{{ csrf_token() }}');
                 
                 console.log('🚀 Upload details:');
                 console.log('  📁 File:', file.name, file.size, 'bytes');
                 console.log('  🎯 URL:', '{{ route("wlcms.admin.media.upload") }}');
                 console.log('  🔐 CSRF token:', '{{ csrf_token() }}');
-                console.log('  📂 Folder ID:', {{ $currentFolder->id ?? 'null' }});
+                console.log('  📂 Folder ID:', folderId === null ? 'ROOT (no folder_id)' : folderId);
                 
                 const uploadItem = document.createElement('div');
                 uploadItem.innerHTML = `
