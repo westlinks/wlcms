@@ -1,16 +1,9 @@
-{{-- TEMPORARY: Force simple layout without navigation --}}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>WLCMS Content</title>
-    @vite(['resources/vendor/wlcms/css/wlcms.css'])
-</head>
-<body class="bg-gray-100">
-    <div class="min-h-screen">
-        <header class="bg-white shadow-sm border-b p-4">
-            <h1 class="text-2xl font-semibold text-gray-800">Content Management</h1>
-        </header>
-        <main class="p-6">
+<x-admin-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Content Management') }}
+        </h2>
+    </x-slot>
     <div class="mb-6">
         <div class="flex justify-between items-center">
             <div class="flex space-x-4">
@@ -184,7 +177,4 @@
             </div>
         @endif
     </div>
-        </main>
-    </div>
-</body>
-</html>
+</x-admin-layout>
