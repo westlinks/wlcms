@@ -588,23 +588,7 @@ class MediaController extends Controller
      */
     public function createFolder(Request $request)
     {
-        // DEBUG: Log what we're receiving
-        \Log::info('FOLDER_CREATE_DEBUG', [
-            'all_input' => $request->all(),
-            'parent_id_raw' => $request->input('parent_id'),
-            'parent_id_type' => gettype($request->input('parent_id')),
-            'has_parent_id' => $request->has('parent_id'),
-            'filled_parent_id' => $request->filled('parent_id'),
-        ]);
-        
         try {
-        // DEBUG: Clear opcache to ensure fresh code
-        if (function_exists('opcache_reset')) {
-            opcache_reset();
-        }
-        
-        // Custom validation to handle empty strings as null
-        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|numeric|exists:cms_media_folders,id'
         ]);
