@@ -56,11 +56,34 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
             Route::post('legacy/mappings/{mapping}/sync', [LegacyController::class, 'syncMapping'])->name('legacy.mappings.sync');
             Route::post('legacy/mappings/bulk-sync', [LegacyController::class, 'bulkSync'])->name('legacy.mappings.bulk-sync');
             
-            // Navigation management
-            Route::get('legacy/navigation', [LegacyController::class, 'navigation'])->name('legacy.navigation.index');
+            // Migration Tools Routes
+            Route::prefix('legacy/migration')->name('legacy.migration.')->group(function () {
+                Route::get('/', [LegacyController::class, 'migrationIndex'])->name('index');
+                Route::post('/bulk', [LegacyController::class, 'bulkMigrate'])->name('bulk');
+                Route::post('/sync-all', [LegacyController::class, 'syncAllMappings'])->name('sync-all');
+                Route::post('/retry-errors', [LegacyController::class, 'retryErrors'])->name('retry-errors');
+                Route::get('/export', [LegacyController::class, 'exportMappings'])->name('export');
+                Route::post('/import', [LegacyController::class, 'importMappings'])->name('import');
+                Route::post('/cleanup', [LegacyController::class, 'cleanupMappings'])->name('cleanup');
+                Route::get('/activity', [LegacyController::class, 'migrationActivity'])->name('activity');
+            });
             
-            // Migration tools
-            Route::get('legacy/migration', [LegacyController::class, 'migration'])->name('legacy.migration.index');
+            // Navigation Management Routes
+            Route::prefix('legacy/navigation')->name('legacy.navigation.')->group(function () {
+                Route::get('/', [LegacyController::class, 'navigationIndex'])->name('index');
+                Route::get('/create', [LegacyController::class, 'navigationCreate'])->name('create');
+                Route::post('/', [LegacyController::class, 'navigationStore'])->name('store');
+                Route::get('/{navigationItem}/edit', [LegacyController::class, 'navigationEdit'])->name('edit');
+                Route::put('/{navigationItem}', [LegacyController::class, 'navigationUpdate'])->name('update');
+                Route::delete('/{navigationItem}', [LegacyController::class, 'navigationDestroy'])->name('destroy');
+                Route::post('/bulk', [LegacyController::class, 'navigationBulk'])->name('bulk');
+                Route::post('/sync-all', [LegacyController::class, 'navigationSyncAll'])->name('sync-all');
+                Route::post('/{navigationItem}/sync', [LegacyController::class, 'navigationSync'])->name('sync');
+                Route::post('/{navigationItem}/activate', [LegacyController::class, 'navigationActivate'])->name('activate');
+                Route::post('/{navigationItem}/deactivate', [LegacyController::class, 'navigationDeactivate'])->name('deactivate');
+                Route::get('/export', [LegacyController::class, 'navigationExport'])->name('export');
+                Route::post('/import', [LegacyController::class, 'navigationImport'])->name('import');
+            });
         }
     });
 
