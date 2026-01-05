@@ -678,4 +678,100 @@ class LegacyController extends Controller
             return back()->with('error', 'Navigation sync failed: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Import navigation items
+     */
+    public function navigationImport(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:json,csv|max:2048',
+            'overwrite_existing' => 'boolean',
+        ]);
+
+        try {
+            $file = $request->file('import_file');
+            $extension = $file->getClientOriginalExtension();
+            $content = file_get_contents($file->getPathname());
+            
+            $importData = [];
+            
+            if ($extension === 'json') {
+                $importData = json_decode($content, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Invalid JSON format');
+                }
+            } elseif ($extension === 'csv') {
+                // Simple CSV parsing for navigation items
+                $lines = explode("\n", $content);
+                $headers = str_getcsv(array_shift($lines));
+                
+                foreach ($lines as $line) {
+                    if (trim($line)) {
+                        $importData[] = array_combine($headers, str_getcsv($line));
+                    }
+                }
+            }
+
+            $importCount = 0;
+            $skipCount = 0;
+            $errorCount = 0;
+
+            foreach ($importData as $item) {
+                try {
+                    // Check if navigation item already exists
+                    $existing = CmsLegacyNavigationItem::where('legacy_id', $item['legacy_id'] ?? null)
+                        ->orWhere('title', $item['title'] ?? null)
+                        ->first();
+
+                    if ($existing && !$request->boolean('overwrite_existing')) {
+                        $skipCount++;
+                        continue;
+                    }
+
+                    // Prepare navigation item data
+                    $navigationData = [
+                        'title' => $item['title'] ?? 'Untitled',
+                        'context' => $item['context'] ?? 'main',
+                        'url' => $item['url'] ?? null,
+                        'legacy_id' => $item['legacy_id'] ?? null,
+                        'parent_legacy_id' => $item['parent_legacy_id'] ?? null,
+                        'sort_order' => $item['sort_order'] ?? 0,
+                        'is_active' => $item['is_active'] ?? true,
+                        'metadata' => isset($item['metadata']) ? 
+                            (is_array($item['metadata']) ? $item['metadata'] : json_decode($item['metadata'], true)) : 
+                            [],
+                    ];
+
+                    if ($existing) {
+                        $existing->update($navigationData);
+                    } else {
+                        CmsLegacyNavigationItem::create($navigationData);
+                    }
+
+                    $importCount++;
+
+                } catch (\Exception $e) {
+                    $errorCount++;
+                    logger('Navigation import error', [
+                        'item' => $item,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $message = "Navigation import completed: {$importCount} imported";
+            if ($skipCount > 0) {
+                $message .= ", {$skipCount} skipped";
+            }
+            if ($errorCount > 0) {
+                $message .= ", {$errorCount} errors";
+            }
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Navigation import failed: ' . $e->getMessage());
+        }
+    }
 }
