@@ -45,40 +45,54 @@
     </div>
 
     <!-- Migration Job Statistics -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-6 text-primary mb-2">{{ number_format($jobStats['total_jobs']) }}</div>
-                    <h6 class="text-muted mb-0">Total Jobs</h6>
+    @if($jobStats['total_jobs'] > 0 || count($activeJobs) > 0 || count($recentJobs) > 0)
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-6 text-primary mb-2">{{ number_format($jobStats['total_jobs']) }}</div>
+                        <h6 class="text-muted mb-0">Total Jobs</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-6 text-info mb-2">{{ number_format($jobStats['running_jobs']) }}</div>
+                        <h6 class="text-muted mb-0">Running</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-6 text-success mb-2">{{ number_format($jobStats['completed_jobs']) }}</div>
+                        <h6 class="text-muted mb-0">Completed</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-6 text-danger mb-2">{{ number_format($jobStats['failed_jobs']) }}</div>
+                        <h6 class="text-muted mb-0">Failed</h6>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-6 text-info mb-2">{{ number_format($jobStats['running_jobs']) }}</div>
-                    <h6 class="text-muted mb-0">Running</h6>
+    @else
+        <!-- Migration Tracking Not Available -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Migration Job Tracking</strong><br>
+                    Migration job tracking is not yet available. Run the package migrations to enable comprehensive job monitoring and statistics.
+                    <br><small class="text-muted">Command: <code>php artisan migrate</code></small>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-6 text-success mb-2">{{ number_format($jobStats['completed_jobs']) }}</div>
-                    <h6 class="text-muted mb-0">Completed</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-6 text-danger mb-2">{{ number_format($jobStats['failed_jobs']) }}</div>
-                    <h6 class="text-muted mb-0">Failed</h6>
-                </div>
-            </div>
-        </div>
-    </div>
+    @endif
 
     <div class="row">
         <!-- Active Migration Jobs -->
@@ -284,7 +298,7 @@
                             </button>
                         </div>
                         <div class="col-md-3 mb-2">
-                            <a href="{{ route('wlcms.admin.legacy.export') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ route('wlcms.admin.legacy.mappings.export') }}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-download"></i> Export Data
                             </a>
                         </div>

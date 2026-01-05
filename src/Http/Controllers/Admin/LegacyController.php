@@ -5,6 +5,7 @@ namespace Westlinks\Wlcms\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Westlinks\Wlcms\Http\Requests\ArticleMappingRequest;
 use Westlinks\Wlcms\Http\Requests\FieldOverrideRequest;
 use Westlinks\Wlcms\Models\ContentItem;
@@ -589,10 +590,15 @@ class LegacyController extends Controller
         // Check if migration progress service is available
         if (class_exists(\Westlinks\Wlcms\Services\MigrationProgressService::class)) {
             try {
-                $progressService = app(\Westlinks\Wlcms\Services\MigrationProgressService::class);
-                $jobStats = $progressService->getMigrationSummary();
-                $recentJobs = $progressService->getJobHistory(15);
-                $activeJobs = $progressService->getActiveJobs();
+                // Check if the migration jobs table exists before using the service
+                if (\Illuminate\Support\Facades\Schema::hasTable('cms_legacy_migration_jobs')) {
+                    $progressService = app(\Westlinks\Wlcms\Services\MigrationProgressService::class);
+                    $jobStats = $progressService->getMigrationSummary();
+                    $recentJobs = $progressService->getJobHistory(15);
+                    $activeJobs = $progressService->getActiveJobs();
+                } else {
+                    logger('Migration jobs table not found - run migrations to enable job tracking');
+                }
             } catch (\Exception $e) {
                 // Fallback if progress service isn't available
                 logger('Migration progress service error: ' . $e->getMessage());
