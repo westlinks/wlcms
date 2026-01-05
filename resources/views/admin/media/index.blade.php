@@ -4,9 +4,9 @@
             {{ __('Media Library') }}
         </h2>
         
-        {{-- WLCMS Assets --}}
-        <link href="{{ asset('build/assets/wlcms-d15d8dce.css') }}" rel="stylesheet">
-        <script src="{{ asset('build/assets/wlcms-01bc0dea.js') }}" defer></script>
+        {{-- WLCMS Assets - Load from package or CDN if available --}}
+        {{-- <link href="{{ asset('build/assets/wlcms-d15d8dce.css') }}" rel="stylesheet">
+        <script src="{{ asset('build/assets/wlcms-01bc0dea.js') }}" defer></script> --}}
         
         {{-- Media Page JavaScript --}}
         <script>
@@ -174,10 +174,30 @@
                         document.getElementById('media-viewer-type').textContent = data.mime_type;
                         document.getElementById('media-viewer-uploaded').textContent = data.created_at;
                         document.getElementById('media-viewer-dimensions').textContent = data.dimensions || 'N/A';
-                        document.getElementById('media-viewer-download').href = data.url;
+                        
+                        // Handle download options - multiple sizes if available
+                        const downloadContainer = document.getElementById('media-viewer-downloads');
+                        if (data.download_sizes && data.download_sizes.length > 0) {
+                            console.log('📏 Multiple download sizes available:', data.download_sizes.length);
+                            let downloadHTML = '<div class="space-y-1">';
+                            for (const [key, sizeData] of Object.entries(data.download_sizes)) {
+                                downloadHTML += `
+                                    <a href="${sizeData.url}" download class="inline-block bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 mr-1 mb-1">
+                                        ${sizeData.label} (${sizeData.description})
+                                    </a>`;
+                            }
+                            downloadHTML += '</div>';
+                            downloadContainer.innerHTML = downloadHTML;
+                        } else {
+                            // Fallback single download
+                            downloadContainer.innerHTML = `<a href="${data.url}" download class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Download</a>`;
+                        }
                         
                         if (data.type === 'image') {
-                            content.innerHTML = `<img src="${data.url}" class="max-w-full max-h-full object-contain mx-auto">`;
+                            console.log('🖼️ Loading image URL:', data.url);
+                            content.innerHTML = `<img src="${data.url}" class="max-w-full max-h-full object-contain mx-auto" 
+                                onerror="console.error('❌ Image failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none" class="text-center p-8"><span class="text-6xl">🖼️</span><p class="mt-4">Image preview unavailable</p><p class="text-sm text-gray-500">URL: ${data.url}</p></div>`;
                         } else if (data.type === 'video') {
                             content.innerHTML = `<video controls class="max-w-full max-h-full mx-auto"><source src="${data.url}" type="${data.mime_type}"></video>`;
                         } else if (data.type === 'audio') {
@@ -454,10 +474,10 @@
                             <strong>Uploaded:</strong> <span id="media-viewer-uploaded"></span><br>
                             <strong>Dimensions:</strong> <span id="media-viewer-dimensions"></span><br>
                             <div class="mt-2">
-                                <a id="media-viewer-download" href="" download class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                                    Download
-                                </a>
-                                <button id="media-viewer-delete" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 ml-2">
+                                <div id="media-viewer-downloads">
+                                    {{-- Download buttons will be populated by JavaScript --}}
+                                </div>
+                                <button id="media-viewer-delete" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 mt-2">
                                     Delete
                                 </button>
                             </div>

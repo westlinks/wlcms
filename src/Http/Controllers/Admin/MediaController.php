@@ -80,6 +80,33 @@ class MediaController extends Controller
             }
         }
 
+        // Generate multiple size URLs for images
+        $downloadSizes = [];
+        $primaryUrl = Storage::disk($media->disk)->url($media->path);
+        
+        if ($media->type === 'image') {
+            $downloadSizes = [
+                'original' => [
+                    'label' => 'Original',
+                    'url' => $primaryUrl,
+                    'dimensions' => $dimensions,
+                    'description' => 'Full resolution'
+                ],
+                'large' => [
+                    'label' => 'Large',
+                    'url' => $primaryUrl, // TODO: Generate resized versions
+                    'dimensions' => $dimensions,
+                    'description' => '1200px max width'
+                ],
+                'medium' => [
+                    'label' => 'Medium', 
+                    'url' => $primaryUrl, // TODO: Generate resized versions
+                    'dimensions' => $dimensions,
+                    'description' => '600px max width'
+                ]
+            ];
+        }
+
         return response()->json([
             'id' => $media->id,
             'name' => $media->name,
@@ -95,7 +122,8 @@ class MediaController extends Controller
             'uploaded_by' => $media->uploaded_by,
             'created_at' => $media->created_at->format('M j, Y g:i A'),
             'updated_at' => $media->updated_at->format('M j, Y g:i A'),
-            'url' => Storage::disk($media->disk)->url($media->path),
+            'url' => $primaryUrl,
+            'download_sizes' => $downloadSizes,
             'folder' => $media->folder ? [
                 'id' => $media->folder->id,
                 'name' => $media->folder->name
