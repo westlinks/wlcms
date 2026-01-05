@@ -99,8 +99,8 @@ return [
     |
     */
     'media' => [
-        // Storage disk for media files
-        'disk' => env('WLCMS_STORAGE_DISK', 'public'),
+        // Storage disk for media files - honors host app's default filesystem
+        'disk' => env('WLCMS_STORAGE_DISK', config('filesystems.default')),
         
         // Base path for media uploads
         'base_path' => 'wlcms',
