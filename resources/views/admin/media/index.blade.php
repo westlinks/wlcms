@@ -7,6 +7,220 @@
         {{-- WLCMS Assets --}}
         <link href="{{ asset('build/assets/wlcms-d15d8dce.css') }}" rel="stylesheet">
         <script src="{{ asset('build/assets/wlcms-01bc0dea.js') }}" defer></script>
+        
+        {{-- Media Page JavaScript --}}
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎬 Media index JavaScript loading...');
+            
+            // Check if elements exist
+            console.log('📤 Upload input:', document.getElementById('media_upload'));
+            console.log('📁 New folder button:', document.getElementById('new-folder-btn'));
+            console.log('🖼️ Media preview items:', document.querySelectorAll('.media-preview'));
+            
+            // Media upload functionality
+            const uploadInput = document.getElementById('media_upload');
+            const uploadInputEmpty = document.getElementById('media_upload_empty');
+            
+            function handleFileUpload(e) {
+                console.log('📤 File upload triggered', e.target.files.length, 'files');
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                const progressContainer = document.getElementById('upload-progress');
+                const uploadList = document.getElementById('upload-list');
+                
+                progressContainer.classList.remove('hidden');
+                uploadList.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    console.log('⬆️ Uploading file:', file.name);
+                    uploadFile(file, index);
+                });
+            }
+            
+            function uploadFile(file, index) {
+                const formData = new FormData();
+                formData.append('files[]', file);
+                formData.append('folder_id', {{ $currentFolder->id ?? 'null' }});
+                formData.append('_token', '{{ csrf_token() }}');
+                
+                const uploadItem = document.createElement('div');
+                uploadItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm truncate">${file.name}</span>
+                        <span class="text-xs text-gray-500">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
+                        <div class="bg-blue-600 h-1 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                `;
+                
+                document.getElementById('upload-list').appendChild(uploadItem);
+                
+                fetch('{{ route("wlcms.admin.media.upload") }}', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Upload response:', data);
+                    if (data.success) {
+                        uploadItem.querySelector('.text-xs').textContent = '100%';
+                        uploadItem.querySelector('.bg-blue-600').style.width = '100%';
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Upload error:', error);
+                    uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: Upload failed</div>`;
+                });
+            }
+            
+            if (uploadInput) {
+                uploadInput.addEventListener('change', handleFileUpload);
+                console.log('✅ Upload event listener added to main input');
+            }
+            
+            if (uploadInputEmpty) {
+                uploadInputEmpty.addEventListener('change', handleFileUpload);
+                console.log('✅ Upload event listener added to empty input');
+            }
+            
+            // New folder functionality
+            const newFolderBtn = document.getElementById('new-folder-btn');
+            const newFolderModal = document.getElementById('new-folder-modal');
+            const cancelFolderBtn = document.getElementById('cancel-folder');
+            const newFolderForm = document.getElementById('new-folder-form');
+            
+            if (newFolderBtn) {
+                newFolderBtn.addEventListener('click', () => {
+                    console.log('📁 New folder button clicked');
+                    if (newFolderModal) {
+                        newFolderModal.classList.remove('hidden');
+                    } else {
+                        console.error('❌ New folder modal not found');
+                    }
+                });
+                console.log('✅ New folder button event listener added');
+            } else {
+                console.error('❌ New folder button not found');
+            }
+            
+            if (cancelFolderBtn) {
+                cancelFolderBtn.addEventListener('click', () => {
+                    console.log('❌ Cancel folder button clicked');
+                    if (newFolderModal) {
+                        newFolderModal.classList.add('hidden');
+                    }
+                });
+            }
+            
+            if (newFolderForm) {
+                newFolderForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    console.log('📝 New folder form submitted');
+                    
+                    const formData = new FormData(e.target);
+                    formData.append('parent_id', {{ $currentFolder->id ?? 'null' }});
+                    formData.append('_token', '{{ csrf_token() }}');
+                    
+                    fetch('{{ route("wlcms.admin.media.folder.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('📁 Folder creation result:', data);
+                        if (data.success !== false) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Failed to create folder');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Folder creation error:', error);
+                        alert('Error creating folder');
+                    });
+                });
+            }
+            
+            // Media viewer functionality
+            function openMediaViewer(mediaId) {
+                console.log('🖼️ Opening media viewer for ID:', mediaId);
+                const url = `{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`;
+                console.log('🔗 Fetching URL:', url);
+                
+                fetch(url)
+                    .then(response => {
+                        console.log('📡 Media viewer response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('📄 Media viewer data:', data);
+                        const modal = document.getElementById('media-viewer-modal');
+                        const content = document.getElementById('media-viewer-content');
+                        
+                        document.getElementById('media-viewer-title').textContent = data.name;
+                        document.getElementById('media-viewer-filename').textContent = data.name;
+                        document.getElementById('media-viewer-size').textContent = data.human_size;
+                        document.getElementById('media-viewer-type').textContent = data.mime_type;
+                        document.getElementById('media-viewer-uploaded').textContent = data.created_at;
+                        document.getElementById('media-viewer-dimensions').textContent = data.dimensions || 'N/A';
+                        document.getElementById('media-viewer-download').href = data.url;
+                        
+                        if (data.type === 'image') {
+                            content.innerHTML = `<img src="${data.url}" class="max-w-full max-h-full object-contain mx-auto">`;
+                        } else if (data.type === 'video') {
+                            content.innerHTML = `<video controls class="max-w-full max-h-full mx-auto"><source src="${data.url}" type="${data.mime_type}"></video>`;
+                        } else if (data.type === 'audio') {
+                            content.innerHTML = `<audio controls class="w-full mt-8"><source src="${data.url}" type="${data.mime_type}"></audio>`;
+                        } else {
+                            content.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-center"><span class="text-6xl">📄</span><p class="mt-4">Preview not available for this file type</p></div></div>`;
+                        }
+                        
+                        modal.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('❌ Media viewer error:', error);
+                        alert('Failed to load media details');
+                    });
+            }
+            
+            // Close media viewer
+            const closeViewerBtn = document.getElementById('close-media-viewer');
+            if (closeViewerBtn) {
+                closeViewerBtn.addEventListener('click', () => {
+                    console.log('❌ Closing media viewer');
+                    document.getElementById('media-viewer-modal').classList.add('hidden');
+                });
+            }
+            
+            // Media preview click handlers
+            document.addEventListener('click', function(e) {
+                const mediaPreview = e.target.closest('.media-preview');
+                if (mediaPreview) {
+                    e.preventDefault();
+                    const mediaId = mediaPreview.getAttribute('data-media-id');
+                    console.log('🖼️ Media preview clicked, ID:', mediaId);
+                    if (mediaId) {
+                        openMediaViewer(mediaId);
+                    } else {
+                        console.error('❌ No media ID found on clicked element');
+                    }
+                }
+            });
+            
+            console.log('🎉 Media page JavaScript initialization complete!');
+        });
+        </script>
     </x-slot>
     <div class="mb-6">
         <div class="flex justify-between items-center">
@@ -253,15 +467,24 @@
             </div>
         </div>
     </div>
-
-    {{-- JavaScript --}}
-    @push('scripts')
-    <script>
+</x-admin-layout>
+        
         // Media upload functionality
-        document.getElementById('media_upload').addEventListener('change', handleFileUpload);
-        document.getElementById('media_upload_empty')?.addEventListener('change', handleFileUpload);
+        const uploadInput = document.getElementById('media_upload');
+        const uploadInputEmpty = document.getElementById('media_upload_empty');
+        
+        if (uploadInput) {
+            uploadInput.addEventListener('change', handleFileUpload);
+            console.log('Upload event listener added to main input');
+        }
+        
+        if (uploadInputEmpty) {
+            uploadInputEmpty.addEventListener('change', handleFileUpload);
+            console.log('Upload event listener added to empty input');
+        }
         
         function handleFileUpload(e) {
+            console.log('File upload triggered', e.target.files.length, 'files');
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
             
@@ -272,6 +495,7 @@
             uploadList.innerHTML = '';
             
             files.forEach((file, index) => {
+                console.log('Uploading file:', file.name);
                 uploadFile(file, index);
             });
         }
@@ -317,40 +541,89 @@
         }
         
         // New folder functionality
-        document.getElementById('new-folder-btn').addEventListener('click', () => {
-            document.getElementById('new-folder-modal').classList.remove('hidden');
+        const newFolderBtn = document.getElementById('new-folder-btn');
+        const newFolderModal = document.getElementById('new-folder-modal');
+        const cancelFolderBtn = document.getElementById('cancel-folder');
+        const newFolderForm = document.getElementById('new-folder-form');
+        
+        console.log('New folder elements:', {
+            button: newFolderBtn,
+            modal: newFolderModal,
+            form: newFolderForm
         });
         
-        document.getElementById('cancel-folder').addEventListener('click', () => {
-            document.getElementById('new-folder-modal').classList.add('hidden');
-        });
-        
-        document.getElementById('new-folder-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            formData.append('parent_id', {{ $currentFolder->id ?? 'null' }});
-            formData.append('_token', '{{ csrf_token() }}');
-            
-            fetch('{{ route("wlcms.admin.media.folder.store") }}', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
+        if (newFolderBtn) {
+            newFolderBtn.addEventListener('click', () => {
+                console.log('New folder button clicked');
+                if (newFolderModal) {
+                    newFolderModal.classList.remove('hidden');
                 } else {
-                    alert(data.message);
+                    console.error('New folder modal not found');
                 }
             });
-        });
+        } else {
+            console.error('New folder button not found');
+        }
+        
+        if (cancelFolderBtn) {
+            cancelFolderBtn.addEventListener('click', () => {
+                console.log('Cancel folder button clicked');
+                if (newFolderModal) {
+                    newFolderModal.classList.add('hidden');
+                }
+            });
+        }
+        
+        if (newFolderForm) {
+            newFolderForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log('New folder form submitted');
+                
+                const formData = new FormData(e.target);
+                formData.append('parent_id', {{ $currentFolder->id ?? 'null' }});
+                formData.append('_token', '{{ csrf_token() }}');
+                
+                console.log('Form data:', Object.fromEntries(formData));
+                
+                fetch('{{ route("wlcms.admin.media.folder.store") }}', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => {
+                    console.log('Folder creation response:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Folder creation result:', data);
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Failed to create folder');
+                    }
+                })
+                .catch(error => {
+                    console.error('Folder creation error:', error);
+                    alert('Error creating folder');
+                });
+            });
+        }
         
         // Media viewer functionality
         function openMediaViewer(mediaId) {
-            fetch(`{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`)
-                .then(response => response.json())
+            console.log('Opening media viewer for ID:', mediaId);
+            const url = `{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`;
+            console.log('Fetching URL:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Media viewer response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Media viewer data:', data);
                     const modal = document.getElementById('media-viewer-modal');
                     const content = document.getElementById('media-viewer-content');
                     
@@ -373,12 +646,20 @@
                     }
                     
                     modal.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Media viewer error:', error);
+                    alert('Failed to load media details');
                 });
         }
         
-        document.getElementById('close-media-viewer').addEventListener('click', () => {
-            document.getElementById('media-viewer-modal').classList.add('hidden');
-        });
+        const closeViewerBtn = document.getElementById('close-media-viewer');
+        if (closeViewerBtn) {
+            closeViewerBtn.addEventListener('click', () => {
+                console.log('Closing media viewer');
+                document.getElementById('media-viewer-modal').classList.add('hidden');
+            });
+        }
         
         // Add click listeners to all media preview items
         document.addEventListener('click', function(e) {
@@ -386,11 +667,14 @@
             if (mediaPreview) {
                 e.preventDefault();
                 const mediaId = mediaPreview.getAttribute('data-media-id');
+                console.log('Media preview clicked, ID:', mediaId);
                 if (mediaId) {
                     openMediaViewer(mediaId);
+                } else {
+                    console.error('No media ID found on clicked element');
                 }
             }
         });
-    </script>
+        </script>
     @endpush
 </x-admin-layout>
