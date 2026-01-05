@@ -72,12 +72,20 @@
                             location.reload();
                         }, 1000);
                     } else {
-                        uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: ${data.message}</div>`;
+                        let errorMessage = 'Upload failed';
+                        if (data.errors && data.errors.length > 0) {
+                            const fileError = data.errors.find(err => err.name === file.name);
+                            errorMessage = fileError ? fileError.error : data.errors[0].error;
+                        } else if (data.message) {
+                            errorMessage = data.message;
+                        }
+                        console.error('❌ Upload error for', file.name, ':', errorMessage);
+                        uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: ${errorMessage}</div>`;
                     }
                 })
                 .catch(error => {
                     console.error('❌ Upload error:', error);
-                    uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: Upload failed</div>`;
+                    uploadItem.innerHTML = `<div class="text-red-600 text-sm">${file.name}: Upload failed - ${error.message}</div>`;
                 });
             }
             
@@ -204,7 +212,16 @@
                                 <div style="display:none" class="text-center p-8"><span class="text-6xl">🖼️</span><p class="mt-4">Image preview unavailable</p><p class="text-sm text-gray-500">URL: ${data.url}</p></div>
                             </div>`;
                         } else if (data.type === 'video') {
-                            content.innerHTML = `<video controls class="max-w-full max-h-full mx-auto"><source src="${data.url}" type="${data.mime_type}"></video>`;
+                            console.log('🎥 Loading video URL:', data.url);
+                            content.innerHTML = `<div class="flex items-center justify-center h-96">
+                                <video controls class="max-h-96 max-w-full object-contain" 
+                                    preload="metadata"
+                                    onerror="console.error('❌ Video failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <source src="${data.url}" type="${data.mime_type}">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div style="display:none" class="text-center p-8"><span class="text-6xl">🎥</span><p class="mt-4">Video preview unavailable</p><p class="text-sm text-gray-500">URL: ${data.url}</p></div>
+                            </div>`;
                         } else if (data.type === 'audio') {
                             content.innerHTML = `<audio controls class="w-full mt-8"><source src="${data.url}" type="${data.mime_type}"></audio>`;
                         } else {

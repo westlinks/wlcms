@@ -198,6 +198,14 @@ class MediaController extends Controller
 
         foreach ($request->file('files', []) as $file) {
             try {
+                // Log upload attempt for debugging
+                Log::info('WLCMS Upload attempt', [
+                    'filename' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'max_allowed' => $maxSize * 1024 // Convert KB to bytes for comparison
+                ]);
+                
                 // Generate unique filename
                 $originalName = $file->getClientOriginalName();
                 $filename = time() . '_' . str()->random(8) . '.' . $file->getClientOriginalExtension();
@@ -247,6 +255,13 @@ class MediaController extends Controller
                 ];
 
             } catch (\Exception $e) {
+                Log::error('WLCMS Upload error', [
+                    'filename' => $file->getClientOriginalName(),
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+                
                 $errors[] = [
                     'name' => $file->getClientOriginalName(),
                     'error' => 'Upload failed: ' . $e->getMessage()
