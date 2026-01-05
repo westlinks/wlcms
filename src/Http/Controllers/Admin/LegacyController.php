@@ -774,4 +774,96 @@ class LegacyController extends Controller
             return back()->with('error', 'Navigation import failed: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Export navigation items
+     */
+    public function navigationExport(Request $request)
+    {
+        $format = $request->get('format', 'json');
+        $context = $request->get('context');
+        
+        // Build query
+        $query = CmsLegacyNavigationItem::with(['contentItem']);
+        
+        if ($context) {
+            $query->where('context', $context);
+        }
+        
+        $navigationItems = $query->orderBy('context')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
+
+        // Prepare export data
+        $exportData = $navigationItems->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'title' => $item->title,
+                'context' => $item->context,
+                'url' => $item->url,
+                'legacy_id' => $item->legacy_id,
+                'parent_legacy_id' => $item->parent_legacy_id,
+                'sort_order' => $item->sort_order,
+                'is_active' => $item->is_active,
+                'cms_content_item_id' => $item->cms_content_item_id,
+                'content_title' => $item->contentItem->title ?? null,
+                'metadata' => $item->metadata,
+                'created_at' => $item->created_at->toISOString(),
+                'updated_at' => $item->updated_at->toISOString(),
+            ];
+        });
+
+        $filename = 'navigation_items_' . now()->format('Y-m-d_H-i-s');
+        
+        if ($format === 'csv') {
+            // CSV Export
+            $csvData = [];
+            
+            // Headers
+            if ($exportData->isNotEmpty()) {
+                $headers = array_keys($exportData->first());
+                $csvData[] = implode(',', $headers);
+                
+                // Data rows
+                foreach ($exportData as $item) {
+                    $row = [];
+                    foreach ($item as $value) {
+                        // Escape CSV values
+                        if (is_array($value) || is_object($value)) {
+                            $value = json_encode($value);
+                        }
+                        $row[] = '"' . str_replace('"', '""', $value) . '"';
+                    }
+                    $csvData[] = implode(',', $row);
+                }
+            }
+            
+            $content = implode("\n", $csvData);
+            $filename .= '.csv';
+            
+            return response($content)
+                ->header('Content-Type', 'text/csv')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                
+        } else {
+            // JSON Export (default)
+            $data = [
+                'export_info' => [
+                    'generated_at' => now()->toISOString(),
+                    'total_items' => $exportData->count(),
+                    'context_filter' => $context,
+                    'format' => 'json',
+                ],
+                'navigation_items' => $exportData->values(),
+            ];
+            
+            $filename .= '.json';
+            
+            return response()->json($data, 200, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+    }
 }
