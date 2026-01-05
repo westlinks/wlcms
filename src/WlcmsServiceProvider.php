@@ -22,6 +22,19 @@ class WlcmsServiceProvider extends ServiceProvider
         $this->app->singleton('wlcms', function () {
             return new WlcmsManager();
         });
+
+        // Register Phase 4 services
+        $this->app->singleton(\Westlinks\Wlcms\Services\LegacyDatabaseService::class);
+        $this->app->singleton(\Westlinks\Wlcms\Services\FieldTransformationService::class);
+        $this->app->singleton(\Westlinks\Wlcms\Services\DataValidationService::class);
+        $this->app->singleton(\Westlinks\Wlcms\Services\MigrationProgressService::class);
+        
+        $this->app->bind(\Westlinks\Wlcms\Services\DataMigrationService::class, function ($app) {
+            return new \Westlinks\Wlcms\Services\DataMigrationService(
+                $app->make(\Westlinks\Wlcms\Services\LegacyDatabaseService::class),
+                $app->make(\Westlinks\Wlcms\Services\FieldTransformationService::class)
+            );
+        });
     }
 
     /**
@@ -84,6 +97,7 @@ class WlcmsServiceProvider extends ServiceProvider
             $this->commands([
                 Commands\InstallCommand::class,
                 Commands\MigrateContentCommand::class,
+                Commands\MigrateLegacyContentCommand::class,
                 Commands\RegenerateThumbnailsCommand::class,
             ]);
         }
