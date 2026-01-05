@@ -298,7 +298,7 @@
                             </button>
                         </div>
                         <div class="col-md-3 mb-2">
-                            <a href="{{ route('wlcms.admin.legacy.mappings.export') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ route('wlcms.admin.legacy.migration.export') }}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-download"></i> Export Data
                             </a>
                         </div>
