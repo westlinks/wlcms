@@ -276,6 +276,11 @@
                         document.getElementById('media-caption').value = data.caption || '';
                         document.getElementById('media-description').value = data.description || '';
                         
+                        // Store media data for form submission
+                        const modal = document.getElementById('media-viewer-modal');
+                        modal.dataset.mediaId = data.id;
+                        modal.dataset.mediaName = data.name;
+                        
                         modal.classList.remove('hidden');
                     })
                     .catch(error => {
@@ -336,43 +341,51 @@
                     e.preventDefault();
                     console.log('📝 Updating media metadata');
                     
-                    const formData = new FormData(e.target);
-                    const mediaId = window.currentMediaId; // Use the stored media ID
+                    const modal = document.getElementById('media-viewer-modal');
+                    const mediaId = modal.dataset.mediaId;
+                    const mediaName = modal.dataset.mediaName;
                     
                     if (!mediaId) {
                         console.error('❌ No media ID found for update');
+                        alert('Error: No media ID found');
                         return;
                     }
                     
+                    const formData = new FormData(e.target);
+                    formData.append('name', mediaName); // Required by the update method
                     formData.append('_token', '{{ csrf_token() }}');
                     formData.append('_method', 'PATCH');
+                    
+                    console.log('📤 Updating media ID:', mediaId, 'with data:', Object.fromEntries(formData));
                     
                     fetch(`{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`, {
                         method: 'POST',
                         body: formData,
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('📡 Update response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         console.log('✅ Metadata updated:', data);
-                        if (data.success !== false) {
-                            // Show success feedback
-                            const submitBtn = e.target.querySelector('button[type=\"submit\"]');
-                            const originalText = submitBtn.textContent;
-                            submitBtn.textContent = 'Updated!';
-                            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                            submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                            setTimeout(() => {
-                                submitBtn.textContent = originalText;
-                                submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                            }, 2000);
-                        } else {
-                            alert('Failed to update metadata: ' + (data.message || 'Unknown error'));
-                        }
+                        // Show success feedback
+                        const submitBtn = e.target.querySelector('button[type=\"submit\"]');
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = 'Updated!';
+                        submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                        submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                            submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        }, 2000);
                     })
                     .catch(error => {
                         console.error('❌ Metadata update error:', error);
-                        alert('Error updating metadata');
+                        alert('Error updating metadata: ' + error.message);
                     });
                 }
             });
