@@ -87,6 +87,12 @@ class LegacyController extends Controller
     public function storeMapping(ArticleMappingRequest $request)
     {
         $validated = $request->validated();
+        
+        // Map cms_content_id to cms_content_item_id for database
+        if (isset($validated['cms_content_id'])) {
+            $validated['cms_content_item_id'] = $validated['cms_content_id'];
+            unset($validated['cms_content_id']);
+        }
 
         $mapping = CmsLegacyArticleMapping::create($validated);
 
