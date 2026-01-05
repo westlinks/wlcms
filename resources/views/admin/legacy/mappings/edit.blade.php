@@ -248,75 +248,9 @@
     @push('scripts')
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Field override script loading...');
-        
-        const addOverrideBtn = document.getElementById('add-override');
-        const overridesContainer = document.getElementById('field-overrides');
-        
-        console.log('Add Override Button:', addOverrideBtn);
-        console.log('Overrides Container:', overridesContainer);
-        
-        if (addOverrideBtn && overridesContainer) {
-            addOverrideBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Add Override button clicked');
-                
-                const row = document.createElement('div');
-                row.className = 'grid grid-cols-4 gap-4 items-center override-row';
-                row.innerHTML = `
-                    <div>
-                        <input type="text" 
-                               name="new_overrides[field_name][]" 
-                               placeholder="Field name"
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    </div>
-                    <div>
-                        <input type="text" 
-                               name="new_overrides[override_value][]" 
-                               placeholder="Override value"
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    </div>
-                    <div>
-                        <select name="new_overrides[field_type][]" 
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                            <option value="string">String</option>
-                            <option value="text">Text</option>
-                            <option value="integer">Integer</option>
-                            <option value="boolean">Boolean</option>
-                            <option value="json">JSON</option>
-                            <option value="datetime">DateTime</option>
-                        </select>
-                    </div>
-                    <div class="text-center">
-                        <button type="button" 
-                                class="remove-override text-red-600 hover:text-red-800"
-                                title="Remove override">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                
-                overridesContainer.appendChild(row);
-                console.log('Override row added');
-            });
-        } else {
-            console.error('Required elements not found:', { 
-                addOverrideBtn: !!addOverrideBtn, 
-                overridesContainer: !!overridesContainer 
-            });
-        }
-        
-        // Remove override functionality
-        if (overridesContainer) {
-            overridesContainer.addEventListener('click', function(e) {
-                if (e.target.closest('.remove-override')) {
-                    e.preventDefault();
-                    e.target.closest('.override-row').remove();
-                    console.log('Override row removed');
-                }
-            });
+        // Initialize WLCMS components, including field override manager
+        if (window.initWlcms) {
+            window.initWlcms();
         }
     });
     </script>
