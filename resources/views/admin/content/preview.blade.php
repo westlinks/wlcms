@@ -1,9 +1,10 @@
-@extends('wlcms::admin.layout')
+<x-admin-layout title="Content Preview">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            Preview: {{ $content->title }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Preview: ' . $content->title . ' - WLCMS Admin')
-@section('page-title', 'Content Preview')
-
-@section('content')
 <div class="max-w-7xl mx-auto">
     <div class="mb-6 flex justify-between items-center">
         <div>
@@ -120,4 +121,5 @@
         <p class="text-xs text-gray-500 mt-2">This is how your content might appear in search engine results.</p>
     </div>
 </div>
-@endsection
+</div>
+</x-admin-layout>

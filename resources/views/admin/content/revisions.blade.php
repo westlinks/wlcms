@@ -1,9 +1,10 @@
-@extends('wlcms::admin.layout')
+<x-admin-layout title="Content Revisions">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            Revisions: {{ $content->title }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Revisions: ' . $content->title . ' - WLCMS Admin')
-@section('page-title', 'Content Revisions')
-
-@section('content')
 <div class="max-w-4xl">
     <div class="mb-6 flex justify-between items-center">
         <div>
@@ -138,4 +139,5 @@ function confirmRevisionAction() {
     closeRevisionModal();
 }
 </script>
-@endsection
+</div>
+</x-admin-layout>
