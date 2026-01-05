@@ -18,49 +18,62 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         @endif
     </label>
     
-    <div class="editor-container">
+    <div class="editor-container" style="border: 1px solid #d1d5db; border-radius: 0.375rem; overflow: hidden; background: white;">
         <!-- Toolbar -->
-        <div id="{{ $editorId }}-toolbar" class="editor-toolbar">
+        <div id="{{ $editorId }}-toolbar" class="editor-toolbar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
             <!-- Text formatting -->
-            <button type="button" data-action="bold" title="Bold (Ctrl+B)">
+            <button type="button" data-action="bold" title="Bold (Ctrl+B)" 
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
                 <strong>B</strong>
             </button>
-            <button type="button" data-action="italic" title="Italic (Ctrl+I)">
+            <button type="button" data-action="italic" title="Italic (Ctrl+I)"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
                 <em>I</em>
             </button>
-            <button type="button" data-action="code" title="Inline Code">
+            <button type="button" data-action="code" title="Inline Code"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
                 &lt;/&gt;
             </button>
             
-            <div class="separator"></div>
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
             <!-- Headings -->
-            <button type="button" data-action="h1" title="Heading 1">H1</button>
-            <button type="button" data-action="h2" title="Heading 2">H2</button>
-            <button type="button" data-action="h3" title="Heading 3">H3</button>
+            <button type="button" data-action="h1" title="Heading 1"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">H1</button>
+            <button type="button" data-action="h2" title="Heading 2"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">H2</button>
+            <button type="button" data-action="h3" title="Heading 3"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">H3</button>
             
-            <div class="separator"></div>
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
             <!-- Lists -->
-            <button type="button" data-action="bullet-list" title="Bullet List">•</button>
-            <button type="button" data-action="ordered-list" title="Numbered List">1.</button>
+            <button type="button" data-action="bullet-list" title="Bullet List"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">•</button>
+            <button type="button" data-action="ordered-list" title="Numbered List"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">1.</button>
             
-            <div class="separator"></div>
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
             <!-- Blocks -->
-            <button type="button" data-action="blockquote" title="Blockquote">"</button>
-            <button type="button" data-action="code-block" title="Code Block">{ }</button>
+            <button type="button" data-action="blockquote" title="Blockquote"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">"</button>
+            <button type="button" data-action="code-block" title="Code Block"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">{ }</button>
             
-            <div class="separator"></div>
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
             <!-- History -->
-            <button type="button" data-action="undo" title="Undo (Ctrl+Z)">↶</button>
-            <button type="button" data-action="redo" title="Redo (Ctrl+Y)">↷</button>
+            <button type="button" data-action="undo" title="Undo (Ctrl+Z)"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">↶</button>
+            <button type="button" data-action="redo" title="Redo (Ctrl+Y)"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">↷</button>
             
-            <div class="separator"></div>
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
             <!-- Source View -->
-            <button type="button" data-action="source" title="View/Edit HTML Source" class="source-toggle">
+            <button type="button" data-action="source" title="View/Edit HTML Source" class="source-toggle"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 50px;">
                 <span>HTML</span>
             </button>
         </div>
@@ -145,37 +158,76 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Focus editor before command
                 editorElement.focus();
                 
+                // Add button hover and active styles
+                function setActiveButton(btn) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.borderColor = '#3b82f6';
+                    btn.style.color = 'white';
+                    btn.classList.add('is-active');
+                }
+                
+                function setInactiveButton(btn) {
+                    btn.style.background = 'white';
+                    btn.style.borderColor = '#d1d5db';
+                    btn.style.color = '#374151';
+                    btn.classList.remove('is-active');
+                }
+                
                 switch(action) {
                     case 'bold':
                         document.execCommand('bold', false, null);
-                        button.classList.toggle('is-active');
+                        if (document.queryCommandState('bold')) {
+                            setActiveButton(button);
+                        } else {
+                            setInactiveButton(button);
+                        }
                         break;
                     case 'italic':
                         document.execCommand('italic', false, null);
-                        button.classList.toggle('is-active');
+                        if (document.queryCommandState('italic')) {
+                            setActiveButton(button);
+                        } else {
+                            setInactiveButton(button);
+                        }
                         break;
                     case 'code':
                         document.execCommand('formatBlock', false, '<code>');
                         break;
                     case 'h1':
                         document.execCommand('formatBlock', false, '<h1>');
+                        // Reset other heading buttons
+                        toolbar.querySelectorAll('[data-action^="h"]').forEach(setInactiveButton);
+                        setActiveButton(button);
                         break;
                     case 'h2':
                         document.execCommand('formatBlock', false, '<h2>');
+                        toolbar.querySelectorAll('[data-action^="h"]').forEach(setInactiveButton);
+                        setActiveButton(button);
                         break;
                     case 'h3':
                         document.execCommand('formatBlock', false, '<h3>');
+                        toolbar.querySelectorAll('[data-action^="h"]').forEach(setInactiveButton);
+                        setActiveButton(button);
                         break;
                     case 'bullet-list':
                         document.execCommand('insertUnorderedList', false, null);
-                        button.classList.toggle('is-active');
+                        if (document.queryCommandState('insertUnorderedList')) {
+                            setActiveButton(button);
+                        } else {
+                            setInactiveButton(button);
+                        }
                         break;
                     case 'ordered-list':
                         document.execCommand('insertOrderedList', false, null);
-                        button.classList.toggle('is-active');
+                        if (document.queryCommandState('insertOrderedList')) {
+                            setActiveButton(button);
+                        } else {
+                            setInactiveButton(button);
+                        }
                         break;
                     case 'blockquote':
                         document.execCommand('formatBlock', false, '<blockquote>');
+                        setActiveButton(button);
                         break;
                     case 'source':
                         toggleSourceView();
@@ -205,6 +257,9 @@ document.addEventListener('DOMContentLoaded', function() {
             sourceElement.classList.remove('hidden');
             sourceElement.value = editorElement.innerHTML;
             editorElement.style.display = 'none';
+            sourceButton.style.background = '#059669';
+            sourceButton.style.borderColor = '#059669';
+            sourceButton.style.color = 'white';
             sourceButton.classList.add('is-active');
             sourceElement.focus();
         } else {
@@ -212,6 +267,9 @@ document.addEventListener('DOMContentLoaded', function() {
             sourceElement.classList.add('hidden');
             editorElement.innerHTML = sourceElement.value;
             editorElement.style.display = 'block';
+            sourceButton.style.background = 'white';
+            sourceButton.style.borderColor = '#d1d5db';
+            sourceButton.style.color = '#374151';
             sourceButton.classList.remove('is-active');
             editorElement.focus();
             hiddenTextarea.value = editorElement.innerHTML;
