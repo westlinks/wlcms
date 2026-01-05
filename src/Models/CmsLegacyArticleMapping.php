@@ -88,7 +88,7 @@ class CmsLegacyArticleMapping extends Model
         $legacyData = $legacyArticle->toArray();
         
         // Apply default field mappings from config
-        $fieldMappings = config('wlcms.legacy_integration.default_field_mappings.articles', []);
+        $fieldMappings = config('wlcms.legacy.field_mappings', []);
         $data = [];
         
         // Map legacy fields to CMS fields using configuration
