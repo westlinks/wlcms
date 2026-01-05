@@ -24,6 +24,11 @@ return new class extends Migration
                   ->default('replacement');
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->enum('sync_frequency', ['manual', 'hourly', 'daily', 'weekly'])
+                  ->default('manual');
+            $table->json('field_mappings')->nullable();
+            $table->timestamp('last_sync_at')->nullable();
+            $table->text('sync_error')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
             

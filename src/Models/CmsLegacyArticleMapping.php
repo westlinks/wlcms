@@ -20,12 +20,18 @@ class CmsLegacyArticleMapping extends Model
         'mapping_type',
         'sort_order',
         'is_active',
+        'sync_frequency',
+        'field_mappings',
+        'last_sync_at',
+        'sync_error',
         'metadata',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'field_mappings' => 'array',
+        'last_sync_at' => 'datetime',
         'metadata' => 'array',
     ];
 
