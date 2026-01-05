@@ -70,12 +70,14 @@ class WlcmsServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         // Register Blade components conditionally to avoid conflicts
-        if (config('wlcms.layout.mode') === 'standalone') {
+        $layoutMode = config('wlcms.layout.mode', 'standalone');
+        
+        if ($layoutMode === 'standalone') {
             // Only register layout components and namespace in standalone mode
             Blade::component('wlcms-admin-layout', AdminLayout::class);
             Blade::componentNamespace('Westlinks\\Wlcms\\View\\Components', 'wlcms');
         }
-        // In embedded mode, no component registration - views must use host layout
+        // In embedded mode, NO component registration at all - host's components take precedence
 
         // Register commands if running in console
         if ($this->app->runningInConsole()) {

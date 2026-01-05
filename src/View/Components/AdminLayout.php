@@ -31,7 +31,7 @@ class AdminLayout extends Component
             }
         }
 
-        // Use package's own admin layout with full navigation
-        return view('wlcms::components.admin-layout');
+        // Use package's own admin layout with full navigation (renamed component)
+        return view('wlcms::components.wlcms-admin-layout');
     }
 }

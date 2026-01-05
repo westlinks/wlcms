@@ -1,9 +1,18 @@
-<x-admin-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@if(config('wlcms.layout.mode') === 'embedded')
+    <x-dynamic-component :component="config('wlcms.layout.host_layout', 'layouts.admin-layout')" title="CMS Dashboard">
+        <x-slot name="header">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Dashboard') }}
+            </h2>
+        </x-slot>
+@else
+    <x-wlcms-admin-layout>
+        <x-slot name="header">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Dashboard') }}
+            </h2>
+        </x-slot>
+@endif
 
     {{-- WLCMS Styles --}}
     @push('styles')
@@ -159,4 +168,8 @@
             </div>
         </div>
     </div>
-</x-admin-layout>
+@if(config('wlcms.layout.mode') === 'embedded')
+    </x-dynamic-component>
+@else
+    </x-wlcms-admin-layout>
+@endif
