@@ -315,7 +315,7 @@ class LegacyController extends Controller
     {
         $parentOptions = CmsLegacyNavigationItem::whereNull('parent_id')
             ->orWhere('parent_id', 0)
-            ->orderBy('title')
+            ->orderBy('label')
             ->get();
 
         return view('wlcms::admin.legacy.navigation.create', compact('parentOptions'));
