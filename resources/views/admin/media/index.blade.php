@@ -45,6 +45,12 @@
                 formData.append('folder_id', {{ $currentFolder->id ?? 'null' }});
                 formData.append('_token', '{{ csrf_token() }}');
                 
+                console.log('🚀 Upload details:');
+                console.log('  📁 File:', file.name, file.size, 'bytes');
+                console.log('  🎯 URL:', '{{ route("wlcms.admin.media.upload") }}');
+                console.log('  🔐 CSRF token:', '{{ csrf_token() }}');
+                console.log('  📂 Folder ID:', {{ $currentFolder->id ?? 'null' }});
+                
                 const uploadItem = document.createElement('div');
                 uploadItem.innerHTML = `
                     <div class="flex items-center justify-between">
@@ -73,8 +79,22 @@
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
                         return response.text().then(text => {
-                            console.error('❌ Expected JSON but got:', text.substring(0, 200));
-                            throw new Error('Server returned HTML instead of JSON - check server logs');
+                            console.error('❌ Expected JSON but got HTML response:');
+                            console.error('📄 First 500 chars:', text.substring(0, 500));
+                            console.error('🔍 Looking for error patterns...');
+                            
+                            // Look for common error patterns
+                            if (text.includes('413') || text.includes('Request Entity Too Large')) {
+                                throw new Error('File too large - check server upload limits');
+                            } else if (text.includes('404') || text.includes('Not Found')) {
+                                throw new Error('Upload route not found - check routing');
+                            } else if (text.includes('500') || text.includes('Internal Server Error')) {
+                                throw new Error('Server error - check server logs');
+                            } else if (text.includes('419') || text.includes('CSRF')) {
+                                throw new Error('CSRF token mismatch - try refreshing page');
+                            } else {
+                                throw new Error('Server returned HTML instead of JSON - check server configuration');
+                            }
                         });
                     }
                     

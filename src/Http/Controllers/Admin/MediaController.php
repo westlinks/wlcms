@@ -184,6 +184,15 @@ class MediaController extends Controller
 
     public function upload(Request $request)
     {
+        // Add immediate logging to confirm we reach the method
+        Log::info('WLCMS Upload method called', [
+            'has_files' => $request->hasFile('files'),
+            'files_count' => $request->hasFile('files') ? count($request->file('files')) : 0,
+            'post_max_size' => ini_get('post_max_size'),
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'max_file_uploads' => ini_get('max_file_uploads')
+        ]);
+        
         $maxSize = config('wlcms.media.max_file_size', 20480);
         
         $request->validate([
