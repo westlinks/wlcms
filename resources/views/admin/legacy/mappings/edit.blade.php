@@ -247,7 +247,10 @@
 
     @push('scripts')
     <script>
+    console.log('=== SCRIPT TAG LOADED ===');
+    
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== DOM READY ===');
         console.log('Testing field override functionality...');
         
         // Test if elements exist
@@ -281,6 +284,7 @@
             });
         } else {
             console.error('Required elements not found!');
+            console.log('Available elements with IDs:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
         }
         
         // Initialize WLCMS components if available (for when Vite is compiled)
