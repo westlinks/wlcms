@@ -102,10 +102,10 @@ class LegacyController extends Controller
             foreach ($request->field_mappings as $field => $override) {
                 if (!empty($override)) {
                     CmsLegacyFieldOverride::create([
-                        'legacy_mapping_id' => $mapping->id,
+                        'cms_legacy_article_mapping_id' => $mapping->id,
                         'field_name' => $field,
                         'override_value' => $override,
-                        'data_type' => 'string', // Default type
+                        'field_type' => 'string', // Default type
                         'is_active' => true,
                     ]);
                 }
@@ -142,10 +142,10 @@ class LegacyController extends Controller
             foreach ($request->field_mappings as $field => $override) {
                 if (!empty($override)) {
                     CmsLegacyFieldOverride::create([
-                        'legacy_mapping_id' => $mapping->id,
+                        'cms_legacy_article_mapping_id' => $mapping->id,
                         'field_name' => $field,
                         'override_value' => $override,
-                        'data_type' => 'string',
+                        'field_type' => 'string',
                         'is_active' => true,
                     ]);
                 }
