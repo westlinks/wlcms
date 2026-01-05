@@ -720,8 +720,8 @@ class LegacyController extends Controller
             foreach ($importData as $item) {
                 try {
                     // Check if navigation item already exists
-                    $existing = CmsLegacyNavigationItem::where('legacy_id', $item['legacy_id'] ?? null)
-                        ->orWhere('title', $item['title'] ?? null)
+                    $existing = CmsLegacyNavigationItem::where('slug', $item['slug'] ?? null)
+                        ->orWhere('label', $item['label'] ?? null)
                         ->first();
 
                     if ($existing && !$request->boolean('overwrite_existing')) {
@@ -731,13 +731,17 @@ class LegacyController extends Controller
 
                     // Prepare navigation item data
                     $navigationData = [
-                        'title' => $item['title'] ?? 'Untitled',
-                        'context' => $item['context'] ?? 'main',
-                        'url' => $item['url'] ?? null,
-                        'legacy_id' => $item['legacy_id'] ?? null,
-                        'parent_legacy_id' => $item['parent_legacy_id'] ?? null,
+                        'label' => $item['label'] ?? 'Untitled',
+                        'navigation_context' => $item['navigation_context'] ?? 'main',
+                        'slug' => $item['slug'] ?? null,
+                        'parent_id' => $item['parent_id'] ?? null,
                         'sort_order' => $item['sort_order'] ?? 0,
+                        'css_class' => $item['css_class'] ?? null,
+                        'icon' => $item['icon'] ?? null,
                         'is_active' => $item['is_active'] ?? true,
+                        'show_in_menu' => $item['show_in_menu'] ?? true,
+                        'target' => $item['target'] ?? '_self',
+                        'cms_content_item_id' => $item['cms_content_item_id'] ?? null,
                         'metadata' => isset($item['metadata']) ? 
                             (is_array($item['metadata']) ? $item['metadata'] : json_decode($item['metadata'], true)) : 
                             [],
@@ -781,31 +785,34 @@ class LegacyController extends Controller
     public function navigationExport(Request $request)
     {
         $format = $request->get('format', 'json');
-        $context = $request->get('context');
+        $navigationContext = $request->get('context');
         
         // Build query
         $query = CmsLegacyNavigationItem::with(['contentItem']);
         
-        if ($context) {
-            $query->where('context', $context);
+        if ($navigationContext) {
+            $query->where('navigation_context', $navigationContext);
         }
         
-        $navigationItems = $query->orderBy('context')
+        $navigationItems = $query->orderBy('navigation_context')
             ->orderBy('sort_order')
-            ->orderBy('title')
+            ->orderBy('label')
             ->get();
 
         // Prepare export data
         $exportData = $navigationItems->map(function ($item) {
             return [
                 'id' => $item->id,
-                'title' => $item->title,
-                'context' => $item->context,
-                'url' => $item->url,
-                'legacy_id' => $item->legacy_id,
-                'parent_legacy_id' => $item->parent_legacy_id,
+                'label' => $item->label,
+                'navigation_context' => $item->navigation_context,
+                'slug' => $item->slug,
+                'parent_id' => $item->parent_id,
                 'sort_order' => $item->sort_order,
+                'css_class' => $item->css_class,
+                'icon' => $item->icon,
                 'is_active' => $item->is_active,
+                'show_in_menu' => $item->show_in_menu,
+                'target' => $item->target,
                 'cms_content_item_id' => $item->cms_content_item_id,
                 'content_title' => $item->contentItem->title ?? null,
                 'metadata' => $item->metadata,
@@ -852,7 +859,7 @@ class LegacyController extends Controller
                 'export_info' => [
                     'generated_at' => now()->toISOString(),
                     'total_items' => $exportData->count(),
-                    'context_filter' => $context,
+                    'context_filter' => $navigationContext,
                     'format' => 'json',
                 ],
                 'navigation_items' => $exportData->values(),
