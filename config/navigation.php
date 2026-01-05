@@ -51,6 +51,43 @@ return [
             'badge' => null,
             'permission' => 'wlcms.manage_media',
             'description' => 'Upload and organize media files'
+        ],
+        
+        // Legacy Integration (conditionally shown based on config)
+        [
+            'label' => 'Legacy Integration',
+            'route' => 'wlcms.admin.legacy.index',
+            'icon' => 'arrow-path-rounded-square',
+            'badge' => null,
+            'permission' => 'wlcms.manage_legacy',
+            'description' => 'Legacy article integration and migration tools',
+            'condition' => 'config("wlcms.legacy.enabled", false)', // Only show if legacy is enabled
+            'children' => [
+                [
+                    'label' => 'Dashboard',
+                    'route' => 'wlcms.admin.legacy.index',
+                    'icon' => 'squares-2x2',
+                    'permission' => 'wlcms.manage_legacy'
+                ],
+                [
+                    'label' => 'Article Mappings',
+                    'route' => 'wlcms.admin.legacy.mappings.index',
+                    'icon' => 'link',
+                    'permission' => 'wlcms.manage_legacy'
+                ],
+                [
+                    'label' => 'Navigation Items',
+                    'route' => 'wlcms.admin.legacy.navigation.index',
+                    'icon' => 'bars-3',
+                    'permission' => 'wlcms.manage_legacy'
+                ],
+                [
+                    'label' => 'Migration Tools',
+                    'route' => 'wlcms.admin.legacy.migration.index',
+                    'icon' => 'arrow-path',
+                    'permission' => 'wlcms.manage_legacy'
+                ]
+            ]
         ]
     ],
 
@@ -78,7 +115,11 @@ return [
                 'plus-circle' => 'plus-circle',
                 'photo' => 'photo',
                 'folder' => 'folder',
-                'cog-6-tooth' => 'cog-6-tooth'
+                'cog-6-tooth' => 'cog-6-tooth',
+                'arrow-path-rounded-square' => 'arrow-path-rounded-square',
+                'link' => 'link',
+                'bars-3' => 'bars-3',
+                'arrow-path' => 'arrow-path'
             ],
             'fontawesome' => [
                 'squares-2x2' => 'fas fa-th',
@@ -121,7 +162,17 @@ return [
         'wlcms.delete_content' => 'Delete Content',
         'wlcms.manage_media' => 'Manage Media Library',
         'wlcms.upload_media' => 'Upload Media Files',
-        'wlcms.delete_media' => 'Delete Media Files'
+        'wlcms.delete_media' => 'Delete Media Files',
+        
+        // Legacy Integration Permissions
+        'wlcms.manage_legacy' => 'Manage Legacy Integration',
+        'wlcms.view_legacy_mappings' => 'View Legacy Article Mappings',
+        'wlcms.create_legacy_mappings' => 'Create Legacy Article Mappings',
+        'wlcms.edit_legacy_mappings' => 'Edit Legacy Article Mappings',
+        'wlcms.delete_legacy_mappings' => 'Delete Legacy Article Mappings',
+        'wlcms.sync_legacy_mappings' => 'Sync Legacy Article Mappings',
+        'wlcms.manage_legacy_navigation' => 'Manage Legacy Navigation Items',
+        'wlcms.use_legacy_migration_tools' => 'Use Legacy Migration Tools'
     ],
 
     /*

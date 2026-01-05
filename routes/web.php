@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Westlinks\Wlcms\Http\Controllers\Admin\ContentController;
 use Westlinks\Wlcms\Http\Controllers\Admin\MediaController;
 use Westlinks\Wlcms\Http\Controllers\Admin\DashboardController;
+use Westlinks\Wlcms\Http\Controllers\Admin\LegacyController;
 
 // Admin routes (protected by middleware defined in config)
 Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
@@ -37,6 +38,30 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('media/folder', [MediaController::class, 'createFolder'])->name('media.folder.store');
         Route::put('media/folder/{folder}', [MediaController::class, 'updateFolder'])->name('media.folder.update');
         Route::delete('media/folder/{folder}', [MediaController::class, 'deleteFolder'])->name('media.folder.destroy');
+        
+        // Legacy article integration (conditionally registered)
+        if (config('wlcms.legacy.enabled', false)) {
+            // Legacy dashboard
+            Route::get('legacy', [LegacyController::class, 'index'])->name('legacy.index');
+            
+            // Article mappings
+            Route::get('legacy/mappings', [LegacyController::class, 'mappings'])->name('legacy.mappings.index');
+            Route::get('legacy/mappings/create', [LegacyController::class, 'createMapping'])->name('legacy.mappings.create');
+            Route::post('legacy/mappings', [LegacyController::class, 'storeMapping'])->name('legacy.mappings.store');
+            Route::get('legacy/mappings/{mapping}/edit', [LegacyController::class, 'editMapping'])->name('legacy.mappings.edit');
+            Route::put('legacy/mappings/{mapping}', [LegacyController::class, 'updateMapping'])->name('legacy.mappings.update');
+            Route::delete('legacy/mappings/{mapping}', [LegacyController::class, 'destroyMapping'])->name('legacy.mappings.destroy');
+            
+            // Sync operations
+            Route::post('legacy/mappings/{mapping}/sync', [LegacyController::class, 'syncMapping'])->name('legacy.mappings.sync');
+            Route::post('legacy/mappings/bulk-sync', [LegacyController::class, 'bulkSync'])->name('legacy.mappings.bulk-sync');
+            
+            // Navigation management
+            Route::get('legacy/navigation', [LegacyController::class, 'navigation'])->name('legacy.navigation.index');
+            
+            // Migration tools
+            Route::get('legacy/migration', [LegacyController::class, 'migration'])->name('legacy.migration.index');
+        }
     });
 
 // Frontend routes (will be registered if enabled in config)
