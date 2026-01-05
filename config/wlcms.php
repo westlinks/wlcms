@@ -231,6 +231,72 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Legacy Article Integration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for optional legacy article system integration.
+    | Disabled by default to maintain clean WLCMS architecture.
+    |
+    */
+    'legacy' => [
+        // Enable legacy article integration
+        'enabled' => env('WLCMS_LEGACY_INTEGRATION', false),
+        
+        // Legacy article table name
+        'article_table' => env('WLCMS_LEGACY_TABLE', 'articles'),
+        
+        // Legacy article model class
+        'article_model' => env('WLCMS_LEGACY_MODEL', 'App\Models\Article'),
+        
+        // Route prefix for legacy routes
+        'route_prefix' => env('WLCMS_LEGACY_ROUTE_PREFIX', 'articles'),
+        
+        // Field mappings between legacy articles and CMS content
+        'field_mappings' => [
+            // Content fields
+            'title' => 'title',
+            'subtitle' => 'subtitle', 
+            'content' => 'description',
+            'intro' => 'intro',
+            'abstract' => 'abstract',
+            'slug' => 'slug',
+            'menu_title' => 'menu_title',
+            
+            // Image fields
+            'image' => 'image',
+            'image_caption' => 'image_caption',
+            'image_width' => 'image_width',
+            'image_height' => 'image_height',
+            'image_position' => 'image_position', 
+            'image_credits' => 'image_credits',
+            
+            // Display settings
+            'is_rich_text' => 'is_rich_text',
+            'sort' => 'sort',
+            'published' => 'published',
+            'top_menu' => 'top_menu',
+            
+            // Hierarchy
+            'is_parent' => 'is_parent',
+            'parent_id' => 'parent_id',
+            
+            // Management
+            'template_id' => 'template_id',
+            'created_by' => 'created_by',
+            'updated_by' => 'updated_by',
+        ],
+        
+        // Migration settings
+        'migration' => [
+            'enabled' => env('WLCMS_LEGACY_MIGRATION', true),
+            'batch_size' => 50,
+            'preserve_urls' => true,
+            'create_redirects' => true,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Frontend Settings
     |--------------------------------------------------------------------------
     |

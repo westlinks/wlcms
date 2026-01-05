@@ -125,6 +125,83 @@ class ContentItem extends Model
     }
 
     /**
+     * Get the legacy article mappings for this content item.
+     */
+    public function legacyArticleMappings(): HasMany
+    {
+        return $this->hasMany(CmsLegacyArticleMapping::class, 'cms_content_item_id');
+    }
+
+    /**
+     * Get the active legacy article mappings.
+     */
+    public function activeLegacyMappings(): HasMany
+    {
+        return $this->legacyArticleMappings()->where('is_active', true);
+    }
+
+    /**
+     * Get the legacy navigation items for this content item.
+     */
+    public function legacyNavigationItems(): HasMany
+    {
+        return $this->hasMany(CmsLegacyNavigationItem::class, 'cms_content_item_id');
+    }
+
+    /**
+     * Get active legacy navigation items.
+     */
+    public function activeLegacyNavigationItems(): HasMany
+    {
+        return $this->legacyNavigationItems()->where('is_active', true);
+    }
+
+    /**
+     * Get the associated legacy article (if any).
+     */
+    public function getLegacyArticle()
+    {
+        if (!config('wlcms.legacy.enabled', false)) {
+            return null;
+        }
+
+        $mapping = $this->activeLegacyMappings()->first();
+        if ($mapping && class_exists(config('wlcms.legacy.article_model'))) {
+            return $mapping->getLegacyArticle();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Check if this content item has legacy mappings.
+     */
+    public function hasLegacyMapping(): bool
+    {
+        return config('wlcms.legacy.enabled', false) && 
+               $this->activeLegacyMappings()->exists();
+    }
+
+    /**
+     * Get effective content data with legacy overrides applied.
+     */
+    public function getEffectiveContentData(): array
+    {
+        $data = $this->toArray();
+
+        if (config('wlcms.legacy.enabled', false)) {
+            $mapping = $this->activeLegacyMappings()->first();
+            if ($mapping) {
+                $legacyData = $mapping->getEffectiveArticleData();
+                // Merge legacy data with CMS data (CMS takes precedence)
+                $data = array_merge($legacyData, $data);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Get the user who created this content.
      */
     public function creator(): BelongsTo
