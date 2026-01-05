@@ -152,6 +152,10 @@
             // Media viewer functionality
             function openMediaViewer(mediaId) {
                 console.log('🖼️ Opening media viewer for ID:', mediaId);
+                
+                // Store media ID for form submissions
+                window.currentMediaId = mediaId;
+                
                 const url = `{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`;
                 console.log('🔗 Fetching URL:', url);
                 
@@ -179,25 +183,26 @@
                         const downloadContainer = document.getElementById('media-viewer-downloads');
                         if (data.download_sizes && data.download_sizes.length > 0) {
                             console.log('📏 Multiple download sizes available:', data.download_sizes.length);
-                            let downloadHTML = '<div class="space-y-1">';
+                            let downloadHTML = '';
                             for (const [key, sizeData] of Object.entries(data.download_sizes)) {
                                 downloadHTML += `
-                                    <a href="${sizeData.url}" download class="inline-block bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 mr-1 mb-1">
-                                        ${sizeData.label} (${sizeData.description})
+                                    <a href="${sizeData.url}" download class="block w-full text-center bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 mb-1">
+                                        ${sizeData.label} - ${sizeData.description}
                                     </a>`;
                             }
-                            downloadHTML += '</div>';
                             downloadContainer.innerHTML = downloadHTML;
                         } else {
                             // Fallback single download
-                            downloadContainer.innerHTML = `<a href="${data.url}" download class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Download</a>`;
+                            downloadContainer.innerHTML = `<a href="${data.url}" download class="block w-full text-center bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Download Original</a>`;
                         }
                         
                         if (data.type === 'image') {
                             console.log('🖼️ Loading image URL:', data.url);
-                            content.innerHTML = `<img src="${data.url}" class="max-w-full max-h-full object-contain mx-auto" 
-                                onerror="console.error('❌ Image failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <div style="display:none" class="text-center p-8"><span class="text-6xl">🖼️</span><p class="mt-4">Image preview unavailable</p><p class="text-sm text-gray-500">URL: ${data.url}</p></div>`;
+                            content.innerHTML = `<div class="flex items-center justify-center h-96">
+                                <img src="${data.url}" class="max-h-96 max-w-full object-contain" 
+                                    onerror="console.error('❌ Image failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none" class="text-center p-8"><span class="text-6xl">🖼️</span><p class="mt-4">Image preview unavailable</p><p class="text-sm text-gray-500">URL: ${data.url}</p></div>
+                            </div>`;
                         } else if (data.type === 'video') {
                             content.innerHTML = `<video controls class="max-w-full max-h-full mx-auto"><source src="${data.url}" type="${data.mime_type}"></video>`;
                         } else if (data.type === 'audio') {
@@ -205,6 +210,11 @@
                         } else {
                             content.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-center"><span class="text-6xl">📄</span><p class="mt-4">Preview not available for this file type</p></div></div>`;
                         }
+                        
+                        // Populate metadata form fields
+                        document.getElementById('media-alt-text').value = data.alt_text || '';
+                        document.getElementById('media-caption').value = data.caption || '';
+                        document.getElementById('media-description').value = data.description || '';
                         
                         modal.classList.remove('hidden');
                     })
@@ -223,6 +233,28 @@
                 });
             }
             
+            // Close modal with ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('media-viewer-modal');
+                    if (modal && !modal.classList.contains('hidden')) {
+                        console.log('⌨️ ESC key pressed - closing modal');
+                        modal.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Close modal when clicking outside
+            document.addEventListener('click', (e) => {
+                const modal = document.getElementById('media-viewer-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    if (e.target === modal) {
+                        console.log('🖱️ Clicked outside modal - closing');
+                        modal.classList.add('hidden');
+                    }
+                }
+            });
+            
             // Media preview click handlers
             document.addEventListener('click', function(e) {
                 const mediaPreview = e.target.closest('.media-preview');
@@ -235,6 +267,53 @@
                     } else {
                         console.error('❌ No media ID found on clicked element');
                     }
+                }
+            });
+            
+            // Handle metadata form submission
+            document.addEventListener('submit', function(e) {
+                if (e.target.id === 'media-metadata-form') {
+                    e.preventDefault();
+                    console.log('📝 Updating media metadata');
+                    
+                    const formData = new FormData(e.target);
+                    const mediaId = window.currentMediaId; // Use the stored media ID
+                    
+                    if (!mediaId) {
+                        console.error('❌ No media ID found for update');
+                        return;
+                    }
+                    
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'PATCH');
+                    
+                    fetch(`{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('✅ Metadata updated:', data);
+                        if (data.success !== false) {
+                            // Show success feedback
+                            const submitBtn = e.target.querySelector('button[type=\"submit\"]');
+                            const originalText = submitBtn.textContent;
+                            submitBtn.textContent = 'Updated!';
+                            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                            submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                            setTimeout(() => {
+                                submitBtn.textContent = originalText;
+                                submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                            }, 2000);
+                        } else {
+                            alert('Failed to update metadata: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Metadata update error:', error);
+                        alert('Error updating metadata');
+                    });
                 }
             });
             
@@ -452,35 +531,96 @@
         </div>
     </div>
 
-    {{-- Media Viewer Modal --}}
+    {{-- Media Viewer Modal - Advanced Layout --}}
     <div id="media-viewer-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="max-w-6xl max-h-full p-4 w-full">
-            <div class="bg-white rounded-lg overflow-hidden max-h-full flex flex-col">
-                <div class="flex justify-between items-center p-4 border-b">
-                    <h3 id="media-viewer-title" class="text-lg font-medium"></h3>
-                    <button id="close-media-viewer" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+        <div class="max-w-7xl max-h-[90vh] p-4 w-full">
+            <div class="bg-white rounded-lg overflow-hidden max-h-full flex">
+                {{-- Left Side - Media Preview --}}
+                <div class="flex-1 bg-gray-100 flex items-center justify-center min-h-96">
+                    <div id="media-viewer-content" class="w-full h-full flex items-center justify-center">
+                        {{-- Media content will be loaded here --}}
+                    </div>
                 </div>
-                <div class="flex-1 overflow-hidden">
-                    <div id="media-viewer-content" class="h-full"></div>
-                </div>
-                <div class="p-4 border-t bg-gray-50">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <strong>File:</strong> <span id="media-viewer-filename"></span><br>
-                            <strong>Size:</strong> <span id="media-viewer-size"></span><br>
-                            <strong>Type:</strong> <span id="media-viewer-type"></span>
-                        </div>
-                        <div>
-                            <strong>Uploaded:</strong> <span id="media-viewer-uploaded"></span><br>
-                            <strong>Dimensions:</strong> <span id="media-viewer-dimensions"></span><br>
-                            <div class="mt-2">
-                                <div id="media-viewer-downloads">
-                                    {{-- Download buttons will be populated by JavaScript --}}
-                                </div>
-                                <button id="media-viewer-delete" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 mt-2">
-                                    Delete
-                                </button>
+                
+                {{-- Right Side - Details & Forms --}}
+                <div class="w-80 bg-white flex flex-col">
+                    {{-- Header --}}
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h3 id="media-viewer-title" class="text-lg font-semibold truncate"></h3>
+                        <button id="close-media-viewer" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+                    </div>
+                    
+                    {{-- Scrollable Content --}}
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        {{-- Basic Info --}}
+                        <div class="space-y-2">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Filename</label>
+                                <p id="media-viewer-filename" class="text-sm text-gray-900 break-words"></p>
                             </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Size</label>
+                                    <p id="media-viewer-size" class="text-sm text-gray-900"></p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</label>
+                                    <p id="media-viewer-type" class="text-sm text-gray-900"></p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dimensions</label>
+                                    <p id="media-viewer-dimensions" class="text-sm text-gray-900"></p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Uploaded</label>
+                                    <p id="media-viewer-uploaded" class="text-sm text-gray-900"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Download Options --}}
+                        <div>
+                            <label class="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-2">Download</label>
+                            <div id="media-viewer-downloads" class="space-y-1">
+                                {{-- Download buttons will be populated by JavaScript --}}
+                            </div>
+                        </div>
+                        
+                        {{-- Metadata Form --}}
+                        <div class="border-t pt-4">
+                            <form id="media-metadata-form" class="space-y-4">
+                                <div>
+                                    <label for="media-alt-text" class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Alt Text</label>
+                                    <input type="text" id="media-alt-text" name="alt_text" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="Describe this image...">
+                                </div>
+                                
+                                <div>
+                                    <label for="media-caption" class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Caption</label>
+                                    <input type="text" id="media-caption" name="caption" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="Image caption...">
+                                </div>
+                                
+                                <div>
+                                    <label for="media-description" class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Description</label>
+                                    <textarea id="media-description" name="description" rows="3"
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              placeholder="Detailed description..."></textarea>
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <button type="submit" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
+                                        Update
+                                    </button>
+                                    <button type="button" id="media-viewer-delete" class="bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500">
+                                        Delete
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
