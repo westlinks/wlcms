@@ -204,7 +204,7 @@
             function openMediaViewer(mediaId) {
                 console.log('🖼️ Opening media viewer for ID:', mediaId);
                 
-                // Store media ID for form submissions (keep both methods for compatibility)
+                // Store media ID for form submissions
                 window.currentMediaId = mediaId;
                 
                 const url = `{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`;
@@ -276,11 +276,6 @@
                         document.getElementById('media-caption').value = data.caption || '';
                         document.getElementById('media-description').value = data.description || '';
                         
-                        // Store media data for form submission
-                        const modal = document.getElementById('media-viewer-modal');
-                        modal.dataset.mediaId = data.id;
-                        modal.dataset.mediaName = data.name;
-                        
                         modal.classList.remove('hidden');
                     })
                     .catch(error => {
@@ -341,18 +336,14 @@
                     e.preventDefault();
                     console.log('📝 Updating media metadata');
                     
-                    const modal = document.getElementById('media-viewer-modal');
+                    const formData = new FormData(e.target);
                     const mediaId = window.currentMediaId; // Use the stored media ID
-                    const mediaName = modal.dataset.mediaName; // Get name from stored dataset
                     
                     if (!mediaId) {
                         console.error('❌ No media ID found for update');
-                        alert('Error: No media ID found');
                         return;
                     }
                     
-                    const formData = new FormData(e.target);
-                    formData.append('name', mediaName); // Required by the update method
                     formData.append('_token', '{{ csrf_token() }}');
                     formData.append('_method', 'PATCH');
                     
