@@ -62,7 +62,24 @@
                     method: 'POST',
                     body: formData,
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('📡 Response status:', response.status);
+                    console.log('📄 Response headers:', response.headers.get('content-type'));
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            console.error('❌ Expected JSON but got:', text.substring(0, 200));
+                            throw new Error('Server returned HTML instead of JSON - check server logs');
+                        });
+                    }
+                    
+                    return response.json();
+                })
                 .then(data => {
                     console.log('✅ Upload response:', data);
                     if (data.success) {

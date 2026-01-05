@@ -208,7 +208,7 @@ class MediaController extends Controller
                 
                 // Generate unique filename
                 $originalName = $file->getClientOriginalName();
-                $filename = time() . '_' . str()->random(8) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
                 $mimeType = $file->getMimeType();
                 
                 // Determine file type category
