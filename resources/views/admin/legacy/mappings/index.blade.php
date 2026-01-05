@@ -1,9 +1,9 @@
-@extends('wlcms::admin.layout')
-
-@section('title', 'Article Mappings - WLCMS Admin')
-@section('page-title', 'Article Mappings')
-
-@section('content')
+<x-admin-layout title="Article Mappings">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Article Mappings') }}
+        </h2>
+    </x-slot>
 <div class="space-y-6">
     <!-- Header with Actions -->
     <div class="sm:flex sm:items-center sm:justify-between">
@@ -281,4 +281,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-@endsection
+</x-admin-layout>

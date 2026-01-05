@@ -1,9 +1,9 @@
-@extends('wlcms::admin.layout')
-
-@section('title', 'Legacy Integration Dashboard - WLCMS Admin')
-@section('page-title', 'Legacy Integration Dashboard')
-
-@section('content')
+<x-admin-layout title="Legacy Integration Dashboard">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Legacy Integration Dashboard') }}
+        </h2>
+    </x-slot>
 <div class="space-y-6">
     <!-- Overview Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -229,4 +229,4 @@
     </div>
     @endif
 </div>
-@endsection
+</x-admin-layout>
