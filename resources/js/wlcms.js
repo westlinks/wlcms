@@ -36,6 +36,7 @@ function initTiptapEditor(elementId, initialContent = '') {
         console.error('Toolbar element not found:', `#${elementId}-toolbar`);
         return;
     }
+    
     if (!sourceElement) {
         console.error('Source element not found:', `#${elementId}-source`);
         return;
@@ -48,79 +49,51 @@ function initTiptapEditor(elementId, initialContent = '') {
         element: editorElement,
         extensions: [
             StarterKit.configure({
-                history: false,
+                history: {
+                    depth: 50,
+                },
             }),
         ],
         content: initialContent,
         onUpdate: ({ editor }) => {
             // Update the hidden textarea
-            textareaElement.value = editor.getHTML();
+            if (!isSourceMode) {
+                textareaElement.value = editor.getHTML();
+            }
+        },
+        onFocus: () => {
+            updateToolbarState();
+        },
+        onSelectionUpdate: () => {
+            updateToolbarState();
         },
     });
     
-    // Toolbar button handlers
-    const toolbar = toolbarElement;
-    
-    // Bold
-    toolbar.querySelector('[data-action="bold"]').addEventListener('click', () => {
-        editor.chain().focus().toggleBold().run();
-    });
-    
-    // Italic
-    toolbar.querySelector('[data-action="italic"]').addEventListener('click', () => {
-        editor.chain().focus().toggleItalic().run();
-    });
-    
-    // Code
-    toolbar.querySelector('[data-action="code"]').addEventListener('click', () => {
-        editor.chain().focus().toggleCode().run();
-    });
-    
-    // Headings
-    toolbar.querySelector('[data-action="h1"]').addEventListener('click', () => {
-        editor.chain().focus().toggleHeading({ level: 1 }).run();
-    });
-    
-    toolbar.querySelector('[data-action="h2"]').addEventListener('click', () => {
-        editor.chain().focus().toggleHeading({ level: 2 }).run();
-    });
-    
-    toolbar.querySelector('[data-action="h3"]').addEventListener('click', () => {
-        editor.chain().focus().toggleHeading({ level: 3 }).run();
-    });
-    
-    // Lists
-    toolbar.querySelector('[data-action="bullet-list"]').addEventListener('click', () => {
-        editor.chain().focus().toggleBulletList().run();
-    });
-    
-    toolbar.querySelector('[data-action="ordered-list"]').addEventListener('click', () => {
-        editor.chain().focus().toggleOrderedList().run();
-    });
-    
-    // Quote
-    toolbar.querySelector('[data-action="blockquote"]').addEventListener('click', () => {
-        editor.chain().focus().toggleBlockquote().run();
-    });
-    
-    // Code block
-    toolbar.querySelector('[data-action="code-block"]').addEventListener('click', () => {
-        editor.chain().focus().toggleCodeBlock().run();
-    });
-    
-    // Undo/Redo
-    toolbar.querySelector('[data-action="undo"]').addEventListener('click', () => {
-        editor.chain().focus().undo().run();
-    });
-    
-    toolbar.querySelector('[data-action="redo"]').addEventListener('click', () => {
-        editor.chain().focus().redo().run();
-    });
+    // Function to update toolbar button states
+    function updateToolbarState() {
+        if (isSourceMode) return;
+        
+        const buttons = toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])');
+        buttons.forEach(button => {
+            button.classList.remove('is-active');
+        });
+        
+        if (editor.isActive('bold')) toolbarElement.querySelector('[data-action="bold"]')?.classList.add('is-active');
+        if (editor.isActive('italic')) toolbarElement.querySelector('[data-action="italic"]')?.classList.add('is-active');
+        if (editor.isActive('code')) toolbarElement.querySelector('[data-action="code"]')?.classList.add('is-active');
+        if (editor.isActive('heading', { level: 1 })) toolbarElement.querySelector('[data-action="h1"]')?.classList.add('is-active');
+        if (editor.isActive('heading', { level: 2 })) toolbarElement.querySelector('[data-action="h2"]')?.classList.add('is-active');
+        if (editor.isActive('heading', { level: 3 })) toolbarElement.querySelector('[data-action="h3"]')?.classList.add('is-active');
+        if (editor.isActive('bulletList')) toolbarElement.querySelector('[data-action="bullet-list"]')?.classList.add('is-active');
+        if (editor.isActive('orderedList')) toolbarElement.querySelector('[data-action="ordered-list"]')?.classList.add('is-active');
+        if (editor.isActive('blockquote')) toolbarElement.querySelector('[data-action="blockquote"]')?.classList.add('is-active');
+        if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
+    }
     
     // Source View Toggle
     function toggleSourceView() {
         isSourceMode = !isSourceMode;
-        const sourceButton = toolbar.querySelector('[data-action="source"]');
+        const sourceButton = toolbarElement.querySelector('[data-action="source"]');
         
         if (isSourceMode) {
             // Switch to source mode
@@ -128,43 +101,86 @@ function initTiptapEditor(elementId, initialContent = '') {
             sourceElement.style.display = 'block';
             sourceElement.classList.remove('hidden');
             sourceElement.value = editor.getHTML();
-            sourceButton.classList.add('is-active');
+            sourceButton?.classList.add('is-active');
             
-            // Update on source change
-            sourceElement.addEventListener('input', () => {
-                textareaElement.value = sourceElement.value;
+            // Clear other button states
+            toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])').forEach(btn => {
+                btn.classList.remove('is-active');
+                btn.disabled = true;
             });
+            
+            // Focus on source textarea
+            sourceElement.focus();
+            
         } else {
             // Switch to visual mode
-            editor.commands.setContent(sourceElement.value);
+            try {
+                editor.commands.setContent(sourceElement.value);
+                textareaElement.value = sourceElement.value;
+            } catch (error) {
+                console.warn('Invalid HTML in source view, reverting:', error);
+                sourceElement.value = editor.getHTML();
+            }
+            
             editorElement.style.display = 'block';
             sourceElement.style.display = 'none';
             sourceElement.classList.add('hidden');
-            sourceButton.classList.remove('is-active');
+            sourceButton?.classList.remove('is-active');
+            
+            // Re-enable toolbar buttons
+            toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])').forEach(btn => {
+                btn.disabled = false;
+            });
+            
             editor.commands.focus();
+            updateToolbarState();
         }
     }
     
-    toolbar.querySelector('[data-action="source"]').addEventListener('click', toggleSourceView);
+    // Toolbar button handlers with error handling
+    const toolbarHandlers = {
+        'bold': () => editor.chain().focus().toggleBold().run(),
+        'italic': () => editor.chain().focus().toggleItalic().run(),
+        'code': () => editor.chain().focus().toggleCode().run(),
+        'h1': () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+        'h2': () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+        'h3': () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+        'bullet-list': () => editor.chain().focus().toggleBulletList().run(),
+        'ordered-list': () => editor.chain().focus().toggleOrderedList().run(),
+        'blockquote': () => editor.chain().focus().toggleBlockquote().run(),
+        'code-block': () => editor.chain().focus().toggleCodeBlock().run(),
+        'undo': () => editor.chain().focus().undo().run(),
+        'redo': () => editor.chain().focus().redo().run(),
+        'source': toggleSourceView
+    };
     
-    // Update toolbar button states
-    editor.on('selectionUpdate', () => {
-        const buttons = toolbar.querySelectorAll('button[data-action]');
-        buttons.forEach(button => {
-            button.classList.remove('is-active');
-        });
-        
-        if (editor.isActive('bold')) toolbar.querySelector('[data-action="bold"]').classList.add('is-active');
-        if (editor.isActive('italic')) toolbar.querySelector('[data-action="italic"]').classList.add('is-active');
-        if (editor.isActive('code')) toolbar.querySelector('[data-action="code"]').classList.add('is-active');
-        if (editor.isActive('heading', { level: 1 })) toolbar.querySelector('[data-action="h1"]').classList.add('is-active');
-        if (editor.isActive('heading', { level: 2 })) toolbar.querySelector('[data-action="h2"]').classList.add('is-active');
-        if (editor.isActive('heading', { level: 3 })) toolbar.querySelector('[data-action="h3"]').classList.add('is-active');
-        if (editor.isActive('bulletList')) toolbar.querySelector('[data-action="bullet-list"]').classList.add('is-active');
-        if (editor.isActive('orderedList')) toolbar.querySelector('[data-action="ordered-list"]').classList.add('is-active');
-        if (editor.isActive('blockquote')) toolbar.querySelector('[data-action="blockquote"]').classList.add('is-active');
-        if (editor.isActive('codeBlock')) toolbar.querySelector('[data-action="code-block"]').classList.add('is-active');
+    // Add event listeners to toolbar buttons
+    Object.keys(toolbarHandlers).forEach(action => {
+        const button = toolbarElement.querySelector(`[data-action="${action}"]`);
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                try {
+                    toolbarHandlers[action]();
+                    if (action !== 'source') {
+                        setTimeout(updateToolbarState, 50);
+                    }
+                } catch (error) {
+                    console.error(`Error executing ${action}:`, error);
+                }
+            });
+        }
     });
+    
+    // Source textarea change handler
+    sourceElement.addEventListener('input', () => {
+        if (isSourceMode) {
+            textareaElement.value = sourceElement.value;
+        }
+    });
+    
+    // Initial toolbar state
+    setTimeout(updateToolbarState, 100);
     
     console.log('Tiptap editor initialized successfully');
     return editor;

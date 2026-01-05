@@ -22,13 +22,13 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         <!-- Toolbar -->
         <div id="{{ $editorId }}-toolbar" class="editor-toolbar">
             <!-- Text formatting -->
-            <button type="button" data-action="bold" title="Bold">
+            <button type="button" data-action="bold" title="Bold (Ctrl+B)">
                 <strong>B</strong>
             </button>
-            <button type="button" data-action="italic" title="Italic">
+            <button type="button" data-action="italic" title="Italic (Ctrl+I)">
                 <em>I</em>
             </button>
-            <button type="button" data-action="code" title="Code">
+            <button type="button" data-action="code" title="Inline Code">
                 &lt;/&gt;
             </button>
             
@@ -48,19 +48,21 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
             <div class="separator"></div>
             
             <!-- Blocks -->
-            <button type="button" data-action="blockquote" title="Quote">"</button>
+            <button type="button" data-action="blockquote" title="Blockquote">"</button>
             <button type="button" data-action="code-block" title="Code Block">{ }</button>
             
             <div class="separator"></div>
             
             <!-- History -->
-            <button type="button" data-action="undo" title="Undo">↶</button>
-            <button type="button" data-action="redo" title="Redo">↷</button>
+            <button type="button" data-action="undo" title="Undo (Ctrl+Z)">↶</button>
+            <button type="button" data-action="redo" title="Redo (Ctrl+Y)">↷</button>
             
             <div class="separator"></div>
             
             <!-- Source View -->
-            <button type="button" data-action="source" title="Source View">&lt;/&gt;</button>
+            <button type="button" data-action="source" title="View/Edit HTML Source" class="source-toggle">
+                <span>HTML</span>
+            </button>
         </div>
         
         <!-- Editor -->
