@@ -91,10 +91,8 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
     @include('wlcms::admin.components.tiptap-editor')
 @endonce
 
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
 });
 </script>
-@endpush
