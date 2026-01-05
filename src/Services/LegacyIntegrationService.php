@@ -291,4 +291,108 @@ class LegacyIntegrationService
         return $this->isEnabled() && 
                config('wlcms.legacy.migration.enabled', true);
     }
+
+    /**
+     * Synchronize a legacy article with its CMS content
+     */
+    public function syncArticle(CmsLegacyArticleMapping $mapping): array
+    {
+        try {
+            // Get the legacy article data
+            $articleModel = $this->getArticleModel();
+            $article = $articleModel::find($mapping->legacy_article_id);
+            
+            if (!$article) {
+                throw new \Exception("Legacy article #{$mapping->legacy_article_id} not found");
+            }
+
+            // Get the CMS content item
+            $contentItem = $mapping->contentItem;
+            if (!$contentItem) {
+                throw new \Exception("CMS content item not found for mapping #{$mapping->id}");
+            }
+
+            // Get effective article data with field mappings applied
+            $articleData = $this->getEffectiveArticleData($article);
+            
+            // Apply field overrides if any exist
+            foreach ($mapping->fieldOverrides as $override) {
+                if ($override->is_active && !empty($override->override_value)) {
+                    $articleData[$override->field_name] = $override->override_value;
+                }
+            }
+
+            // Update the CMS content item based on sync direction
+            $syncDirection = $mapping->sync_direction ?? 'legacy_to_cms';
+            
+            if ($syncDirection === 'legacy_to_cms' || $syncDirection === 'bidirectional') {
+                // Update CMS content from legacy data
+                $updateData = [];
+                
+                // Map common fields
+                if (isset($articleData['title'])) {
+                    $updateData['title'] = $articleData['title'];
+                }
+                if (isset($articleData['content'])) {
+                    $updateData['content'] = $articleData['content'];
+                }
+                if (isset($articleData['excerpt'])) {
+                    $updateData['excerpt'] = $articleData['excerpt'];
+                }
+                if (isset($articleData['slug'])) {
+                    $updateData['slug'] = $articleData['slug'];
+                }
+                if (isset($articleData['published_at'])) {
+                    $updateData['published_at'] = $articleData['published_at'];
+                }
+                if (isset($articleData['status'])) {
+                    $updateData['status'] = $articleData['status'];
+                }
+
+                // Update meta data with additional fields
+                $meta = $contentItem->meta ?? [];
+                foreach ($articleData as $key => $value) {
+                    if (!in_array($key, ['title', 'content', 'excerpt', 'slug', 'published_at', 'status'])) {
+                        $meta['legacy_' . $key] = $value;
+                    }
+                }
+                $updateData['meta'] = $meta;
+
+                $contentItem->update($updateData);
+            }
+
+            // Update mapping sync status
+            $mapping->update([
+                'last_sync_at' => now(),
+                'sync_error' => null,
+            ]);
+
+            return [
+                'status' => 'success',
+                'message' => 'Article synchronized successfully',
+                'updated_fields' => array_keys($updateData ?? []),
+                'sync_direction' => $syncDirection,
+                'synced_at' => now()->toISOString(),
+            ];
+
+        } catch (\Exception $e) {
+            // Update mapping with error
+            $mapping->update([
+                'last_sync_at' => now(),
+                'sync_error' => $e->getMessage(),
+            ]);
+
+            Log::error('Article sync failed', [
+                'mapping_id' => $mapping->id,
+                'legacy_article_id' => $mapping->legacy_article_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'error_at' => now()->toISOString(),
+            ];
+        }
+    }
 }
