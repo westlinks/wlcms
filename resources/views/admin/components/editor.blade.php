@@ -64,7 +64,9 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         </div>
         
         <!-- Editor -->
-        <div id="{{ $editorId }}-editor" class="prose max-w-none"></div>
+        <div id="{{ $editorId }}-editor" class="prose max-w-none min-h-[200px] border border-gray-300 rounded-md p-4 bg-white focus-within:border-blue-500">
+            {!! old($editorId, $editorValue) !!}
+        </div>
         
         <!-- Source View Textarea (hidden by default) -->
         <textarea id="{{ $editorId }}-source" 
@@ -93,6 +95,31 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
+    const editorElement = document.getElementById('{{ $editorId }}-editor');
+    const hiddenTextarea = document.getElementById('{{ $editorId }}');
+    
+    if (typeof window.initTiptapEditor === 'function') {
+        // TipTap available - use rich editor
+        try {
+            initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
+        } catch (error) {
+            console.log('TipTap initialization failed, using fallback:', error);
+            setupFallbackEditor();
+        }
+    } else {
+        // TipTap not available - use fallback contenteditable
+        setupFallbackEditor();
+    }
+    
+    function setupFallbackEditor() {
+        editorElement.contentEditable = true;
+        editorElement.style.minHeight = '200px';
+        editorElement.focus();
+        
+        // Sync content with hidden textarea
+        editorElement.addEventListener('input', function() {
+            hiddenTextarea.value = editorElement.innerHTML;
+        });
+    }
 });
 </script>
