@@ -13,6 +13,11 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // TEST ROUTE - Completely minimal view
+        Route::get('/test-minimal', function() {
+            return view('wlcms::admin.test-minimal');
+        })->name('test-minimal');
 
         // Content management
         Route::resource('content', ContentController::class);
