@@ -271,10 +271,13 @@
                             content.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-center"><span class="text-6xl">📄</span><p class="mt-4">Preview not available for this file type</p></div></div>`;
                         }
                         
-                        // Populate metadata form fields
+                        // Populate metadata form fields and store media info
                         document.getElementById('media-alt-text').value = data.alt_text || '';
                         document.getElementById('media-caption').value = data.caption || '';
                         document.getElementById('media-description').value = data.description || '';
+                        
+                        // Store media name for updates (controller requires this)
+                        window.currentMediaName = data.name;
                         
                         modal.classList.remove('hidden');
                     })
@@ -344,6 +347,8 @@
                         return;
                     }
                     
+                    // Add required name field
+                    formData.append('name', window.currentMediaName);
                     formData.append('_token', '{{ csrf_token() }}');
                     formData.append('_method', 'PATCH');
                     
@@ -355,9 +360,21 @@
                     })
                     .then(response => {
                         console.log('📡 Update response status:', response.status);
+                        console.log('📄 Update response headers:', response.headers.get('content-type'));
+                        
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
+                        
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            return response.text().then(text => {
+                                console.error('❌ Expected JSON but got HTML response:');
+                                console.error('📄 First 500 chars:', text.substring(0, 500));
+                                throw new Error('Server returned HTML instead of JSON - check server configuration');
+                            });
+                        }
+                        
                         return response.json();
                     })
                     .then(data => {
