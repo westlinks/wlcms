@@ -381,6 +381,55 @@
                 }
             });
             
+            // Handle delete button separately (prevent it from triggering form submission)
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'media-viewer-delete') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🗑️ Delete button clicked');
+                    
+                    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                        return;
+                    }
+                    
+                    const mediaId = window.currentMediaId;
+                    
+                    if (!mediaId) {
+                        console.error('❌ No media ID found for delete');
+                        alert('Error: No media ID found');
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'DELETE');
+                    
+                    console.log('🗑️ Deleting media ID:', mediaId);
+                    
+                    fetch(`{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => {
+                        console.log('📡 Delete response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('✅ File deleted:', data);
+                        // Close modal and refresh page
+                        document.getElementById('media-viewer-modal').classList.add('hidden');
+                        setTimeout(() => location.reload(), 500);
+                    })
+                    .catch(error => {
+                        console.error('❌ Delete error:', error);
+                        alert('Error deleting file: ' + error.message);
+                    });
+                }
+            });
+            
             console.log('🎉 Media page JavaScript initialization complete!');
         });
         </script>
