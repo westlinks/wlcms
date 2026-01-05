@@ -204,7 +204,7 @@
             function openMediaViewer(mediaId) {
                 console.log('🖼️ Opening media viewer for ID:', mediaId);
                 
-                // Store media ID for form submissions
+                // Store media ID for form submissions (keep both methods for compatibility)
                 window.currentMediaId = mediaId;
                 
                 const url = `{{ url(config('wlcms.admin.prefix', 'admin/cms')) }}/media/${mediaId}`;
@@ -342,8 +342,8 @@
                     console.log('📝 Updating media metadata');
                     
                     const modal = document.getElementById('media-viewer-modal');
-                    const mediaId = modal.dataset.mediaId;
-                    const mediaName = modal.dataset.mediaName;
+                    const mediaId = window.currentMediaId; // Use the stored media ID
+                    const mediaName = modal.dataset.mediaName; // Get name from stored dataset
                     
                     if (!mediaId) {
                         console.error('❌ No media ID found for update');
