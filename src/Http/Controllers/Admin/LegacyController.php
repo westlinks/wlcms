@@ -112,8 +112,16 @@ class LegacyController extends Controller
             }
         }
 
+        // Automatically sync the article data with field mappings
+        try {
+            $this->legacyIntegrationService->syncArticle($mapping);
+            $message = 'Article mapping created and synced successfully';
+        } catch (\Exception $e) {
+            $message = 'Article mapping created successfully, but sync failed: ' . $e->getMessage();
+        }
+
         return redirect()->route('wlcms.admin.legacy.mappings.index')
-            ->with('success', 'Article mapping created successfully');
+            ->with('success', $message);
     }
 
     /**
@@ -486,10 +494,10 @@ class LegacyController extends Controller
      */
     private function createMappingFromLegacyArticle($legacyArticle, string $contentType, bool $preserveHierarchy): CmsLegacyArticleMapping
     {
-        // Create CMS content item
+        // Create CMS content item with basic data (will be properly populated by sync)
         $contentData = [
             'title' => $legacyArticle->title ?? 'Imported Article',
-            'content' => $legacyArticle->content ?? '',
+            'content' => '', // Will be populated by sync with proper field mapping
             'type' => $contentType,
             'status' => 'published',
             'slug' => $this->generateSlugFromLegacyArticle($legacyArticle),
@@ -498,13 +506,22 @@ class LegacyController extends Controller
         $contentItem = \Westlinks\Wlcms\Models\ContentItem::create($contentData);
 
         // Create mapping
-        return CmsLegacyArticleMapping::create([
+        $mapping = CmsLegacyArticleMapping::create([
             'legacy_article_id' => $legacyArticle->id,
             'cms_content_id' => $contentItem->id,
             'is_active' => true,
             'sync_frequency' => 'manual',
             'field_mappings' => $this->generateDefaultFieldMappings($legacyArticle),
         ]);
+
+        // Automatically sync the article data with proper field mappings
+        try {
+            $this->legacyIntegrationService->syncArticle($mapping);
+        } catch (\Exception $e) {
+            \Log::warning('Auto-sync failed for new mapping: ' . $e->getMessage());
+        }
+
+        return $mapping;
     }
 
     /**
