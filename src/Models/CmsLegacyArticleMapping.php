@@ -85,9 +85,27 @@ class CmsLegacyArticleMapping extends Model
         }
         
         // Start with legacy article data
-        $data = $legacyArticle->toArray();
+        $legacyData = $legacyArticle->toArray();
         
-        // Apply field overrides
+        // Apply default field mappings from config
+        $fieldMappings = config('wlcms.legacy_integration.default_field_mappings.articles', []);
+        $data = [];
+        
+        // Map legacy fields to CMS fields using configuration
+        foreach ($fieldMappings as $cmsField => $legacyField) {
+            if (isset($legacyData[$legacyField])) {
+                $data[$cmsField] = $legacyData[$legacyField];
+            }
+        }
+        
+        // Add any unmapped legacy fields as legacy_* in the data
+        foreach ($legacyData as $key => $value) {
+            if (!in_array($key, $fieldMappings) && !isset($data[$key])) {
+                $data[$key] = $value;
+            }
+        }
+        
+        // Apply field overrides (these take precedence over mappings)
         foreach ($this->activeFieldOverrides as $override) {
             $value = $this->castFieldValue($override->override_value, $override->field_type);
             $data[$override->field_name] = $value;
