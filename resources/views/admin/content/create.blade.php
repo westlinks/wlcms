@@ -4,6 +4,14 @@
             {{ __('Create Content') }}
         </h2>
     </x-slot>
+
+    @push('styles')
+        @vite(['resources/vendor/wlcms/css/wlcms.css'])
+    @endpush
+
+    @push('scripts')
+        @vite(['resources/vendor/wlcms/js/wlcms.js'])
+    @endpush
     <form method="POST" action="{{ route('wlcms.admin.content.store') }}" enctype="multipart/form-data">
         @csrf
 

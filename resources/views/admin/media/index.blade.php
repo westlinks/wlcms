@@ -4,6 +4,14 @@
             {{ __('Media Library') }}
         </h2>
     </x-slot>
+
+    @push('styles')
+        @vite(['resources/vendor/wlcms/css/wlcms.css'])
+    @endpush
+
+    @push('scripts')
+        @vite(['resources/vendor/wlcms/js/wlcms.js'])
+    @endpush
     <div class="mb-6">
         <div class="flex justify-between items-center">
             {{-- Upload Button --}}
