@@ -586,18 +586,41 @@ class MediaController extends Controller
      */
     public function createFolder(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:cms_media_folders,id'
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'parent_id' => 'nullable|exists:cms_media_folders,id'
+            ]);
 
-        MediaFolder::create([
-            'name' => $request->name,
-            'slug' => \Str::slug($request->name),
-            'parent_id' => $request->parent_id
-        ]);
+            $folder = MediaFolder::create([
+                'name' => $request->name,
+                'slug' => \Illuminate\Support\Str::slug($request->name),
+                'parent_id' => $request->parent_id
+            ]);
 
-        return back()->with('success', 'Folder created successfully.');
+            // Return JSON response for AJAX requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Folder created successfully.',
+                    'folder' => $folder
+                ]);
+            }
+
+            return back()->with('success', 'Folder created successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error creating folder: ' . $e->getMessage());
+            
+            // Return JSON error for AJAX requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating folder: ' . $e->getMessage()
+                ], 400);
+            }
+            
+            return back()->with('error', 'Error creating folder.');
+        }
     }
 
     /**

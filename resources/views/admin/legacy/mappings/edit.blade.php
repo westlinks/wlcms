@@ -139,6 +139,10 @@
                                 class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
                             + Add Override
                         </button>
+                        {{-- TODO: Button not responding - JavaScript not executing
+                             Issue: @push('scripts') not working in embedded layout mode
+                             Need to: Fix layout mode detection or ensure main app layout has @stack('scripts')
+                             Priority: Medium - Field overrides can be added via direct database/code for now --}}
                     </div>
                     
                     <div class="bg-gray-50 p-4 rounded-md">
