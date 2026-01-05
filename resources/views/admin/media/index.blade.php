@@ -177,7 +177,9 @@
                     console.log('📝 New folder form submitted');
                     
                     const formData = new FormData(e.target);
-                    formData.append('parent_id', {{ $currentFolder->id ?? 'null' }});
+                    @if($currentFolder)
+                        formData.append('parent_id', {{ $currentFolder->id }});
+                    @endif
                     formData.append('_token', '{{ csrf_token() }}');
                     
                     console.log('📤 Sending request to:', '{{ route("wlcms.admin.media.folder.store") }}');

@@ -9,6 +9,7 @@ use Westlinks\Wlcms\Models\MediaFolder;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 class MediaController extends Controller
 {
@@ -619,7 +620,7 @@ class MediaController extends Controller
             if ($request->wantsJson() || $request->ajax() || $request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed: ' . implode(', ', array_flatten($e->errors())),
+                    'message' => 'Validation failed: ' . implode(', ', Arr::flatten($e->errors())),
                     'errors' => $e->errors()
                 ], 422);
             }
