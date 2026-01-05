@@ -512,4 +512,54 @@ class MediaController extends Controller
             return $bytes . ' B';
         }
     }
+
+    /**
+     * Create a new folder
+     */
+    public function createFolder(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:cms_media_folders,id'
+        ]);
+
+        MediaFolder::create([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name),
+            'parent_id' => $request->parent_id
+        ]);
+
+        return back()->with('success', 'Folder created successfully.');
+    }
+
+    /**
+     * Update a folder
+     */
+    public function updateFolder(Request $request, MediaFolder $folder)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $folder->update([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name)
+        ]);
+
+        return back()->with('success', 'Folder updated successfully.');
+    }
+
+    /**
+     * Delete a folder
+     */
+    public function deleteFolder(MediaFolder $folder)
+    {
+        // Check if folder has any files or subfolders
+        if ($folder->files()->exists() || $folder->children()->exists()) {
+            return back()->with('error', 'Cannot delete folder that contains files or subfolders.');
+        }
+
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully.');
+    }
 }

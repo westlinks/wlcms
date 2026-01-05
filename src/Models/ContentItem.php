@@ -223,4 +223,12 @@ class ContentItem extends Model
 
         return true;
     }
+
+    /**
+     * Check if the content item has revisions.
+     */
+    public function hasRevisions(): bool
+    {
+        return $this->revisions()->exists();
+    }
 }

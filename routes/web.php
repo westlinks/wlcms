@@ -32,6 +32,11 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
         Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
         Route::get('media/{media}/serve/{size?}', [MediaController::class, 'serve'])->name('media.serve');
+        
+        // Media folder management
+        Route::post('media/folder', [MediaController::class, 'createFolder'])->name('media.folder.store');
+        Route::put('media/folder/{folder}', [MediaController::class, 'updateFolder'])->name('media.folder.update');
+        Route::delete('media/folder/{folder}', [MediaController::class, 'deleteFolder'])->name('media.folder.destroy');
     });
 
 // Frontend routes (will be registered if enabled in config)
