@@ -248,9 +248,47 @@
     @push('scripts')
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize WLCMS components, including field override manager
+        console.log('Testing field override functionality...');
+        
+        // Test if elements exist
+        const addBtn = document.getElementById('add-override');
+        const container = document.getElementById('field-overrides');
+        
+        console.log('Add button:', addBtn);
+        console.log('Container:', container);
+        
+        if (addBtn && container) {
+            console.log('Elements found, attaching listeners...');
+            
+            addBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Add button clicked!');
+                alert('Add Override button is working!');
+                
+                // Actually add the row
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-4 gap-4 items-center override-row mb-3';
+                row.innerHTML = `
+                    <input type="text" name="new_overrides[field_name][]" placeholder="Field name" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <input type="text" name="new_overrides[override_value][]" placeholder="Override value" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <select name="new_overrides[field_type][]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <option value="string">String</option>
+                        <option value="text">Text</option>
+                    </select>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">Remove</button>
+                `;
+                container.appendChild(row);
+            });
+        } else {
+            console.error('Required elements not found!');
+        }
+        
+        // Initialize WLCMS components if available (for when Vite is compiled)
         if (window.initWlcms) {
+            console.log('initWlcms found, calling...');
             window.initWlcms();
+        } else {
+            console.log('initWlcms not found - Vite compilation needed');
         }
     });
     </script>
