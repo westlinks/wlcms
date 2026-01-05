@@ -97,6 +97,7 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
 document.addEventListener('DOMContentLoaded', function() {
     const editorElement = document.getElementById('{{ $editorId }}-editor');
     const hiddenTextarea = document.getElementById('{{ $editorId }}');
+    const toolbar = document.getElementById('{{ $editorId }}-toolbar');
     
     if (typeof window.initTiptapEditor === 'function') {
         // TipTap available - use rich editor
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setupFallbackEditor();
         }
     } else {
-        // TipTap not available - use fallback contenteditable
+        // TipTap not available - use fallback contenteditable with basic formatting
         setupFallbackEditor();
     }
     
@@ -116,7 +117,45 @@ document.addEventListener('DOMContentLoaded', function() {
         editorElement.style.minHeight = '200px';
         editorElement.focus();
         
-        // Sync content with hidden textarea
+        // Add toolbar button functionality
+        toolbar.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+                const action = e.target.getAttribute('data-action');
+                
+                switch(action) {
+                    case 'bold':
+                        document.execCommand('bold', false, null);
+                        break;
+                    case 'italic':
+                        document.execCommand('italic', false, null);
+                        break;
+                    case 'underline':
+                        document.execCommand('underline', false, null);
+                        break;
+                    case 'h1':
+                        document.execCommand('formatBlock', false, '<h1>');
+                        break;
+                    case 'h2':
+                        document.execCommand('formatBlock', false, '<h2>');
+                        break;
+                    case 'h3':
+                        document.execCommand('formatBlock', false, '<h3>');
+                        break;
+                    case 'bullet-list':
+                        document.execCommand('insertUnorderedList', false, null);
+                        break;
+                    case 'ordered-list':
+                        document.execCommand('insertOrderedList', false, null);
+                        break;
+                }
+                
+                // Sync content with hidden textarea
+                hiddenTextarea.value = editorElement.innerHTML;
+            }
+        });
+        
+        // Sync content with hidden textarea on any change
         editorElement.addEventListener('input', function() {
             hiddenTextarea.value = editorElement.innerHTML;
         });

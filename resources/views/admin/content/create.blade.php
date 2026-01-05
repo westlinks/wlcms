@@ -258,4 +258,4 @@
         </div>
     </form>
 </div>
-@endsection
+</x-admin-layout>
