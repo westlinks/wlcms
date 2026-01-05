@@ -66,13 +66,13 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         </div>
         
         <!-- Editor -->
-        <div id="{{ $editorId }}-editor" class="prose max-w-none min-h-[200px] border border-gray-300 rounded-md p-4 bg-white focus-within:border-blue-500">
+        <div id="{{ $editorId }}-editor" class="min-h-[300px] p-4 bg-white prose prose-sm max-w-none focus:outline-none">
             {!! old($editorId, $editorValue) !!}
         </div>
         
         <!-- Source View Textarea (hidden by default) -->
         <textarea id="{{ $editorId }}-source" 
-                  class="hidden w-full h-80 p-3 border border-gray-300 rounded font-mono text-sm"
+                  class="hidden w-full min-h-[300px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
                   placeholder="HTML source code..."></textarea>
     </div>
     
@@ -101,9 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const hiddenTextarea = document.getElementById('{{ $editorId }}');
     const toolbar = document.getElementById('{{ $editorId }}-toolbar');
     
+    console.log('Editor initialization for {{ $editorId }}');
+    console.log('TipTap available:', typeof window.initTiptapEditor === 'function');
+    
     if (typeof window.initTiptapEditor === 'function') {
         // TipTap available - use rich editor
         try {
+            console.log('Initializing TipTap editor...');
             initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
         } catch (error) {
             console.log('TipTap initialization failed, using fallback:', error);
@@ -111,29 +115,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } else {
         // TipTap not available - use fallback contenteditable with basic formatting
+        console.log('Using fallback editor');
         setupFallbackEditor();
     }
     
     function setupFallbackEditor() {
+        console.log('Setting up fallback editor');
+        
+        if (!editorElement || !toolbar || !hiddenTextarea) {
+            console.error('Missing editor elements');
+            return;
+        }
+        
         editorElement.contentEditable = true;
-        editorElement.style.minHeight = '200px';
-        editorElement.focus();
+        editorElement.style.minHeight = '300px';
+        editorElement.style.border = '1px solid #d1d5db';
+        editorElement.style.borderTop = 'none';
+        editorElement.style.outline = 'none';
         
         // Add toolbar button functionality
         toolbar.addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON') {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
                 e.preventDefault();
-                const action = e.target.getAttribute('data-action');
+                const button = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+                const action = button.getAttribute('data-action');
+                
+                console.log('Toolbar action:', action);
+                
+                // Focus editor before command
+                editorElement.focus();
                 
                 switch(action) {
                     case 'bold':
                         document.execCommand('bold', false, null);
+                        button.classList.toggle('is-active');
                         break;
                     case 'italic':
                         document.execCommand('italic', false, null);
+                        button.classList.toggle('is-active');
                         break;
-                    case 'underline':
-                        document.execCommand('underline', false, null);
+                    case 'code':
+                        document.execCommand('formatBlock', false, '<code>');
                         break;
                     case 'h1':
                         document.execCommand('formatBlock', false, '<h1>');
@@ -146,9 +168,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                     case 'bullet-list':
                         document.execCommand('insertUnorderedList', false, null);
+                        button.classList.toggle('is-active');
                         break;
                     case 'ordered-list':
                         document.execCommand('insertOrderedList', false, null);
+                        button.classList.toggle('is-active');
+                        break;
+                    case 'blockquote':
+                        document.execCommand('formatBlock', false, '<blockquote>');
+                        break;
+                    case 'source':
+                        toggleSourceView();
                         break;
                 }
                 
@@ -161,6 +191,31 @@ document.addEventListener('DOMContentLoaded', function() {
         editorElement.addEventListener('input', function() {
             hiddenTextarea.value = editorElement.innerHTML;
         });
+        
+        // Focus the editor initially
+        editorElement.focus();
+    }
+    
+    function toggleSourceView() {
+        const sourceElement = document.getElementById('{{ $editorId }}-source');
+        const sourceButton = toolbar.querySelector('[data-action="source"]');
+        
+        if (sourceElement.classList.contains('hidden')) {
+            // Switch to source mode
+            sourceElement.classList.remove('hidden');
+            sourceElement.value = editorElement.innerHTML;
+            editorElement.style.display = 'none';
+            sourceButton.classList.add('is-active');
+            sourceElement.focus();
+        } else {
+            // Switch to visual mode
+            sourceElement.classList.add('hidden');
+            editorElement.innerHTML = sourceElement.value;
+            editorElement.style.display = 'block';
+            sourceButton.classList.remove('is-active');
+            editorElement.focus();
+            hiddenTextarea.value = editorElement.innerHTML;
+        }
     }
 });
 </script>
