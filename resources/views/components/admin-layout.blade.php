@@ -1,3 +1,21 @@
+@if(config('wlcms.layout.mode') === 'embedded')
+    {{-- Embedded mode: Use host application's layout --}}
+    @php
+        $hostLayout = config('wlcms.layout.host_layout', 'layouts.admin-layout');
+    @endphp
+    
+    <x-dynamic-component :component="$hostLayout" :title="$title">
+        {{ $slot }}
+        
+        @if(isset($scripts) || View::hasSection('scripts'))
+            @push('scripts')
+                {{ $scripts ?? '' }}
+                @yield('scripts')
+            @endpush
+        @endif
+    </x-dynamic-component>
+@else
+    {{-- Standalone mode: Use WLCMS layout --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -72,3 +90,4 @@
     @stack('scripts')
 </body>
 </html>
+@endif
