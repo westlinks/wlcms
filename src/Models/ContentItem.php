@@ -133,6 +133,15 @@ class ContentItem extends Model
     }
 
     /**
+     * Get the primary legacy article mapping for this content item.
+     * This is an alias/convenience method for getting the first active mapping.
+     */
+    public function legacyMapping()
+    {
+        return $this->legacyArticleMappings()->where('is_active', true)->first();
+    }
+
+    /**
      * Get the active legacy article mappings.
      */
     public function activeLegacyMappings(): HasMany
