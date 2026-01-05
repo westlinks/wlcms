@@ -1,5 +1,5 @@
 @if(config('wlcms.layout.mode') === 'embedded')
-    <x-dynamic-component :component="config('wlcms.layout.host_layout', 'layouts.admin-layout')" title="CMS Dashboard">
+    <x-admin-layout title="CMS Dashboard">
         <x-slot name="header">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Dashboard') }}
@@ -169,7 +169,7 @@
         </div>
     </div>
 @if(config('wlcms.layout.mode') === 'embedded')
-    </x-dynamic-component>
+    </x-admin-layout>
 @else
     </x-wlcms-admin-layout>
 @endif
