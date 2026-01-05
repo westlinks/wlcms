@@ -138,6 +138,41 @@ class LegacyController extends Controller
 
         // Update field overrides
         $mapping->fieldOverrides()->delete();
+        
+        // Handle existing overrides
+        if ($request->filled('existing_overrides')) {
+            foreach ($request->existing_overrides as $override) {
+                if (!empty($override['field_name']) && !empty($override['override_value'])) {
+                    CmsLegacyFieldOverride::create([
+                        'cms_legacy_article_mapping_id' => $mapping->id,
+                        'field_name' => $override['field_name'],
+                        'override_value' => $override['override_value'],
+                        'field_type' => $override['field_type'] ?? 'string',
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
+        
+        // Handle new overrides
+        if ($request->filled('new_overrides')) {
+            $newOverrides = $request->new_overrides;
+            if (isset($newOverrides['field_name']) && is_array($newOverrides['field_name'])) {
+                for ($i = 0; $i < count($newOverrides['field_name']); $i++) {
+                    if (!empty($newOverrides['field_name'][$i]) && !empty($newOverrides['override_value'][$i])) {
+                        CmsLegacyFieldOverride::create([
+                            'cms_legacy_article_mapping_id' => $mapping->id,
+                            'field_name' => $newOverrides['field_name'][$i],
+                            'override_value' => $newOverrides['override_value'][$i],
+                            'field_type' => $newOverrides['field_type'][$i] ?? 'string',
+                            'is_active' => true,
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        // Legacy support for field_mappings (if any old forms still use it)
         if ($request->filled('field_mappings')) {
             foreach ($request->field_mappings as $field => $override) {
                 if (!empty($override)) {
