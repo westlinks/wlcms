@@ -589,9 +589,10 @@ class MediaController extends Controller
     public function createFolder(Request $request)
     {
         try {
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|numeric|exists:cms_media_folders,id'
-        ]);
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'parent_id' => 'nullable|numeric|exists:cms_media_folders,id'
+            ]);
         
         // Explicitly handle empty parent_id
         if (empty($validatedData['parent_id']) || $validatedData['parent_id'] === '') {
