@@ -65,7 +65,16 @@ class ContentController extends Controller
             'type' => 'required|string|in:page,post,article,news,event',
             'status' => 'required|string|in:draft,published,scheduled,archived',
             'meta' => 'nullable|array',
+            'show_in_menu' => 'boolean',
+            'menu_title' => 'nullable|string|max:255',
+            'menu_order' => 'integer|min:0',
+            'menu_location' => 'string|in:primary,footer,sidebar',
         ]);
+
+        // Convert checkbox value properly
+        $validated['show_in_menu'] = $request->has('show_in_menu');
+        $validated['menu_order'] = $validated['menu_order'] ?? 0;
+        $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 
         $content = ContentItem::create($validated);
 
@@ -87,7 +96,16 @@ class ContentController extends Controller
             'type' => 'required|string|in:page,post,article,news,event',
             'status' => 'required|string|in:draft,published,scheduled,archived',
             'meta' => 'nullable|array',
+            'show_in_menu' => 'boolean',
+            'menu_title' => 'nullable|string|max:255',
+            'menu_order' => 'integer|min:0',
+            'menu_location' => 'string|in:primary,footer,sidebar',
         ]);
+
+        // Convert checkbox value properly
+        $validated['show_in_menu'] = $request->has('show_in_menu');
+        $validated['menu_order'] = $validated['menu_order'] ?? 0;
+        $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 
         $content->update($validated);
 

@@ -165,6 +165,48 @@
                     </div>
                 </div>
 
+                {{-- Navigation Settings Card --}}
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigation</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show_in_menu" name="show_in_menu" value="1" 
+                                   {{ old('show_in_menu') ? 'checked' : '' }}
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="show_in_menu" class="ml-2 block text-sm font-medium text-gray-700">
+                                Show in Navigation Menu
+                            </label>
+                        </div>
+
+                        <div>
+                            <label for="menu_title" class="block text-sm font-medium text-gray-700 mb-2">Menu Title</label>
+                            <input type="text" id="menu_title" name="menu_title" value="{{ old('menu_title') }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Leave empty to use page title">
+                            <p class="text-gray-600 text-xs mt-1">Custom title for navigation menu</p>
+                        </div>
+
+                        <div>
+                            <label for="menu_location" class="block text-sm font-medium text-gray-700 mb-2">Menu Location</label>
+                            <select id="menu_location" name="menu_location"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="primary" {{ old('menu_location', 'primary') === 'primary' ? 'selected' : '' }}>Primary Menu</option>
+                                <option value="footer" {{ old('menu_location') === 'footer' ? 'selected' : '' }}>Footer Menu</option>
+                                <option value="sidebar" {{ old('menu_location') === 'sidebar' ? 'selected' : '' }}>Sidebar Menu</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="menu_order" class="block text-sm font-medium text-gray-700 mb-2">Menu Order</label>
+                            <input type="number" id="menu_order" name="menu_order" value="{{ old('menu_order', 0) }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   min="0">
+                            <p class="text-gray-600 text-xs mt-1">Lower numbers appear first</p>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Categories/Tags Card --}}
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Organization</h3>
@@ -179,8 +221,8 @@
                         </div>
 
                         <div>
-                            <label for="order_column" class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
-                            <input type="number" id="order_column" name="order_column" value="{{ old('order_column', 0) }}"
+                            <label for="sort_order" class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
+                            <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}"
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                    min="0">
                             <p class="text-gray-600 text-xs mt-1">Higher numbers appear first</p>

@@ -98,6 +98,54 @@
                         </div>
                     </div>
 
+                    <!-- Navigation Settings -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-900 mb-4">Navigation Settings</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Show in Menu -->
+                            <div class="flex items-center">
+                                <input type="checkbox" id="show_in_menu" name="show_in_menu" value="1" 
+                                       {{ old('show_in_menu', $content->show_in_menu) ? 'checked' : '' }}
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="show_in_menu" class="ml-2 block text-sm font-medium text-gray-700">
+                                    Show in Navigation Menu
+                                </label>
+                            </div>
+
+                            <!-- Menu Title -->
+                            <div>
+                                <label for="menu_title" class="block text-sm font-medium text-gray-700">Menu Title</label>
+                                <input type="text" id="menu_title" name="menu_title" 
+                                       value="{{ old('menu_title', $content->menu_title) }}"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                       placeholder="Leave empty to use page title">
+                                <p class="text-gray-600 text-xs mt-1">Custom title for navigation menu</p>
+                            </div>
+
+                            <!-- Menu Location -->
+                            <div>
+                                <label for="menu_location" class="block text-sm font-medium text-gray-700">Menu Location</label>
+                                <select id="menu_location" name="menu_location"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="primary" {{ old('menu_location', $content->menu_location) === 'primary' ? 'selected' : '' }}>Primary Menu</option>
+                                    <option value="footer" {{ old('menu_location', $content->menu_location) === 'footer' ? 'selected' : '' }}>Footer Menu</option>
+                                    <option value="sidebar" {{ old('menu_location', $content->menu_location) === 'sidebar' ? 'selected' : '' }}>Sidebar Menu</option>
+                                </select>
+                            </div>
+
+                            <!-- Menu Order -->
+                            <div>
+                                <label for="menu_order" class="block text-sm font-medium text-gray-700">Menu Order</label>
+                                <input type="number" id="menu_order" name="menu_order" 
+                                       value="{{ old('menu_order', $content->menu_order) }}"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                       min="0">
+                                <p class="text-gray-600 text-xs mt-1">Lower numbers appear first</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Content Info -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="font-medium text-gray-900 mb-4">Content Info</h3>

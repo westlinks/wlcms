@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Westlinks\Wlcms\Services\UserService;
 
 class ContentItem extends Model
@@ -29,6 +30,10 @@ class ContentItem extends Model
         'parent_id',
         'sort_order',
         'is_featured',
+        'show_in_menu',
+        'menu_title',
+        'menu_order',
+        'menu_location',
         'published_at',
         'user_id',
         'created_by',
@@ -40,6 +45,8 @@ class ContentItem extends Model
         'meta' => 'array',
         'sort_order' => 'integer',
         'is_featured' => 'boolean',
+        'show_in_menu' => 'boolean',
+        'menu_order' => 'integer',
     ];
 
     protected static function booted(): void
@@ -295,6 +302,83 @@ class ContentItem extends Model
         return config('wlcms.content.templates', [
             'default' => 'Default Page',
         ]);
+    }
+
+    /**
+     * Get navigation items for a specific location.
+     */
+    public static function getNavigationItems(string $location = 'primary'): \Illuminate\Support\Collection
+    {
+        return static::where('show_in_menu', true)
+            ->where('menu_location', $location)
+            ->published()
+            ->orderBy('menu_order')
+            ->orderBy('title')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => $item->menu_title ?: $item->title,
+                    'url' => "/" . $item->slug,
+                    'order' => $item->menu_order,
+                    'parent_id' => $item->parent_id,
+                    'location' => $item->menu_location,
+                ];
+            });
+    }
+
+    /**
+     * Build a hierarchical navigation tree from flat navigation items.
+     */
+    public static function buildNavigationTree(\Illuminate\Support\Collection $items): \Illuminate\Support\Collection
+    {
+        // Group items by parent_id
+        $grouped = $items->groupBy('parent_id');
+        
+        // Get top-level items (parent_id is null)
+        $tree = $grouped->get(null, collect());
+        
+        // Recursively build children
+        $tree = $tree->map(function ($item) use ($grouped) {
+            return static::buildNavigationNode($item, $grouped);
+        });
+        
+        return $tree;
+    }
+
+    /**
+     * Recursively build a navigation node with its children.
+     */
+    private static function buildNavigationNode(array $item, \Illuminate\Support\Collection $grouped): array
+    {
+        $item['children'] = collect();
+        
+        if ($grouped->has($item['id'])) {
+            $item['children'] = $grouped->get($item['id'])->map(function ($child) use ($grouped) {
+                return static::buildNavigationNode($child, $grouped);
+            });
+        }
+        
+        return $item;
+    }
+
+    /**
+     * Scope for items shown in navigation menus.
+     */
+    public function scopeInMenu(Builder $query, string $location = 'primary'): Builder
+    {
+        return $query->where('show_in_menu', true)
+            ->where('menu_location', $location)
+            ->orderBy('menu_order')
+            ->orderBy('title');
+    }
+
+    /**
+     * Get the effective menu title for this item.
+     */
+    public function getEffectiveMenuTitle(): string
+    {
+        return $this->menu_title ?: $this->title;
     }
 
     /**
