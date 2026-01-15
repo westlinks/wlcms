@@ -1,11 +1,17 @@
+# Dependencies
 node_modules/
+vendor/
+composer.lock
 package-lock.json
-# public/build/
+
 # Ignore build outputs - these should be built by consuming applications
 dist/
 public/build/
-node_modules/
+
+# OS files
 .DS_Store
+
+# Logs
 *.log
 
 # Thumbnail quality test files

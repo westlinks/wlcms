@@ -100,6 +100,22 @@ class ContentItem extends Model
     }
 
     /**
+     * Scope to find content by slug.
+     */
+    public function scopeBySlug(Builder $query, string $slug): Builder
+    {
+        return $query->where('slug', $slug);
+    }
+
+    /**
+     * Scope to filter content by type.
+     */
+    public function scopeOfType(Builder $query, string $type): Builder
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
      * Get the parent content item.
      */
     public function parent(): BelongsTo
