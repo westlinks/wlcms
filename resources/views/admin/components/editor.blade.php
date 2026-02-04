@@ -86,22 +86,21 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         <!-- Source View Textarea (hidden by default) -->
         <textarea id="{{ $editorId }}-source" 
                   class="hidden w-full min-h-[300px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
-                  placeholder="HTML source code..."></textarea>
+                  placeholder="HTML source code...">
+        </textarea>
     </div>
     
     <!-- Hidden textarea for form submission -->
     <textarea name="{{ $editorId }}" 
               id="{{ $editorId }}" 
               class="hidden" 
-              @if($editorRequired) required @endif>{!! old($editorId, $editorValue) !!}</textarea>
+              @if($editorRequired) required @endif>{!! old($editorId, $editorValue) !!}
+    </textarea>
     
     @error($editorId)
         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
     @enderror
-    
-    <p class="mt-2 text-sm text-gray-500">
-        ✨ Rich text editor with formatting, headings, lists, and more. Content is saved as clean HTML.
-    </p>
+
 </div>
 
 @once
