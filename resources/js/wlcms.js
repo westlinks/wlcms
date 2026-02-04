@@ -46,10 +46,7 @@ function initTiptapEditor(elementId, initialContent = '') {
     let isSourceMode = false;
     
     // Clear the element before TipTap takes over (prevents duplicate content)
-    const originalHTML = editorElement.innerHTML;
     editorElement.innerHTML = '';
-    
-    console.log('Creating TipTap editor with content:', initialContent);
     
     const editor = new Editor({
         element: editorElement,
@@ -62,10 +59,6 @@ function initTiptapEditor(elementId, initialContent = '') {
         ],
         content: initialContent,
         onCreate: ({ editor }) => {
-            console.log('TipTap onCreate fired');
-            console.log('Editor view exists:', !!editor.view);
-            console.log('Editor has ProseMirror class:', editorElement.querySelector('.ProseMirror') !== null);
-            
             // Initialize hidden textarea
             textareaElement.value = editor.getHTML();
         },
@@ -82,15 +75,6 @@ function initTiptapEditor(elementId, initialContent = '') {
             updateToolbarState();
         },
     });
-    
-    // Verify TipTap mounted successfully
-    console.log('Editor instance created:', !!editor);
-    console.log('Editor view exists:', !!editor.view);
-    
-    if (!editor.view) {
-        console.error('TipTap failed to create EditorView - falling back to original HTML');
-        editorElement.innerHTML = originalHTML;
-    }
     
     // Function to update toolbar button states
     function updateToolbarState() {
