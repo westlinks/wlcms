@@ -69,6 +69,22 @@ function initTiptapEditor(elementId, initialContent = '') {
         onCreate: ({ editor }) => {
             // Initialize hidden textarea
             textareaElement.value = editor.getHTML();
+            
+            // Add click handler for links in the editor
+            const editorContent = editorElement.querySelector('.ProseMirror');
+            if (editorContent) {
+                editorContent.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link) {
+                        e.preventDefault();
+                        // Set cursor position to the link
+                        const pos = editor.view.posAtDOM(link, 0);
+                        editor.commands.setTextSelection({ from: pos, to: pos + link.textContent.length });
+                        // Open the link modal
+                        setTimeout(() => openLinkModal(), 10);
+                    }
+                });
+            }
         },
         onUpdate: ({ editor }) => {
             // Update the hidden textarea
