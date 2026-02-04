@@ -101,6 +101,51 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
               @if($editorRequired) required @endif>{!! old($editorId, $editorValue) !!}
     </textarea>
     
+    <!-- Link Modal -->
+    <div id="{{ $editorId }}-link-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Insert/Edit Link</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                        <input type="text" id="{{ $editorId }}-link-url" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="https://example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Link Text (optional)</label>
+                        <input type="text" id="{{ $editorId }}-link-text" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Click here">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Open in</label>
+                        <select id="{{ $editorId }}-link-target" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="_blank">New tab</option>
+                            <option value="_self">Same tab</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" id="{{ $editorId }}-link-cancel" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+                        Cancel
+                    </button>
+                    <button type="button" id="{{ $editorId }}-link-remove" 
+                            class="px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200">
+                        Remove Link
+                    </button>
+                    <button type="button" id="{{ $editorId }}-link-save" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     @error($editorId)
         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
     @enderror

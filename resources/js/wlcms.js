@@ -153,6 +153,91 @@ function initTiptapEditor(elementId, initialContent = '') {
         }
     }
     
+    // Link modal functionality
+    const linkModal = document.getElementById(`${elementId}-link-modal`);
+    const linkUrlInput = document.getElementById(`${elementId}-link-url`);
+    const linkTextInput = document.getElementById(`${elementId}-link-text`);
+    const linkTargetSelect = document.getElementById(`${elementId}-link-target`);
+    const linkSaveBtn = document.getElementById(`${elementId}-link-save`);
+    const linkRemoveBtn = document.getElementById(`${elementId}-link-remove`);
+    const linkCancelBtn = document.getElementById(`${elementId}-link-cancel`);
+    
+    function openLinkModal() {
+        const previousUrl = editor.getAttributes('link').href;
+        const previousTarget = editor.getAttributes('link').target;
+        const { from, to } = editor.state.selection;
+        const selectedText = editor.state.doc.textBetween(from, to);
+        
+        linkUrlInput.value = previousUrl || '';
+        linkTextInput.value = selectedText || '';
+        linkTargetSelect.value = previousTarget || '_blank';
+        linkRemoveBtn.style.display = previousUrl ? 'block' : 'none';
+        
+        linkModal.classList.remove('hidden');
+        linkUrlInput.focus();
+    }
+    
+    function closeLinkModal() {
+        linkModal.classList.add('hidden');
+    }
+    
+    function saveLinkModal() {
+        const url = linkUrlInput.value.trim();
+        const text = linkTextInput.value.trim();
+        const target = linkTargetSelect.value;
+        
+        if (!url) {
+            closeLinkModal();
+            return;
+        }
+        
+        const { from, to } = editor.state.selection;
+        const hasSelection = from !== to;
+        
+        if (text && !hasSelection) {
+            // Insert new link with text
+            editor.chain().focus().insertContent(`<a href="${url}" target="${target}">${text}</a>`).run();
+        } else {
+            // Update existing selection or link
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url, target: target }).run();
+        }
+        
+        closeLinkModal();
+    }
+    
+    function removeLinkModal() {
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+        closeLinkModal();
+    }
+    
+    if (linkModal && linkSaveBtn && linkCancelBtn && linkRemoveBtn) {
+        linkSaveBtn.addEventListener('click', saveLinkModal);
+        linkCancelBtn.addEventListener('click', closeLinkModal);
+        linkRemoveBtn.addEventListener('click', removeLinkModal);
+        
+        // Close modal on backdrop click
+        linkModal.addEventListener('click', (e) => {
+            if (e.target === linkModal) {
+                closeLinkModal();
+            }
+        });
+        
+        // Handle Enter key in inputs
+        linkUrlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveLinkModal();
+            }
+        });
+        
+        linkTextInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveLinkModal();
+            }
+        });
+    }
+    
     // Toolbar button handlers with error handling
     const toolbarHandlers = {
         'bold': () => editor.chain().focus().toggleBold().run(),
@@ -165,19 +250,7 @@ function initTiptapEditor(elementId, initialContent = '') {
         'ordered-list': () => editor.chain().focus().toggleOrderedList().run(),
         'blockquote': () => editor.chain().focus().toggleBlockquote().run(),
         'code-block': () => editor.chain().focus().toggleCodeBlock().run(),
-        'link': () => {
-            const previousUrl = editor.getAttributes('link').href;
-            const url = window.prompt('Enter URL:', previousUrl || 'https://');
-            
-            if (url === null) return;
-            
-            if (url === '') {
-                editor.chain().focus().extendMarkRange('link').unsetLink().run();
-                return;
-            }
-            
-            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-        },
+        'link': openLinkModal,
         'undo': () => editor.chain().focus().undo().run(),
         'redo': () => editor.chain().focus().redo().run(),
         'source': toggleSourceView
