@@ -19,3 +19,4 @@ quality-test.php
 quality_tests/
 test-thumbnail.php
 thumbnail-method-test.php
+*.md
