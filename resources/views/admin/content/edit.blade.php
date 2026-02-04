@@ -5,8 +5,7 @@
         </h2>
         
         {{-- WLCMS Assets --}}
-        <link href="{{ asset('build/assets/wlcms-d15d8dce.css') }}" rel="stylesheet">
-        <script src="{{ asset('build/assets/wlcms-01bc0dea.js') }}" defer></script>
+        @vite(['resources/vendor/wlcms/css/wlcms.css', 'resources/vendor/wlcms/js/wlcms.js'])
     </x-slot>
     <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" enctype="multipart/form-data">
         @csrf
