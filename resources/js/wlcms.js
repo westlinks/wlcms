@@ -4,6 +4,7 @@
 // Tiptap Editor imports
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
 
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
@@ -56,6 +57,13 @@ function initTiptapEditor(elementId, initialContent = '') {
                     depth: 50,
                 },
             }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                },
+            }),
         ],
         content: initialContent,
         onCreate: ({ editor }) => {
@@ -95,6 +103,7 @@ function initTiptapEditor(elementId, initialContent = '') {
         if (editor.isActive('orderedList')) toolbarElement.querySelector('[data-action="ordered-list"]')?.classList.add('is-active');
         if (editor.isActive('blockquote')) toolbarElement.querySelector('[data-action="blockquote"]')?.classList.add('is-active');
         if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
+        if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
     }
     
     // Source View Toggle
@@ -156,6 +165,19 @@ function initTiptapEditor(elementId, initialContent = '') {
         'ordered-list': () => editor.chain().focus().toggleOrderedList().run(),
         'blockquote': () => editor.chain().focus().toggleBlockquote().run(),
         'code-block': () => editor.chain().focus().toggleCodeBlock().run(),
+        'link': () => {
+            const previousUrl = editor.getAttributes('link').href;
+            const url = window.prompt('Enter URL:', previousUrl || 'https://');
+            
+            if (url === null) return;
+            
+            if (url === '') {
+                editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                return;
+            }
+            
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+        },
         'undo': () => editor.chain().focus().undo().run(),
         'redo': () => editor.chain().focus().redo().run(),
         'source': toggleSourceView

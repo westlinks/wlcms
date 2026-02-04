@@ -34,6 +34,10 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
                     style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
                 &lt;/&gt;
             </button>
+            <button type="button" data-action="link" title="Insert/Edit Link (Ctrl+K)"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
+                🔗
+            </button>
             
             <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
