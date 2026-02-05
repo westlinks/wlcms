@@ -150,8 +150,11 @@
                         <h3 class="font-medium text-gray-900 mb-4">Content Info</h3>
                         <div class="space-y-3 text-sm">
                             <div>
-                                <span class="text-gray-600">Slug:</span>
-                                <span class="ml-2 text-gray-900 font-mono">{{ $content->slug }}</span>
+                                <label for="slug" class="block text-sm font-medium text-gray-700">Slug</label>
+                                <input type="text" name="slug" id="slug" value="{{ old('slug', $content->slug) }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                       required>
+                                <p class="mt-1 text-xs text-gray-500">URL-friendly identifier (lowercase, hyphens only)</p>
                             </div>
                             <div>
                                 <span class="text-gray-600">Created:</span>
