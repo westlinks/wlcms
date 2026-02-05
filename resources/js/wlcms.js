@@ -157,6 +157,34 @@ function initTiptapEditor(elementId, initialContent = '') {
         if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
     }
     
+    // Simple HTML formatter for better readability in source view
+    function formatHTML(html) {
+        let formatted = '';
+        let indent = 0;
+        const tab = '    '; // 4 spaces
+        
+        // Split by tags
+        html.split(/(<[^>]+>)/g).forEach(element => {
+            if (element.match(/^<\/\w/)) {
+                // Closing tag - decrease indent before adding
+                indent = Math.max(0, indent - 1);
+                formatted += tab.repeat(indent) + element.trim() + '\n';
+            } else if (element.match(/^<\w[^>]*[^\/]>$/)) {
+                // Opening tag (not self-closing) - add then increase indent
+                formatted += tab.repeat(indent) + element.trim() + '\n';
+                indent++;
+            } else if (element.match(/^<\w[^>]*\/>$/)) {
+                // Self-closing tag
+                formatted += tab.repeat(indent) + element.trim() + '\n';
+            } else if (element.trim().length > 0) {
+                // Text content
+                formatted += tab.repeat(indent) + element.trim() + '\n';
+            }
+        });
+        
+        return formatted.trim();
+    }
+    
     // Source View Toggle
     function toggleSourceView() {
         isSourceMode = !isSourceMode;
@@ -167,7 +195,8 @@ function initTiptapEditor(elementId, initialContent = '') {
             editorElement.style.display = 'none';
             sourceElement.style.display = 'block';
             sourceElement.classList.remove('hidden');
-            sourceElement.value = editor.getHTML();
+            // Format the HTML for better readability
+            sourceElement.value = formatHTML(editor.getHTML());
             sourceButton?.classList.add('is-active');
             
             // Clear other button states
