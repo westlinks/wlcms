@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 
 // Custom HTML extensions to preserve divs and classes
-import { CustomDiv, CustomParagraph } from './components/custom-html.js'
+import { CustomDiv, CustomParagraph, CustomLink } from './components/custom-html.js'
 
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
@@ -91,14 +91,7 @@ function initTiptapEditor(elementId, initialContent = '') {
             }),
             CustomParagraph,
             CustomDiv,
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    target: '_blank',
-                    rel: 'noopener noreferrer',
-                    class: null,
-                },
-            }),
+            CustomLink,
         ],
         content: initialContent,
         onCreate: ({ editor }) => {

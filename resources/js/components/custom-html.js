@@ -14,17 +14,8 @@ export const CustomDiv = Node.create({
     return [
       {
         tag: 'div',
-        getAttrs: (node) => {
-          // Preserve all attributes
-          const attrs = {};
-          if (node.hasAttributes()) {
-            for (let i = 0; i < node.attributes.length; i++) {
-              const attr = node.attributes[i];
-              attrs[attr.name] = attr.value;
-            }
-          }
-          return attrs.class || attrs.id || Object.keys(attrs).length > 0 ? attrs : false;
-        },
+        // Accept all divs
+        getAttrs: () => null,
       },
     ]
   },
@@ -35,41 +26,31 @@ export const CustomDiv = Node.create({
   
   addAttributes() {
     return {
+      // Dynamically preserve all attributes
       class: {
         default: null,
         parseHTML: element => element.getAttribute('class'),
         renderHTML: attributes => {
-          if (!attributes.class) {
-            return {}
-          }
+          if (!attributes.class) return {}
           return { class: attributes.class }
         },
       },
       id: {
         default: null,
+        parseHTML: element => element.getAttribute('id'),
+        renderHTML: attributes => {
+          if (!attributes.id) return {}
+          return { id: attributes.id }
+        },
       },
       style: {
         default: null,
+        parseHTML: element => element.getAttribute('style'),
+        renderHTML: attributes => {
+          if (!attributes.style) return {}
+          return { style: attributes.style }
+        },
       },
-      // Catch-all for any other attributes
-      ...Object.fromEntries(
-        ['data-', 'aria-', 'role', 'tabindex'].map(prefix => [
-          prefix,
-          {
-            default: null,
-            parseHTML: element => {
-              const attrs = {};
-              for (let i = 0; i < element.attributes.length; i++) {
-                const attr = element.attributes[i];
-                if (attr.name.startsWith(prefix) || attr.name === prefix.replace('-', '')) {
-                  attrs[attr.name] = attr.value;
-                }
-              }
-              return Object.keys(attrs).length > 0 ? attrs : null;
-            },
-          },
-        ])
-      ),
     }
   },
 })
@@ -98,9 +79,50 @@ export const CustomParagraph = Node.create({
         default: null,
         parseHTML: element => element.getAttribute('class'),
         renderHTML: attributes => {
-          if (!attributes.class) {
-            return {}
-          }
+          if (!attributes.class) return {}
+          return { class: attributes.class }
+        },
+      },
+    }
+  },
+})
+
+// Custom anchor/link extension that preserves all attributes
+export const CustomLink = Node.create({
+  name: 'customLink',
+  
+  priority: 1000,
+  
+  inline: true,
+  
+  group: 'inline',
+  
+  content: 'text*',
+  
+  parseHTML() {
+    return [{ tag: 'a[href]' }]
+  },
+  
+  renderHTML({ HTMLAttributes }) {
+    return ['a', HTMLAttributes, 0]
+  },
+  
+  addAttributes() {
+    return {
+      href: {
+        default: null,
+      },
+      target: {
+        default: null,
+      },
+      rel: {
+        default: null,
+      },
+      class: {
+        default: null,
+        parseHTML: element => element.getAttribute('class'),
+        renderHTML: attributes => {
+          if (!attributes.class) return {}
           return { class: attributes.class }
         },
       },
