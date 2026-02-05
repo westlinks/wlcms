@@ -6,6 +6,9 @@ import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 
+// Custom HTML extensions to preserve divs and classes
+import { CustomDiv, CustomParagraph } from './components/custom-html.js'
+
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
 import { FileUpload } from './components/file-upload.js'
@@ -53,15 +56,47 @@ function initTiptapEditor(elementId, initialContent = '') {
         element: editorElement,
         extensions: [
             StarterKit.configure({
+                // Disable the default paragraph to use our custom one
+                paragraph: false,
                 history: {
                     depth: 50,
                 },
+                // Configure heading to preserve classes
+                heading: {
+                    HTMLAttributes: {
+                        class: null,
+                    },
+                },
+                // Configure lists to preserve classes
+                bulletList: {
+                    HTMLAttributes: {
+                        class: null,
+                    },
+                },
+                orderedList: {
+                    HTMLAttributes: {
+                        class: null,
+                    },
+                },
+                listItem: {
+                    HTMLAttributes: {
+                        class: null,
+                    },
+                },
+                blockquote: {
+                    HTMLAttributes: {
+                        class: null,
+                    },
+                },
             }),
+            CustomParagraph,
+            CustomDiv,
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
                     target: '_blank',
                     rel: 'noopener noreferrer',
+                    class: null,
                 },
             }),
         ],
