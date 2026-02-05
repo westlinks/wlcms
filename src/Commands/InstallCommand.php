@@ -30,9 +30,9 @@ class InstallCommand extends Command
             '--force' => $this->option('force'),
         ]);
 
-        // Publish views
+        // Publish assets
         $this->call('vendor:publish', [
-            '--tag' => 'wlcms-views',
+            '--tag' => 'wlcms-assets',
             '--force' => $this->option('force'),
         ]);
 
@@ -44,17 +44,19 @@ class InstallCommand extends Command
         // Create storage directories
         $this->createStorageDirectories();
 
-        // Publish assets if needed
-        if ($this->confirm('Install and compile frontend assets?', true)) {
+        // Install and configure frontend assets
+        if ($this->confirm('Install and configure frontend assets?', true)) {
             $this->installAssets();
+            $this->updateViteConfig();
         }
 
         $this->info('WLCMS installation completed!');
         $this->line('');
         $this->line('Next steps:');
         $this->line('1. Review the configuration file: config/wlcms.php');
-        $this->line('2. Run: php artisan wlcms:permissions (if using Spatie permissions)');
-        $this->line('3. Visit /admin/cms to start using the CMS');
+        $this->line('2. Run: npm install && npm run build');
+        $this->line('3. Run: php artisan migrate (if you skipped it)');
+        $this->line('4. Visit /admin/cms to start using the CMS');
 
         return Command::SUCCESS;
     }
@@ -85,9 +87,8 @@ class InstallCommand extends Command
      */
     protected function installAssets(): void
     {
-        $this->info('Installing frontend dependencies...');
+        $this->info('Updating package.json with WLCMS dependencies...');
         
-        // Add Tiptap dependencies to package.json
         $packageJsonPath = base_path('package.json');
         if (file_exists($packageJsonPath)) {
             $packageJson = json_decode(file_get_contents($packageJsonPath), true);
@@ -98,20 +99,66 @@ class InstallCommand extends Command
                 '@tiptap/starter-kit' => '^2.0.0',
                 '@tiptap/extension-image' => '^2.0.0',
                 '@tiptap/extension-link' => '^2.0.0',
-                'wlcms' => '^2.0.0',
             ];
 
+            $added = false;
             foreach ($dependencies as $package => $version) {
-                if (!isset($packageJson['devDependencies'][$package])) {
-                    $packageJson['devDependencies'][$package] = $version;
+                if (!isset($packageJson['dependencies'][$package]) && !isset($packageJson['devDependencies'][$package])) {
+                    $packageJson['dependencies'][$package] = $version;
+                    $added = true;
                 }
             }
 
-            file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            $this->info('Updated package.json with WLCMS dependencies');
+            if ($added) {
+                file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+                $this->info('✓ Updated package.json with WLCMS dependencies');
+            } else {
+                $this->info('✓ WLCMS dependencies already in package.json');
+            }
+        } else {
+            $this->warn('package.json not found. Please ensure you have a Laravel Vite setup.');
+        }
+    }
+
+    /**
+     * Update vite.config.js to include WLCMS assets.
+     */
+    protected function updateViteConfig(): void
+    {
+        $viteConfigPath = base_path('vite.config.js');
+        
+        if (!file_exists($viteConfigPath)) {
+            $this->warn('vite.config.js not found. Skipping Vite configuration.');
+            return;
         }
 
-        // Suggest running npm install
-        $this->warn('Remember to run: npm install && npm run build');
+        $viteConfig = file_get_contents($viteConfigPath);
+        
+        // Check if WLCMS assets are already included
+        if (strpos($viteConfig, 'resources/vendor/wlcms/js/wlcms.js') !== false) {
+            $this->info('✓ Vite config already includes WLCMS assets');
+            return;
+        }
+
+        $this->info('Updating vite.config.js...');
+
+        // Pattern to find the input array
+        $pattern = "/(input:\s*\[[\s\S]*?)(\])/";
+        
+        if (preg_match($pattern, $viteConfig, $matches)) {
+            // Add WLCMS assets to the input array
+            $originalInput = $matches[1];
+            $replacement = $originalInput . ",\n                'resources/vendor/wlcms/js/wlcms.js',\n                'resources/vendor/wlcms/css/wlcms.css'\n            " . $matches[2];
+            
+            $updatedConfig = preg_replace($pattern, $replacement, $viteConfig, 1);
+            
+            file_put_contents($viteConfigPath, $updatedConfig);
+            $this->info('✓ Updated vite.config.js to include WLCMS assets');
+        } else {
+            $this->warn('Could not automatically update vite.config.js. Please manually add:');
+            $this->line("  'resources/vendor/wlcms/js/wlcms.js',");
+            $this->line("  'resources/vendor/wlcms/css/wlcms.css'");
+            $this->line('to the input array in your vite.config.js');
+        }
     }
 }
