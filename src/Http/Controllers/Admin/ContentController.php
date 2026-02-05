@@ -60,6 +60,7 @@ class ContentController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:cms_content_items,slug',
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'type' => 'required|string|in:page,post,article,news,event',
@@ -91,6 +92,7 @@ class ContentController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:cms_content_items,slug,' . $content->id,
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'type' => 'required|string|in:page,post,article,news,event',
