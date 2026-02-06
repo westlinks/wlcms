@@ -65,8 +65,8 @@
 <template id="media-item-template">
     <div class="media-item relative group cursor-pointer border-2 border-transparent rounded-lg overflow-hidden hover:border-blue-500 transition-all"
          data-media-id="">
-        <div class="aspect-square bg-gray-100 flex items-center justify-center">
-            <img src="" alt="" class="media-thumbnail w-full h-full object-cover">
+        <div class="aspect-square bg-gray-200 flex items-center justify-center">
+            <img src="" alt="" class="media-thumbnail w-full h-full object-cover" loading="lazy">
         </div>
         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
             <div class="media-checkbox hidden group-hover:block">
@@ -78,6 +78,9 @@
         </div>
         <div class="p-2 bg-white">
             <p class="media-name text-xs text-gray-700 truncate"></p>
+        </div>
+    </div>
+</template>
         </div>
     </div>
 </template>
