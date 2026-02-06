@@ -177,6 +177,30 @@ class ContentController extends Controller
 
         return redirect()->back()
                         ->with('success', 'Content published successfully!');
+    }
+
+    public function unpublish(ContentItem $content)
+    {
+        $content->update([
+            'status' => 'draft',
+            'published_at' => null
+        ]);
+
+        return redirect()->back()
+                        ->with('success', 'Content moved to draft!');
+    }
+
+    public function preview(ContentItem $content)
+    {
+        return view('wlcms::admin.content.preview', compact('content'));
+    }
+
+    public function revisions(ContentItem $content)
+    {
+        $revisions = $content->revisions()->latest()->get();
+
+        return view('wlcms::admin.content.revisions', compact('content', 'revisions'));
+    }
 
     /**
      * Attach media to content item
@@ -205,30 +229,6 @@ class ContentController extends Controller
                 'message' => 'Media attached successfully'
             ]);
         }
-
-        return redirect()->back()->with('success', 'Media attached successfully');
-    }
-
-    /**
-     * Detach media from content item
-     */
-    public function detachMedia(Request $request, ContentItem $content)
-    {
-        $validated = $request->validate([
-            'media_id' => 'required|exists:cms_media_assets,id',
-        ]);
-
-        $content->mediaAssets()->detach($validated['media_id']);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Media detached successfully'
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Media removed successfully');
-    }
     }
 
     public function unpublish(ContentItem $content)
