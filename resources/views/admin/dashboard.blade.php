@@ -72,15 +72,16 @@
                     @if($stats['recent_content']->count() > 0)
                         <div class="space-y-4">
                             @foreach($stats['recent_content'] as $content)
-                                <div class="flex items-center justify-between py-2 border-b last:border-0">
+                                <a href="{{ route('wlcms.admin.content.show', $content) }}" 
+                                   class="flex items-center justify-between py-2 border-b last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded transition-colors">
                                     <div>
-                                        <h4 class="font-medium text-gray-900">{{ $content->title }}</h4>
+                                        <h4 class="font-medium text-gray-900 hover:text-blue-600">{{ $content->title }}</h4>
                                         <p class="text-sm text-gray-600">{{ ucfirst($content->type) }} • {{ ucfirst($content->status) }}</p>
                                     </div>
                                     <div class="text-sm text-gray-500">
                                         {{ $content->updated_at->diffForHumans() }}
                                     </div>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                         <div class="mt-4 pt-4 border-t">
@@ -109,8 +110,8 @@
                 <div class="p-6">
                     @if($stats['recent_media']->count() > 0)
                         <div class="space-y-4">
-                            @foreach($stats['recent_media'] as $media)
-                                <div class="flex items-center justify-between py-2 border-b last:border-0">
+                            @forea href="{{ route('wlcms.admin.media.show', $media) }}" 
+                                   class="flex items-center justify-between py-2 border-b last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded transition-colors">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
                                             @if($media->type === 'image')
@@ -130,13 +131,14 @@
                                             @endif
                                         </div>
                                         <div class="ml-3">
-                                            <h4 class="font-medium text-gray-900">{{ $media->name }}</h4>
+                                            <h4 class="font-medium text-gray-900 hover:text-blue-600">{{ $media->name }}</h4>
                                             <p class="text-sm text-gray-600">{{ ucfirst($media->type) }}</p>
                                         </div>
                                     </div>
                                     <div class="text-sm text-gray-500">
                                         {{ $media->created_at->diffForHumans() }}
                                     </div>
+                                </a/div>
                                 </div>
                             @endforeach
                         </div>
