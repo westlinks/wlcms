@@ -197,7 +197,12 @@ class MediaAsset extends Model
             return null;
         }
 
-        // Always return the serve route - it will handle fallback to original if thumbnail doesn't exist
+        // For S3 and cloud storage, return direct URL
+        if ($this->disk !== 'local' && $this->disk !== 'public') {
+            return Storage::disk($this->disk)->url($this->path);
+        }
+
+        // For local storage, use the serve route which handles thumbnails
         return route('wlcms.admin.media.serve', ['media' => $this->id, 'size' => $size]);
     }
 

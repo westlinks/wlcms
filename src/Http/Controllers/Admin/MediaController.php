@@ -702,25 +702,31 @@ class MediaController extends Controller
         $query->orderBy('created_at', 'desc');
 
         $media = $query->get()->map(function($item) {
-            // For images, try to get thumbnail URL, otherwise use original
-            $thumbnailUrl = null;
-            if ($item->type === 'image') {
-                $thumbnailUrl = $item->getThumbnailUrl('small');
-                // If getThumbnailUrl returns null (not an image), use the serve route for original
-                if (!$thumbnailUrl) {
-                    $thumbnailUrl = route('wlcms.admin.media.serve', ['media' => $item->id, 'size' => 'original']);
-                }
-            } else {
-                $thumbnailUrl = route('wlcms.admin.media.serve', ['media' => $item->id, 'size' => 'original']);
+            // For S3 and other cloud storage, use direct URLs
+            if ($item->disk !== 'local' && $item->disk !== 'public') {
+                $url = Storage::disk($item->disk)->url($item->path);
+                $thumbnailUrl = $url; // Use original for now, thumbnails handled separately
+                
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'type' => $item->type,
+                    'path' => $item->path,
+                    'url' => $url,
+                    'thumbnail_url' => $thumbnailUrl,
+                    'alt_text' => $item->alt_text,
+                    'mime_type' => $item->mime_type,
+                ];
             }
             
+            // For local storage, use serve routes
             return [
                 'id' => $item->id,
                 'name' => $item->name,
                 'type' => $item->type,
                 'path' => $item->path,
                 'url' => route('wlcms.admin.media.serve', ['media' => $item->id, 'size' => 'original']),
-                'thumbnail_url' => $thumbnailUrl,
+                'thumbnail_url' => route('wlcms.admin.media.serve', ['media' => $item->id, 'size' => 'small']),
                 'alt_text' => $item->alt_text,
                 'mime_type' => $item->mime_type,
             ];
