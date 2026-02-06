@@ -270,8 +270,8 @@
                         document.getElementById('featured_media_id').value = media.id;
                         
                         // Update preview
-                        document.getElementById('featured-image-thumbnail').src = media.thumbnail || media.url;
-                        document.getElementById('featured-image-thumbnail').alt = media.name;
+                        document.getElementById('featured-image-thumbnail').src = media.thumbnail_url || media.url;
+                        document.getElementById('featured-image-thumbnail').alt = media.alt_text || media.name;
                         document.getElementById('featured-image-name').textContent = media.name;
                         
                         // Show preview, hide select button

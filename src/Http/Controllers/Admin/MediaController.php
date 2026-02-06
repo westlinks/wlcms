@@ -708,7 +708,7 @@ class MediaController extends Controller
                 'type' => $item->type,
                 'path' => $item->path,
                 'url' => Storage::disk($item->disk)->url($item->path),
-                'thumbnail_url' => $item->thumbnails['small'] ?? Storage::disk($item->disk)->url($item->path),
+                'thumbnail_url' => $item->getThumbnailUrl('small') ?? Storage::disk($item->disk)->url($item->path),
                 'alt_text' => $item->alt_text,
                 'mime_type' => $item->mime_type,
             ];

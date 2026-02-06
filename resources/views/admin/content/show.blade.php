@@ -42,6 +42,21 @@
 
         <!-- Sidebar -->
         <div class="space-y-6">
+            <!-- Featured Image -->
+            @php
+                $featuredMedia = $content->mediaAssets()->wherePivot('type', 'featured')->first();
+            @endphp
+            
+            @if($featuredMedia)
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-medium text-gray-900 mb-4">Featured Image</h3>
+                    <img src="{{ $featuredMedia->getThumbnailUrl('medium') }}" 
+                         alt="{{ $featuredMedia->alt_text }}" 
+                         class="w-full rounded-lg">
+                    <p class="text-xs text-gray-600 mt-2">{{ $featuredMedia->name }}</p>
+                </div>
+            @endif
+            
             <!-- Status -->
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="font-medium text-gray-900 mb-4">Status</h3>

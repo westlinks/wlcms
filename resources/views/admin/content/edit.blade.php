@@ -160,7 +160,7 @@
                         <div id="featured-image-preview" class="{{ $featuredMedia ? '' : 'hidden' }}">
                             <div class="relative group">
                                 <img id="featured-image-thumbnail" 
-                                     src="{{ $featuredMedia?->thumbnails['medium'] ?? $featuredMedia?->path }}" 
+                                     src="{{ $featuredMedia?->getThumbnailUrl('medium') }}" 
                                      alt="{{ $featuredMedia?->alt_text }}" 
                                      class="w-full h-32 object-cover rounded-lg">
                                 <button type="button" 
@@ -249,8 +249,8 @@
                         document.getElementById('featured_media_id').value = media.id;
                         
                         // Update preview
-                        document.getElementById('featured-image-thumbnail').src = media.thumbnail || media.url;
-                        document.getElementById('featured-image-thumbnail').alt = media.name;
+                        document.getElementById('featured-image-thumbnail').src = media.thumbnail_url || media.url;
+                        document.getElementById('featured-image-thumbnail').alt = media.alt_text || media.name;
                         document.getElementById('featured-image-name').textContent = media.name;
                         
                         // Show preview, hide select button
