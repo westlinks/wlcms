@@ -31,13 +31,15 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('content/{content}/media/attach', [ContentController::class, 'attachMedia'])->name('content.media.attach');
         Route::post('content/{content}/media/detach', [ContentController::class, 'detachMedia'])->name('content.media.detach');
 
+        // Media list endpoint (must be before resource route)
+        Route::get('media/list', [MediaController::class, 'listJson'])->name('media.list');
+        
         // Media management
         Route::resource('media', MediaController::class)->parameters(['media' => 'media']);
         Route::post('media/upload', [MediaController::class, 'upload'])->name('media.upload');
         Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
         Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
         Route::get('media/{media}/serve/{size?}', [MediaController::class, 'serve'])->name('media.serve');
-        Route::get('media/list', [MediaController::class, 'listJson'])->name('media.list');
         
         // Media folder management
         Route::post('media/folder', [MediaController::class, 'createFolder'])->name('media.folder.store');
