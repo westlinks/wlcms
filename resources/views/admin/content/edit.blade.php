@@ -3,9 +3,6 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Edit Content') }}
         </h2>
-        
-        {{-- WLCMS Assets --}}
-        @vite(['vendor/westlinks/wlcms/resources/css/wlcms.css', 'vendor/westlinks/wlcms/resources/js/wlcms.js'])
     </x-slot>
     <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" enctype="multipart/form-data">
         @csrf
