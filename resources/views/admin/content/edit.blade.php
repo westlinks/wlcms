@@ -223,7 +223,6 @@
 
     {{-- Include Media Picker Modal --}}
     @include('wlcms::admin.components.media-picker')
-@endsection
 
 @push('scripts')
     {{-- Featured Image Picker Script --}}
