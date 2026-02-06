@@ -231,6 +231,11 @@
 @push('scripts')
     {{-- Featured Image Picker Script --}}
     <script>
+        console.log('=== FEATURED IMAGE DEBUG ===');
+        console.log('Modal element exists:', !!document.getElementById('media-picker-modal'));
+        console.log('window.mediaPicker exists:', !!window.mediaPicker);
+        console.log('Script timestamp:', new Date().toISOString());
+        
         // Wait for WLCMS to initialize
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Featured image picker script loaded');
