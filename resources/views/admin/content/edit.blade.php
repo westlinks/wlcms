@@ -226,11 +226,16 @@
 
     {{-- Include Media Picker Modal --}}
     @include('wlcms::admin.components.media-picker')
+@endsection
 
+@push('scripts')
     {{-- Featured Image Picker Script --}}
     <script>
         // Wait for WLCMS to initialize
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Featured image picker script loaded');
+            console.log('window.mediaPicker:', window.mediaPicker);
+            
             // Make functions globally available
             window.openFeaturedImagePicker = function() {
                 if (window.mediaPicker) {
@@ -262,4 +267,5 @@
             };
         });
     </script>
+@endpush
 </x-admin-layout>
