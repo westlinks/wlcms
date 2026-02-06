@@ -5,7 +5,7 @@
         </h2>
         
         {{-- WLCMS Assets --}}
-        @vite(['resources/vendor/wlcms/css/wlcms.css', 'resources/vendor/wlcms/js/wlcms.js'])
+        @vite(['vendor/westlinks/wlcms/resources/css/wlcms.css', 'vendor/westlinks/wlcms/resources/js/wlcms.js'])
     </x-slot>
     <form method="POST" action="{{ route('wlcms.admin.content.update', $content) }}" enctype="multipart/form-data">
         @csrf
