@@ -120,7 +120,10 @@ export class MediaPicker {
                 params.append('type', this.mediaType);
             }
 
-            const response = await fetch(`/admin/cms/media/list?${params}`, {
+            const url = `/admin/cms/media/list?${params}`;
+            console.log('Fetching media from:', url);
+            
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -128,11 +131,17 @@ export class MediaPicker {
                 }
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
             if (!response.ok) {
-                throw new Error('Failed to load media');
+                const errorText = await response.text();
+                console.error('Response error:', errorText);
+                throw new Error(`Failed to load media: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log('Media data received:', data);
             this.mediaData = data.media || [];
             this.renderMedia();
         } catch (error) {
