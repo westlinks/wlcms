@@ -677,4 +677,46 @@ class MediaController extends Controller
         $folder->delete();
         return back()->with('success', 'Folder deleted successfully.');
     }
+
+    /**
+     * Get media list as JSON for media picker
+     */
+    public function listJson(Request $request)
+    {
+        $query = MediaAsset::query();
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Search by name or alt text
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('alt_text', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Order by newest first
+        $query->orderBy('created_at', 'desc');
+
+        $media = $query->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'type' => $item->type,
+                'path' => $item->path,
+                'url' => Storage::disk($item->disk)->url($item->path),
+                'thumbnail_url' => $item->thumbnails['small'] ?? Storage::disk($item->disk)->url($item->path),
+                'alt_text' => $item->alt_text,
+                'mime_type' => $item->mime_type,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'media' => $media
+        ]);
+    }
 }

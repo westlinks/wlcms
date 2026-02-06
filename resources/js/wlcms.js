@@ -12,10 +12,12 @@ import { CustomDiv, CustomParagraph, CustomLink } from './components/custom-html
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
 import { FileUpload } from './components/file-upload.js'
+import { MediaPicker } from './components/media-picker.js'
 
 // Global instances
 let mediaModalInstance = null;
 let fileUploadInstance = null;
+let mediaPickerInstance = null;
 
 // Initialize Tiptap Editor
 function initTiptapEditor(elementId, initialContent = '') {
@@ -491,6 +493,13 @@ function initWlcms(config = {}) {
         const uploadUrl = config.uploadUrl || '/admin/cms/media/upload';
         const csrfToken = config.csrfToken || '';
         initFileUpload(uploadUrl, csrfToken);
+    }
+    
+    // Initialize media picker if modal exists on page
+    if (document.getElementById('media-picker-modal')) {
+        mediaPickerInstance = new MediaPicker();
+        mediaPickerInstance.init();
+        window.mediaPicker = mediaPickerInstance;
     }
     
     // Initialize field override manager if elements exist on page

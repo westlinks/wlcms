@@ -70,6 +70,9 @@ class ContentController extends Controller
             'menu_title' => 'nullable|string|max:255',
             'menu_order' => 'integer|min:0',
             'menu_location' => 'string|in:primary,footer,sidebar',
+            'featured_media_id' => 'nullable|exists:cms_media_assets,id',
+            'media_ids' => 'nullable|array',
+            'media_ids.*' => 'exists:cms_media_assets,id',
         ]);
 
         // Convert checkbox value properly
@@ -79,12 +82,31 @@ class ContentController extends Controller
 
         $content = ContentItem::create($validated);
 
+        // Attach featured media
+        if ($request->filled('featured_media_id')) {
+            $content->mediaAssets()->attach($request->featured_media_id, [
+                'type' => 'featured',
+                'sort_order' => 0
+            ]);
+        }
+
+        // Attach additional media (gallery, attachments, etc.)
+        if ($request->filled('media_ids')) {
+            foreach ($request->media_ids as $index => $mediaId) {
+                $content->mediaAssets()->attach($mediaId, [
+                    'type' => 'attachment',
+                    'sort_order' => $index + 1
+                ]);
+            }
+        }
+
         return redirect()->route('wlcms.admin.content.index')
                         ->with('success', 'Content created successfully!');
     }
 
     public function edit(ContentItem $content)
     {
+        $content->load('mediaAssets');
         return view('wlcms::admin.content.edit', compact('content'));
     }
 
@@ -101,7 +123,9 @@ class ContentController extends Controller
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_order' => 'integer|min:0',
-            'menu_location' => 'string|in:primary,footer,sidebar',
+            'featured_media_id' => 'nullable|exists:cms_media_assets,id',
+            'media_ids' => 'nullable|array',
+            'media_ids.*' => 'exists:cms_media_assets,id',
         ]);
 
         // Convert checkbox value properly
@@ -109,6 +133,27 @@ class ContentController extends Controller
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 
+        $content->update($validated);
+
+        // Sync featured media
+        $content->mediaAssets()->wherePivot('type', 'featured')->detach();
+        if ($request->filled('featured_media_id')) {
+            $content->mediaAssets()->attach($request->featured_media_id, [
+                'type' => 'featured',
+                'sort_order' => 0
+            ]);
+        }
+
+        // Sync additional media
+        $content->mediaAssets()->wherePivot('type', 'attachment')->detach();
+        if ($request->filled('media_ids')) {
+            foreach ($request->media_ids as $index => $mediaId) {
+                $content->mediaAssets()->attach($mediaId, [
+                    'type' => 'attachment',
+                    'sort_order' => $index + 1
+                ]);
+            }
+        }
         $content->update($validated);
 
         return redirect()->route('wlcms.admin.content.index')
@@ -132,6 +177,58 @@ class ContentController extends Controller
 
         return redirect()->back()
                         ->with('success', 'Content published successfully!');
+
+    /**
+     * Attach media to content item
+     */
+    public function attachMedia(Request $request, ContentItem $content)
+    {
+        $validated = $request->validate([
+            'media_id' => 'required|exists:cms_media_assets,id',
+            'type' => 'required|string|in:featured,gallery,attachment',
+            'sort_order' => 'nullable|integer|min:0',
+        ]);
+
+        // If featured, remove existing featured media
+        if ($validated['type'] === 'featured') {
+            $content->mediaAssets()->wherePivot('type', 'featured')->detach();
+        }
+
+        $content->mediaAssets()->attach($validated['media_id'], [
+            'type' => $validated['type'],
+            'sort_order' => $validated['sort_order'] ?? 0
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Media attached successfully'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Media attached successfully');
+    }
+
+    /**
+     * Detach media from content item
+     */
+    public function detachMedia(Request $request, ContentItem $content)
+    {
+        $validated = $request->validate([
+            'media_id' => 'required|exists:cms_media_assets,id',
+        ]);
+
+        $content->mediaAssets()->detach($validated['media_id']);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Media detached successfully'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Media removed successfully');
+    }
     }
 
     public function unpublish(ContentItem $content)

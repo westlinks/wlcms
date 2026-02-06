@@ -26,6 +26,10 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('content/{content}/unpublish', [ContentController::class, 'unpublish'])->name('content.unpublish');
         Route::get('content/{content}/preview', [ContentController::class, 'preview'])->name('content.preview');
         Route::get('content/{content}/revisions', [ContentController::class, 'revisions'])->name('content.revisions');
+        
+        // Content media attachment
+        Route::post('content/{content}/media/attach', [ContentController::class, 'attachMedia'])->name('content.media.attach');
+        Route::post('content/{content}/media/detach', [ContentController::class, 'detachMedia'])->name('content.media.detach');
 
         // Media management
         Route::resource('media', MediaController::class)->parameters(['media' => 'media']);
@@ -33,6 +37,7 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
         Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
         Route::get('media/{media}/serve/{size?}', [MediaController::class, 'serve'])->name('media.serve');
+        Route::get('media/list', [MediaController::class, 'listJson'])->name('media.list');
         
         // Media folder management
         Route::post('media/folder', [MediaController::class, 'createFolder'])->name('media.folder.store');

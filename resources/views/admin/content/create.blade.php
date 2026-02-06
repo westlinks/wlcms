@@ -147,19 +147,31 @@
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
                     
                     <div class="space-y-4">
-                        <div>
-                            <input type="file" id="featured_image" name="featured_image" accept="image/*"
-                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            @error('featured_image')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                        {{-- Hidden input to store selected media ID --}}
+                        <input type="hidden" id="featured_media_id" name="featured_media_id" value="">
+                        
+                        {{-- Featured image preview --}}
+                        <div id="featured-image-preview" class="hidden">
+                            <div class="relative group">
+                                <img id="featured-image-thumbnail" src="" alt="" class="w-full h-48 object-cover rounded-lg">
+                                <button type="button" 
+                                        onclick="removeFeaturedImage()"
+                                        class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Remove
+                                </button>
+                                <div class="mt-2">
+                                    <p id="featured-image-name" class="text-sm text-gray-600"></p>
+                                </div>
+                            </div>
                         </div>
-
-                        <div>
-                            <label for="featured_image_alt" class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
-                            <input type="text" id="featured_image_alt" name="featured_image_alt" value="{{ old('featured_image_alt') }}"
-                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="Describe the image for accessibility">
+                        
+                        {{-- Select button --}}
+                        <div id="featured-image-select">
+                            <button type="button" 
+                                    onclick="openFeaturedImagePicker()"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                                📷 Select Featured Image
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -231,4 +243,43 @@
             </div>
         </div>
     </form>
+
+    {{-- Include Media Picker Modal --}}
+    @include('wlcms::admin.components.media-picker')
+
+    {{-- Featured Image Picker Script --}}
+    <script>
+        // Wait for WLCMS to initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Make functions globally available
+            window.openFeaturedImagePicker = function() {
+                if (window.mediaPicker) {
+                    window.mediaPicker.open((media) => {
+                        // Set hidden input value
+                        document.getElementById('featured_media_id').value = media.id;
+                        
+                        // Update preview
+                        document.getElementById('featured-image-thumbnail').src = media.thumbnail || media.url;
+                        document.getElementById('featured-image-thumbnail').alt = media.name;
+                        document.getElementById('featured-image-name').textContent = media.name;
+                        
+                        // Show preview, hide select button
+                        document.getElementById('featured-image-preview').classList.remove('hidden');
+                        document.getElementById('featured-image-select').classList.add('hidden');
+                    });
+                } else {
+                    console.error('Media picker not initialized');
+                }
+            };
+
+            window.removeFeaturedImage = function() {
+                // Clear hidden input
+                document.getElementById('featured_media_id').value = '';
+                
+                // Hide preview, show select button
+                document.getElementById('featured-image-preview').classList.add('hidden');
+                document.getElementById('featured-image-select').classList.remove('hidden');
+            };
+        });
+    </script>
 </x-admin-layout>

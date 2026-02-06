@@ -185,4 +185,43 @@
             </div>
         </div>
     </form>
+
+    {{-- Include Media Picker Modal --}}
+    @include('wlcms::admin.components.media-picker')
+
+    {{-- Featured Image Picker Script --}}
+    <script>
+        // Wait for WLCMS to initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Make functions globally available
+            window.openFeaturedImagePicker = function() {
+                if (window.mediaPicker) {
+                    window.mediaPicker.open((media) => {
+                        // Set hidden input value
+                        document.getElementById('featured_media_id').value = media.id;
+                        
+                        // Update preview
+                        document.getElementById('featured-image-thumbnail').src = media.thumbnail || media.url;
+                        document.getElementById('featured-image-thumbnail').alt = media.name;
+                        document.getElementById('featured-image-name').textContent = media.name;
+                        
+                        // Show preview, hide select button
+                        document.getElementById('featured-image-preview').classList.remove('hidden');
+                        document.getElementById('featured-image-select').classList.add('hidden');
+                    });
+                } else {
+                    console.error('Media picker not initialized');
+                }
+            };
+
+            window.removeFeaturedImage = function() {
+                // Clear hidden input
+                document.getElementById('featured_media_id').value = '';
+                
+                // Hide preview, show select button
+                document.getElementById('featured-image-preview').classList.add('hidden');
+                document.getElementById('featured-image-select').classList.remove('hidden');
+            };
+        });
+    </script>
 </x-admin-layout>
