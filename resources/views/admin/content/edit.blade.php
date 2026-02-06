@@ -144,7 +144,45 @@
                             </div>
                         </div>
                     </div>
-
+                    <!-- Featured Image -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-900 mb-4">Featured Image</h3>
+                        
+                        {{-- Hidden input to store selected media ID --}}
+                        <input type="hidden" id="featured_media_id" name="featured_media_id" 
+                               value="{{ $content->mediaAssets()->wherePivot('type', 'featured')->first()?->id }}">
+                        
+                        @php
+                            $featuredMedia = $content->mediaAssets()->wherePivot('type', 'featured')->first();
+                        @endphp
+                        
+                        {{-- Featured image preview --}}
+                        <div id="featured-image-preview" class="{{ $featuredMedia ? '' : 'hidden' }}">
+                            <div class="relative group">
+                                <img id="featured-image-thumbnail" 
+                                     src="{{ $featuredMedia?->thumbnails['medium'] ?? $featuredMedia?->path }}" 
+                                     alt="{{ $featuredMedia?->alt_text }}" 
+                                     class="w-full h-32 object-cover rounded-lg">
+                                <button type="button" 
+                                        onclick="removeFeaturedImage()"
+                                        class="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Remove
+                                </button>
+                                <div class="mt-2">
+                                    <p id="featured-image-name" class="text-xs text-gray-600">{{ $featuredMedia?->name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Select button --}}
+                        <div id="featured-image-select" class="{{ $featuredMedia ? 'hidden' : '' }}">
+                            <button type="button" 
+                                    onclick="openFeaturedImagePicker()"
+                                    class="w-full px-3 py-2 border-2 border-dashed border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                                📷 Select Image
+                            </button>
+                        </div>
+                    </div>
                     <!-- Content Info -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="font-medium text-gray-900 mb-4">Content Info</h3>

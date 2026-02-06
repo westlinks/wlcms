@@ -497,9 +497,12 @@ function initWlcms(config = {}) {
     
     // Initialize media picker if modal exists on page
     if (document.getElementById('media-picker-modal')) {
+        console.log('Initializing media picker...');
         mediaPickerInstance = new MediaPicker();
         mediaPickerInstance.init();
         window.mediaPicker = mediaPickerInstance;
+    } else {
+        console.log('Media picker modal not found on page');
     }
     
     // Initialize field override manager if elements exist on page

@@ -28,10 +28,14 @@ export class MediaPicker {
         this.typeFilter = document.getElementById('media-type-filter');
 
         if (!this.modal || !this.grid) {
-            console.error('Media picker elements not found');
+            console.error('Media picker elements not found', {
+                modal: !!this.modal,
+                grid: !!this.grid
+            });
             return;
         }
 
+        console.log('Media picker initialized successfully');
         this.bindEvents();
         this.isInitialized = true;
     }
