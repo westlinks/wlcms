@@ -702,24 +702,6 @@ class MediaController extends Controller
         $query->orderBy('created_at', 'desc');
 
         $media = $query->get()->map(function($item) {
-            // For S3 and other cloud storage, use direct URLs
-            if ($item->disk !== 'local' && $item->disk !== 'public') {
-                $url = Storage::disk($item->disk)->url($item->path);
-                $thumbnailUrl = $url; // Use original for now, thumbnails handled separately
-                
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'type' => $item->type,
-                    'path' => $item->path,
-                    'url' => $url,
-                    'thumbnail_url' => $thumbnailUrl,
-                    'alt_text' => $item->alt_text,
-                    'mime_type' => $item->mime_type,
-                ];
-            }
-            
-            // For local storage, use serve routes
             return [
                 'id' => $item->id,
                 'name' => $item->name,
