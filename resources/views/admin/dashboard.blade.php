@@ -107,7 +107,7 @@
                     @if($stats['recent_media']->count() > 0)
                         <div class="space-y-4">
                             @foreach($stats['recent_media'] as $media)
-                                <a href="{{ route('wlcms.admin.media.edit', $media) }}" 
+                                <a href="{{ route('wlcms.admin.media.index') }}?search={{ urlencode($media->name) }}" 
                                    class="flex items-center justify-between py-2 border-b last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded transition-colors">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
