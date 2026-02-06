@@ -5,10 +5,6 @@
         </h2>
     </x-slot>
 
-    {{-- WLCMS Styles --}}
-    @push('styles')
-        @vite(['resources/vendor/wlcms/css/wlcms.css'])
-    @endpush
     <div class="space-y-6">
         {{-- Stats Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
