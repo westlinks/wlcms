@@ -77,6 +77,7 @@ class ContentController extends Controller
             'media_ids.*' => 'exists:cms_media_assets,id',
             'zones_json' => 'nullable|string',
             'zones' => 'nullable|array',
+            'settings_json' => 'nullable|string',
         ]);
 
         // Convert checkbox value properly
@@ -95,9 +96,16 @@ class ContentController extends Controller
 
         $content = ContentItem::create($validated);
 
+        // Extract featured_image from template settings if provided
+        $settingsData = $request->settings_json ? json_decode($request->settings_json, true) : [];
+        $featuredMediaId = $settingsData['featured_image'] ?? $request->featured_media_id;
+        
+        \Log::info('STORE - Settings Data:', ['settings' => $settingsData]);
+        \Log::info('STORE - Featured Media ID:', ['id' => $featuredMediaId, 'from_settings' => $settingsData['featured_image'] ?? null, 'from_request' => $request->featured_media_id]);
+
         // Attach featured media
-        if ($request->filled('featured_media_id')) {
-            $content->mediaAssets()->attach($request->featured_media_id, [
+        if ($featuredMediaId) {
+            $content->mediaAssets()->attach($featuredMediaId, [
                 'type' => 'featured',
                 'sort_order' => 0
             ]);
@@ -113,26 +121,34 @@ class ContentController extends Controller
             }
         }
 
-        // Save template zones data
+        // Save template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
             $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
             
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
                 [
-                    'settings' => [],
+                    'settings' => $settingsData ?? [],
                     'zones_data' => $zonesData ?? []
                 ]
             );
         }
 
-        return redirect()->route('wlcms.admin.content.index')
+        return redirect()->route('wlcms.admin.content.show', $content)
                         ->with('success', 'Content created successfully!');
     }
 
     public function edit(ContentItem $content)
     {
         $content->load('mediaAssets', 'templateSettings');
+        
+        $featuredMedia = $content->mediaAssets->firstWhere('pivot.type', 'featured');
+        \Log::info('EDIT - Loading content:', [
+            'content_id' => $content->id,
+            'featured_media_id' => $featuredMedia?->id,
+            'template_settings' => $content->templateSettings?->settings,
+        ]);
+        
         return view('wlcms::admin.content.edit', compact('content'));
     }
 
@@ -155,6 +171,7 @@ class ContentController extends Controller
             'media_ids.*' => 'exists:cms_media_assets,id',
             'zones_json' => 'nullable|string',
             'zones' => 'nullable|array',
+            'settings_json' => 'nullable|string',
         ]);
 
         // Convert checkbox value properly
@@ -173,10 +190,17 @@ class ContentController extends Controller
 
         $content->update($validated);
 
+        // Extract featured_image from template settings if provided
+        $settingsData = $request->settings_json ? json_decode($request->settings_json, true) : [];
+        $featuredMediaId = $settingsData['featured_image'] ?? $request->featured_media_id;
+        
+        \Log::info('UPDATE - Settings Data:', ['settings' => $settingsData]);
+        \Log::info('UPDATE - Featured Media ID:', ['id' => $featuredMediaId, 'from_settings' => $settingsData['featured_image'] ?? null, 'from_request' => $request->featured_media_id]);
+
         // Sync featured media
         $content->mediaAssets()->wherePivot('type', 'featured')->detach();
-        if ($request->filled('featured_media_id')) {
-            $content->mediaAssets()->attach($request->featured_media_id, [
+        if ($featuredMediaId) {
+            $content->mediaAssets()->attach($featuredMediaId, [
                 'type' => 'featured',
                 'sort_order' => 0
             ]);
@@ -193,20 +217,20 @@ class ContentController extends Controller
             }
         }
 
-        // Update template zones data
+        // Update template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
             $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
             
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
                 [
-                    'settings' => $content->templateSettings->settings ?? [],
+                    'settings' => $settingsData ?? [],
                     'zones_data' => $zonesData ?? []
                 ]
             );
         }
 
-        return redirect()->route('wlcms.admin.content.index')
+        return redirect()->route('wlcms.admin.content.show', $content)
                         ->with('success', 'Content updated successfully!');
     }
 

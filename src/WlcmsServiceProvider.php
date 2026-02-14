@@ -290,11 +290,13 @@ class WlcmsServiceProvider extends ServiceProvider
 
         // Persist registered templates to database
         if (config('wlcms.templates.auto_persist', true)) {
-            try {
-                \Westlinks\Wlcms\Services\TemplateManager::persistRegisteredTemplates();
-            } catch (\Exception $e) {
-                // Silent fail during initial installation when tables don't exist yet
-                \Illuminate\Support\Facades\Log::debug('Template registration skipped: ' . $e->getMessage());
+            // Only attempt to persist if the cms_templates table exists
+            if (\Illuminate\Support\Facades\Schema::hasTable('cms_templates')) {
+                try {
+                    \Westlinks\Wlcms\Services\TemplateManager::persistRegisteredTemplates();
+                } catch (\Exception $e) {
+                    // Silent fail if any other error occurs
+                }
             }
         }
     }

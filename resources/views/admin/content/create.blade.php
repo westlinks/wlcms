@@ -139,6 +139,11 @@
 
                         {{-- Hidden input to store all zone data as JSON --}}
                         <input type="hidden" name="zones_json" :value="JSON.stringify(zoneData)">
+                        
+                        {{-- Template Settings Panel --}}
+                        @include('wlcms::admin.components.template-settings-panel', [
+                            'settings' => old('settings', [])
+                        ])
                     </div>
                 </div>
 

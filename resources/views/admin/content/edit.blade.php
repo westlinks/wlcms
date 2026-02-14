@@ -115,6 +115,20 @@
 
                             {{-- Hidden input to store all zone data as JSON --}}
                             <input type="hidden" name="zones_json" :value="JSON.stringify(zoneData)">
+                            
+                            {{-- DEBUG: Show what's being passed to template settings --}}
+                            @php
+                                $settingsForPanel = old('settings', array_merge(
+                                    (array)($content->templateSettings?->settings ?? []),
+                                    ['featured_image' => $content->mediaAssets->firstWhere('pivot.type', 'featured')?->id]
+                                ));
+                                \Log::info('VIEW - Settings being passed to panel:', ['settings' => $settingsForPanel]);
+                            @endphp
+                            
+                            {{-- Template Settings Panel --}}
+                            @include('wlcms::admin.components.template-settings-panel', [
+                                'settings' => $settingsForPanel
+                            ])
                         </div>
                     </div>
                 </div>
