@@ -28,6 +28,7 @@ export default defineConfig({
         outDir: 'dist',
         rollupOptions: {
             input: {
+                app: 'resources/js/app.js',
                 wlcms: 'resources/js/wlcms.js',
                 wlcmsCss: 'resources/css/wlcms.css'
             },

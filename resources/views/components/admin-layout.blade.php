@@ -26,7 +26,7 @@
     <title>{{ $title }}</title>
 
     <!-- Scripts and Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/vendor/wlcms/css/wlcms.css', 'resources/vendor/wlcms/js/wlcms.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     {{ $head ?? '' }}
 </head>

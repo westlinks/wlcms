@@ -359,6 +359,20 @@ function initTiptapEditor(elementId, initialContent = '') {
     // Initial toolbar state
     setTimeout(updateToolbarState, 100);
     
+    // Ensure content is synced before form submission
+    const form = textareaElement.closest('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            if (isSourceMode) {
+                // If in source mode, use the source textarea value
+                textareaElement.value = sourceElement.value;
+            } else {
+                // Otherwise use the TipTap editor HTML
+                textareaElement.value = editor.getHTML();
+            }
+        });
+    }
+    
     console.log('Tiptap editor initialized successfully');
     return editor;
 }
@@ -517,6 +531,9 @@ window.initMediaModal = initMediaModal;
 window.initFileUpload = initFileUpload;
 window.initFieldOverrideManager = initFieldOverrideManager;
 window.initWlcms = initWlcms;
+
+// Export MediaPicker class for manual initialization (embedded mode)
+window.MediaPicker = MediaPicker;
 
 // Global component access for template functions
 window.wlcmsMediaModal = () => mediaModalInstance;

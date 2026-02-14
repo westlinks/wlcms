@@ -25,6 +25,7 @@ class ContentItem extends Model
         'content',
         'excerpt',
         'type',
+        'template',
         'status',
         'meta',
         'parent_id',
@@ -189,6 +190,22 @@ class ContentItem extends Model
     public function activeLegacyNavigationItems(): HasMany
     {
         return $this->legacyNavigationItems()->where('is_active', true);
+    }
+
+    /**
+     * Get the template configuration for this content item.
+     */
+    public function templateConfig(): BelongsTo
+    {
+        return $this->belongsTo(Template::class, 'template', 'identifier');
+    }
+
+    /**
+     * Get the template settings for this content item.
+     */
+    public function templateSettings(): HasOne
+    {
+        return $this->hasOne(ContentTemplateSettings::class, 'content_id');
     }
 
     /**

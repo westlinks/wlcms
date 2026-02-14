@@ -314,4 +314,30 @@ return [
         'middleware' => ['web'],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Template System Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the template/layout system
+    |
+    */
+    'templates' => [
+        // Automatically persist registered templates to database on boot
+        'auto_persist' => true,
+        
+        // Show site header on template pages
+        'show_header' => false,
+        
+        // Show site footer on template pages  
+        'show_footer' => false,
+        
+        // Cache template data for performance
+        'cache_enabled' => true,
+        'cache_duration' => 3600, // 1 hour in seconds
+        
+        // Allow custom templates from host application
+        'allow_custom' => true,
+    ],
+
 ];

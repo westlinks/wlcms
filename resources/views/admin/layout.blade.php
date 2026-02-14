@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'WLCMS Admin')</title>
     
-    <!-- Include app styles (Tailwind) and WLCMS styles -->
-    @vite(['resources/css/app.css', 'resources/vendor/wlcms/css/wlcms.css', 'resources/vendor/wlcms/js/wlcms.js'])
+    <!-- Include app styles (Tailwind), WLCMS styles, and app.js for Alpine.js -->
+    @vite(['resources/css/app.css', 'resources/vendor/wlcms/css/wlcms.css', 'resources/js/app.js', 'resources/vendor/wlcms/js/wlcms.js'])
     
     <!-- Required for component functionality -->
     <meta name="csrf-token" content="{{ csrf_token() }}">

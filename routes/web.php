@@ -6,6 +6,11 @@ use Westlinks\Wlcms\Http\Controllers\Admin\MediaController;
 use Westlinks\Wlcms\Http\Controllers\Admin\DashboardController;
 use Westlinks\Wlcms\Http\Controllers\Admin\LegacyController;
 
+// Test Route for Template Picker (unprotected for easy access)
+Route::get('/wlcms-test-template-picker', function () {
+    return view('wlcms::test-template-picker');
+})->name('wlcms.test.template-picker');
+
 // Admin routes (protected by middleware defined in config)
 Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
     ->prefix(config('wlcms.admin.prefix', 'admin/cms'))

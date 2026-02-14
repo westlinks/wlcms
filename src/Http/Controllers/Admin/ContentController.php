@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Westlinks\Wlcms\Models\ContentItem;
 use Westlinks\Wlcms\Models\ContentRevision;
+use Westlinks\Wlcms\Models\Template;
 
 class ContentController extends Controller
 {
@@ -65,6 +66,7 @@ class ContentController extends Controller
             'excerpt' => 'nullable|string',
             'type' => 'required|string|in:page,post,article,news,event',
             'status' => 'required|string|in:draft,published,scheduled,archived',
+            'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
             'meta' => 'nullable|array',
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
@@ -73,12 +75,23 @@ class ContentController extends Controller
             'featured_media_id' => 'nullable|exists:cms_media_assets,id',
             'media_ids' => 'nullable|array',
             'media_ids.*' => 'exists:cms_media_assets,id',
+            'zones_json' => 'nullable|string',
+            'zones' => 'nullable|array',
         ]);
 
         // Convert checkbox value properly
         $validated['show_in_menu'] = $request->has('show_in_menu');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+
+        // Validate required zones if template has been selected
+        if ($request->filled('template_identifier')) {
+            $template = Template::where('identifier', $request->template_identifier)->first();
+            if ($template) {
+                $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : ($request->zones ?? []);
+                $this->validateRequiredZones($template, $zonesData);
+            }
+        }
 
         $content = ContentItem::create($validated);
 
@@ -100,13 +113,26 @@ class ContentController extends Controller
             }
         }
 
+        // Save template zones data
+        if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
+            $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
+            
+            $content->templateSettings()->updateOrCreate(
+                ['content_id' => $content->id],
+                [
+                    'settings' => [],
+                    'zones_data' => $zonesData ?? []
+                ]
+            );
+        }
+
         return redirect()->route('wlcms.admin.content.index')
                         ->with('success', 'Content created successfully!');
     }
 
     public function edit(ContentItem $content)
     {
-        $content->load('mediaAssets');
+        $content->load('mediaAssets', 'templateSettings');
         return view('wlcms::admin.content.edit', compact('content'));
     }
 
@@ -118,6 +144,7 @@ class ContentController extends Controller
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'type' => 'required|string|in:page,post,article,news,event',
+            'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
             'status' => 'required|string|in:draft,published,scheduled,archived',
             'meta' => 'nullable|array',
             'show_in_menu' => 'boolean',
@@ -126,12 +153,23 @@ class ContentController extends Controller
             'featured_media_id' => 'nullable|exists:cms_media_assets,id',
             'media_ids' => 'nullable|array',
             'media_ids.*' => 'exists:cms_media_assets,id',
+            'zones_json' => 'nullable|string',
+            'zones' => 'nullable|array',
         ]);
 
         // Convert checkbox value properly
         $validated['show_in_menu'] = $request->has('show_in_menu');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+
+        // Validate required zones if template has been selected
+        if ($request->filled('template_identifier')) {
+            $template = Template::where('identifier', $request->template_identifier)->first();
+            if ($template) {
+                $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : ($request->zones ?? []);
+                $this->validateRequiredZones($template, $zonesData);
+            }
+        }
 
         $content->update($validated);
 
@@ -154,7 +192,19 @@ class ContentController extends Controller
                 ]);
             }
         }
-        $content->update($validated);
+
+        // Update template zones data
+        if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
+            $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
+            
+            $content->templateSettings()->updateOrCreate(
+                ['content_id' => $content->id],
+                [
+                    'settings' => $content->templateSettings->settings ?? [],
+                    'zones_data' => $zonesData ?? []
+                ]
+            );
+        }
 
         return redirect()->route('wlcms.admin.content.index')
                         ->with('success', 'Content updated successfully!');
@@ -252,5 +302,29 @@ class ContentController extends Controller
         }
 
         return redirect()->back()->with('success', 'Media removed successfully');
+    }
+
+    /**
+     * Validate that all required zones have content
+     */
+    protected function validateRequiredZones(Template $template, array $zonesData): void
+    {
+        $templateZones = $template->zones ?? [];
+        $missingZones = [];
+
+        foreach ($templateZones as $zoneKey => $zoneConfig) {
+            if (isset($zoneConfig['required']) && $zoneConfig['required']) {
+                if (empty($zonesData[$zoneKey])) {
+                    $zoneLabel = $zoneConfig['label'] ?? $zoneKey;
+                    $missingZones[] = $zoneLabel;
+                }
+            }
+        }
+
+        if (!empty($missingZones)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'zones_json' => 'The following required zones must be filled: ' . implode(', ', $missingZones)
+            ]);
+        }
     }
 }
