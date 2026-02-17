@@ -230,9 +230,10 @@ document.addEventListener('alpine:init', () => {
         },
 
         getMediaPreview(mediaId) {
-            if (!mediaId) return '';
-            // Use the actual media serve route
-            return `{{ config('wlcms.admin.prefix', 'admin/cms') }}/media/${mediaId}/serve/thumbnail`;
+            if (!mediaId || typeof mediaId !== 'number') return '';
+            // Build URL using the route prefix from config
+            const prefix = '{{ config("wlcms.admin.prefix", "admin/cms") }}';
+            return `/${prefix}/media/${mediaId}/serve/thumbnail`;
         }
     }));
 });

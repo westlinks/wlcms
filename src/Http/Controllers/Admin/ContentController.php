@@ -85,6 +85,12 @@ class ContentController extends Controller
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 
+        // Map template_identifier to template column
+        if (isset($validated['template_identifier'])) {
+            $validated['template'] = $validated['template_identifier'];
+            unset($validated['template_identifier']);
+        }
+
         // Validate required zones if template has been selected
         if ($request->filled('template_identifier')) {
             $template = Template::where('identifier', $request->template_identifier)->first();
@@ -142,7 +148,9 @@ class ContentController extends Controller
     {
         $content->load('mediaAssets', 'templateSettings');
         
-        $featuredMedia = $content->mediaAssets->firstWhere('pivot.type', 'featured');
+        $featuredMedia = $content->mediaAssets->first(function($media) {
+            return $media->pivot->type === 'featured';
+        });
         \Log::info('EDIT - Loading content:', [
             'content_id' => $content->id,
             'featured_media_id' => $featuredMedia?->id,
@@ -178,6 +186,12 @@ class ContentController extends Controller
         $validated['show_in_menu'] = $request->has('show_in_menu');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+
+        // Map template_identifier to template column
+        if (isset($validated['template_identifier'])) {
+            $validated['template'] = $validated['template_identifier'];
+            unset($validated['template_identifier']);
+        }
 
         // Validate required zones if template has been selected
         if ($request->filled('template_identifier')) {

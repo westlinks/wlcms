@@ -138,6 +138,7 @@ class ContentItem extends Model
     public function mediaAssets(): BelongsToMany
     {
         return $this->belongsToMany(MediaAsset::class, 'cms_content_media', 'content_id', 'media_id')
+            ->withPivot('type', 'sort_order', 'metadata')
             ->withTimestamps();
     }
 

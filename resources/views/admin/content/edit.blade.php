@@ -53,7 +53,13 @@
                              selectedTemplate: @js($currentTemplate),
                              zoneData: @js(old('zones_json') ? json_decode(old('zones_json'), true) : ($content->templateSettings ? $content->templateSettings->getAllZonesData() : (object)[]))
                          }"
+                         x-init="
+                             console.log('Edit form Alpine initialized');
+                             console.log('Current template:', selectedTemplate);
+                             console.log('Zone data:', zoneData);
+                         "
                          @template-selected.window="
+                             console.log('Template selected event received:', $event.detail.template);
                              selectedTemplate = $event.detail.template;
                              // Initialize zone data object with keys for each zone
                              if (selectedTemplate && selectedTemplate.zones) {
@@ -121,9 +127,12 @@
                             
                             {{-- DEBUG: Show what's being passed to template settings --}}
                             @php
+                                $featuredMediaForSettings = $content->mediaAssets->first(function($media) {
+                                    return $media->pivot->type === 'featured';
+                                });
                                 $settingsForPanel = old('settings', array_merge(
                                     (array)($content->templateSettings?->settings ?? []),
-                                    ['featured_image' => $content->mediaAssets->firstWhere('pivot.type', 'featured')?->id]
+                                    ['featured_image' => $featuredMediaForSettings?->id]
                                 ));
                                 \Log::info('VIEW - Settings being passed to panel:', ['settings' => $settingsForPanel]);
                             @endphp
