@@ -45,9 +45,12 @@
                     </div>
 
                     <!-- Template Selection -->
+@php
+    $currentTemplate = $content->template ? \Westlinks\Wlcms\Models\Template::where('identifier', $content->template)->first() : null;
+@endphp
 <div class="bg-gray-50 rounded-lg p-4"
                          x-data="{ 
-                             selectedTemplate: null,
+                             selectedTemplate: @js($currentTemplate),
                              zoneData: @js(old('zones_json') ? json_decode(old('zones_json'), true) : ($content->templateSettings ? $content->templateSettings->getAllZonesData() : (object)[]))
                          }"
                          @template-selected.window="
