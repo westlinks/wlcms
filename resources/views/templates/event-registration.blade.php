@@ -1,5 +1,5 @@
 <x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
-<div class="container">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <article class="main-content event-registration-template">
         <h1 class="page-title">{{ $contentItem->title }}</h1>
 
@@ -22,8 +22,7 @@
             @if(!empty($settings['registration_link']))
                 <div class="registration-cta" style="margin-top: 2rem; text-align: center;">
                     <a href="{{ $settings['registration_link'] }}" 
-                       class="btn btn-primary" 
-                       style="display: inline-block; padding: 12px 32px; background: #4F46E5; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                       class="inline-block px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-200 shadow-lg hover:shadow-xl">
                         Register Now
                     </a>
                 </div>

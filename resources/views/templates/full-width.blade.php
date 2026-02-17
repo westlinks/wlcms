@@ -1,5 +1,5 @@
 <x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
-<div class="container">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <article class="main-content full-width-template">
         {{-- Featured Image (if enabled) --}}
         @if(($settings['show_featured_image'] ?? 'no') === 'yes' && isset($settings['featured_image']))

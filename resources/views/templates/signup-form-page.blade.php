@@ -1,30 +1,30 @@
 <x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
-<div class="signup-form-page-template" 
-     style="min-height: 100vh; background: {{ $settings['background_color'] ?? '#ffffff' }}; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-    <div class="signup-container" style="max-width: 600px; width: 100%; background: white; border-radius: 12px; padding: 3rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+<div class="signup-form-page-template min-h-screen flex items-center justify-center p-8" 
+     style="background: {{ $settings['background_color'] ?? '#ffffff' }};">
+    <div class="max-w-xl w-full bg-white rounded-xl p-12 shadow-2xl">
         
         {{-- Optional Logo --}}
         @if(($settings['show_logo'] ?? true))
-            <div class="logo-section" style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2rem; font-weight: bold; color: #1F2937;">{{ config('app.name') }}</h1>
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">{{ config('app.name') }}</h1>
             </div>
         @endif
 
         {{-- Header Content Zone --}}
         @if(!empty($zones['header']))
-            <div class="header-zone" style="margin-bottom: 2rem; text-align: center; color: #6B7280;">
+            <div class="mb-8 text-center text-gray-600">
                 {!! $zones['header'] !!}
             </div>
         @endif
 
         {{-- Form Zone --}}
-        <div class="form-zone" style="margin-bottom: 2rem;">
+        <div class="mb-8">
             {!! $zones['form'] ?? '' !!}
         </div>
 
         {{-- Footer Content Zone --}}
         @if(!empty($zones['footer']))
-            <div class="footer-zone" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #E5E7EB; font-size: 0.875rem; color: #9CA3AF; text-align: center;">
+            <div class="mt-8 pt-8 border-t border-gray-200 text-sm text-gray-400 text-center">
                 {!! $zones['footer'] !!}
             </div>
         @endif

@@ -142,7 +142,7 @@
 </section>
 @endif
 
-<div class="container">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {{-- Seasonal Banner (Conditional) --}}
     @if(isset($zones['seasonal_banner']) && !empty($zones['seasonal_banner']))
         @php
@@ -186,7 +186,7 @@
 {{-- Sponsor Logos --}}
 @if(isset($zones['sponsors']) && is_array($zones['sponsors']) && count($zones['sponsors']) > 0)
 <section class="sponsors-section">
-    <div class="container">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h2 style="text-align: center; margin-bottom: 1rem;">Our Sponsors</h2>
         <div class="sponsor-grid">
             @foreach($zones['sponsors'] as $sponsor)
