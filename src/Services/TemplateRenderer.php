@@ -59,6 +59,7 @@ class TemplateRenderer
         // Prepare view data
         $viewData = array_merge([
             'contentItem' => $contentItem,
+            'content' => $contentItem,  // Alias for backward compatibility
             'template' => $template,
             'settings' => $settings,
             'zones' => $processedZones,
