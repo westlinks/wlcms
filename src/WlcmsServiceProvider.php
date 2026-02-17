@@ -288,6 +288,164 @@ class WlcmsServiceProvider extends ServiceProvider
             ],
         ]);
 
+        // Event Registration Template - Advanced
+        \Westlinks\Wlcms\Services\TemplateManager::register('event-registration', [
+            'name' => 'Event Registration',
+            'description' => 'Specialized template for event registration with status-based content switching.',
+            'view' => 'wlcms::templates.event-registration',
+            'preview' => null,
+            'category' => 'landing',
+            'zones' => [
+                'pre_registration' => [
+                    'label' => 'Pre-Registration Content',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+                'active_event' => [
+                    'label' => 'Active Event Content',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+                'closed_event' => [
+                    'label' => 'Closed/Past Event Content',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+            ],
+            'settings_schema' => [
+                'registration_status' => [
+                    'type' => 'select',
+                    'label' => 'Registration Status',
+                    'options' => [
+                        'upcoming' => 'Upcoming (Pre-Registration)',
+                        'open' => 'Open (Active)',
+                        'closed' => 'Closed',
+                    ],
+                    'default' => 'upcoming',
+                ],
+                'event_date' => [
+                    'type' => 'date',
+                    'label' => 'Event Date',
+                ],
+                'registration_link' => [
+                    'type' => 'text',
+                    'label' => 'Registration Form Link',
+                ],
+            ],
+        ]);
+
+        // Signup Form Page - Advanced
+        \Westlinks\Wlcms\Services\TemplateManager::register('signup-form-page', [
+            'name' => 'Signup Form Page',
+            'description' => 'Full-page template optimized for signup forms with minimal distractions.',
+            'view' => 'wlcms::templates.signup-form-page',
+            'preview' => null,
+            'category' => 'landing',
+            'zones' => [
+                'header' => [
+                    'label' => 'Header Content',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+                'form' => [
+                    'label' => 'Form Area',
+                    'type' => 'form_embed',
+                    'required' => true,
+                ],
+                'footer' => [
+                    'label' => 'Footer/Fine Print',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+            ],
+            'settings_schema' => [
+                'background_color' => [
+                    'type' => 'color',
+                    'label' => 'Background Color',
+                    'default' => '#ffffff',
+                ],
+                'show_logo' => [
+                    'type' => 'toggle',
+                    'label' => 'Show Logo',
+                    'default' => true,
+                ],
+            ],
+        ]);
+
+        // Time-Limited Content Template - Advanced
+        \Westlinks\Wlcms\Services\TemplateManager::register('time-limited-content', [
+            'name' => 'Time-Limited Content',
+            'description' => 'Content with specific availability dates and downloadable files.',
+            'view' => 'wlcms::templates.time-limited-content',
+            'preview' => null,
+            'category' => 'content',
+            'zones' => [
+                'content' => [
+                    'label' => 'Main Content',
+                    'type' => 'rich_text',
+                    'required' => true,
+                ],
+                'files' => [
+                    'label' => 'Downloadable Files',
+                    'type' => 'file_list',
+                    'required' => false,
+                ],
+            ],
+            'settings_schema' => [
+                'available_from' => [
+                    'type' => 'date',
+                    'label' => 'Available From',
+                ],
+                'available_until' => [
+                    'type' => 'date',
+                    'label' => 'Available Until',
+                ],
+                'expiration_message' => [
+                    'type' => 'text',
+                    'label' => 'Expiration Message',
+                    'default' => 'This content is no longer available.',
+                ],
+            ],
+        ]);
+
+        // Archive Timeline Template - Advanced
+        \Westlinks\Wlcms\Services\TemplateManager::register('archive-timeline', [
+            'name' => 'Archive Timeline',
+            'description' => 'Year-based timeline with photo galleries and historical content.',
+            'view' => 'wlcms::templates.archive-timeline',
+            'preview' => null,
+            'category' => 'content',
+            'zones' => [
+                'intro' => [
+                    'label' => 'Introduction',
+                    'type' => 'rich_text',
+                    'required' => false,
+                ],
+                'timeline_items' => [
+                    'label' => 'Timeline Entries',
+                    'type' => 'repeater',
+                    'required' => true,
+                ],
+                'gallery' => [
+                    'label' => 'Photo Gallery',
+                    'type' => 'media_gallery',
+                    'required' => false,
+                ],
+            ],
+            'settings_schema' => [
+                'default_year' => [
+                    'type' => 'number',
+                    'label' => 'Default Year to Display',
+                    'default' => date('Y'),
+                ],
+                'show_year_selector' => [
+                    'type' => 'toggle',
+                    'label' => 'Show Year Selector',
+                    'default' => true,
+                ],
+            ],
+        ]);
+
         // Persist registered templates to database
         if (config('wlcms.templates.auto_persist', true)) {
             // Only attempt to persist if the cms_templates table exists

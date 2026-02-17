@@ -116,47 +116,51 @@ Implement dynamic content zones with different field types.
 
 ## Phase 5: Template Settings Panel
 **Target:** Days 15-17  
-**Status:** ⏸️ Not Started
+**Status:** ✅ Complete
 
 Build dynamic settings forms based on template schemas.
 
 ### Subtasks:
-- [ ] 5.1 Create settings schema parser
-- [ ] 5.2 Build dynamic form field generator
-- [ ] 5.3 Implement field types (text, select, media, date, number)
-- [ ] 5.4 Create settings panel UI component
-- [ ] 5.5 Add settings validation
-- [ ] 5.6 Implement default values handling
-- [ ] 5.7 Add conditional field display logic
-- [ ] 5.8 Create settings save/update API endpoint
+- [x] 5.1 Create settings schema parser
+- [x] 5.2 Build dynamic form field generator
+- [x] 5.3 Implement field types (text, select, media, date, number, toggle, color)
+- [x] 5.4 Create settings panel UI component
+- [x] 5.5 Add settings validation
+- [x] 5.6 Implement default values handling
+- [ ] 5.7 Add conditional field display logic (deferred)
+- [x] 5.8 Create settings save/update API endpoint
 
 **Deliverables:**
-- Dynamic settings form builder
-- Template-specific settings UI
-- Settings validation and persistence
+- ✅ Dynamic settings form builder with 7 field types
+- ✅ Template-specific settings UI integrated in create/edit forms
+- ✅ Settings validation and persistence via ContentController
+
+**Known Issues:**
+- Featured image in settings panel not persisting (deferred for future fix)
 
 ---
 
 ## Phase 6: Advanced Templates
 **Target:** Days 18-21  
-**Status:** ⏸️ Not Started
+**Status:** ✅ Complete
 
 Create the remaining 4 advanced templates with specialized features.
 
 ### Subtasks:
-- [ ] 6.1 Create `event-registration` template view + registration
-- [ ] 6.2 Implement registration status conditional logic
-- [ ] 6.3 Create `signup-form-page` template view + registration
-- [ ] 6.4 Create `time-limited-content` template view + registration
-- [ ] 6.5 Implement file management for time-limited content
-- [ ] 6.6 Create `archive-timeline` template view + registration
-- [ ] 6.7 Add year selector and gallery integration
-- [ ] 6.8 Create seasonal content switching service
+- [x] 6.1 Create `event-registration` template view + registration
+- [x] 6.2 Implement registration status conditional logic
+- [x] 6.3 Create `signup-form-page` template view + registration
+- [x] 6.4 Create `time-limited-content` template view + registration
+- [x] 6.5 Implement file management for time-limited content
+- [x] 6.6 Create `archive-timeline` template view + registration
+- [x] 6.7 Add year selector and gallery integration
+- [ ] 6.8 Create seasonal content switching service (deferred - not needed yet)
 
 **Deliverables:**
-- 4 advanced templates completed
-- Specialized template features working
-- Complete set of 8 core templates
+- ✅ 4 advanced templates completed (event-registration, signup-form-page, time-limited-content, archive-timeline)
+- ✅ Status-based conditional rendering in event-registration
+- ✅ Time-based availability checking in time-limited-content
+- ✅ Complete set of 8 core templates
 
 ---
 
