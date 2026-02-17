@@ -22,7 +22,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Westlinks\\Wlcms\\": "src/"
+            "Westlinks\\Wlcms\\": "src/",
+            "Westlinks\\Wlcms\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
