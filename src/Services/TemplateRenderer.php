@@ -64,6 +64,7 @@ class TemplateRenderer
             'settings' => $settings,
             'zones' => $processedZones,
             'meta' => $contentItem->meta ?? [],
+            'layout' => $additionalData['layout'] ?? 'wlcms::layouts.base',
         ], $additionalData);
 
         // Render the template view

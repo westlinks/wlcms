@@ -148,7 +148,7 @@
 
     {{-- Main Content Area --}}
     <main class="page-content">
-        @yield('content')
+        {{ $slot }}
     </main>
 
     {{-- Optional: Site Footer --}}

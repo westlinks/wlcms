@@ -1,6 +1,4 @@
-@extends('wlcms::layouts.base')
-
-@section('content')
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 <div class="container">
     <article class="main-content archive-timeline-template">
         <h1 class="page-title">{{ $contentItem->title }}</h1>
@@ -56,4 +54,4 @@
         background: #E5E7EB;
     }
 </style>
-@endsection
+</x-dynamic-component>

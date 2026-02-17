@@ -1,6 +1,4 @@
-@extends('wlcms::layouts.base')
-
-@section('content')
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 <div class="container">
     <article class="main-content full-width-template">
         {{-- Featured Image (if enabled) --}}
@@ -16,4 +14,4 @@
         </div>
     </article>
 </div>
-@endsection
+</x-dynamic-component>

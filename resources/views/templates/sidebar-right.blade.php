@@ -1,5 +1,4 @@
-@extends('wlcms::layouts.base')
-
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 @push('styles')
 <style>
     .sidebar-layout {
@@ -30,7 +29,6 @@
 </style>
 @endpush
 
-@section('content')
 <div class="container">
     <div class="sidebar-layout">
         {{-- Main Content --}}
@@ -51,4 +49,4 @@
         </aside>
     </div>
 </div>
-@endsection
+</x-dynamic-component>

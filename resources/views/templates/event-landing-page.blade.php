@@ -1,5 +1,4 @@
-@extends('wlcms::layouts.base')
-
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 @push('styles')
 <style>
     .hero-section {
@@ -127,7 +126,6 @@
 </style>
 @endpush
 
-@section('content')
 {{-- Hero Section --}}
 @if(isset($zones['hero']) && !empty($zones['hero']))
 <section class="hero-section" 
@@ -200,4 +198,4 @@
     </div>
 </section>
 @endif
-@endsection
+</x-dynamic-component>

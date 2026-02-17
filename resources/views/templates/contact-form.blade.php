@@ -1,5 +1,4 @@
-@extends('wlcms::layouts.base')
-
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 @push('styles')
 <style>
     .contact-layout {
@@ -41,7 +40,6 @@
 </style>
 @endpush
 
-@section('content')
 <div class="container">
     <div class="contact-layout">
         {{-- Form Section --}}
@@ -92,4 +90,4 @@
         </aside>
     </div>
 </div>
-@endsection
+</x-dynamic-component>

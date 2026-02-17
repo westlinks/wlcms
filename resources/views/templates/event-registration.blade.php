@@ -1,6 +1,4 @@
-@extends('wlcms::layouts.base')
-
-@section('content')
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 <div class="container">
     <article class="main-content event-registration-template">
         <h1 class="page-title">{{ $contentItem->title }}</h1>
@@ -44,4 +42,4 @@
         @endif
     </article>
 </div>
-@endsection
+</x-dynamic-component>

@@ -1,6 +1,4 @@
-@extends('wlcms::layouts.base')
-
-@section('content')
+<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
 <div class="signup-form-page-template" 
      style="min-height: 100vh; background: {{ $settings['background_color'] ?? '#ffffff' }}; display: flex; align-items: center; justify-content: center; padding: 2rem;">
     <div class="signup-container" style="max-width: 600px; width: 100%; background: white; border-radius: 12px; padding: 3rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
@@ -32,4 +30,4 @@
         @endif
     </div>
 </div>
-@endsection
+</x-dynamic-component>
