@@ -183,6 +183,82 @@
                             </div>
                         </div>
 
+                        <!-- Auto-Activation Settings -->
+                        <div class="mt-6 pt-4 border-t border-gray-200">
+                            <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                                <span class="mr-2">⏰</span> Auto-Activation
+                            </h4>
+                            
+                            <div class="space-y-4">
+                                <div x-data="{
+                                    autoActivate: {{ old('auto_activate', $content->auto_activate) ? 'true' : 'false' }},
+                                    autoDeactivate: {{ old('auto_deactivate', $content->auto_deactivate) ? 'true' : 'false' }}
+                                }">
+                                    <!-- Auto Activate Toggle -->
+                                    <div class="flex items-center">
+                                        <input type="checkbox" 
+                                               name="auto_activate" 
+                                               id="auto_activate" 
+                                               value="1"
+                                               x-model="autoActivate"
+                                               {{ old('auto_activate', $content->auto_activate) ? 'checked' : '' }}
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <label for="auto_activate" class="ml-2 block text-sm text-gray-900">
+                                            Auto-activate on scheduled date
+                                        </label>
+                                    </div>
+
+                                    <!-- Activation Date -->
+                                    <div class="mt-2">
+                                        <label for="activation_date" class="block text-sm font-medium text-gray-700">
+                                            Activation Date
+                                        </label>
+                                        <input type="datetime-local" 
+                                               name="activation_date" 
+                                               id="activation_date"
+                                               value="{{ old('activation_date', $content->activation_date?->format('Y-m-d\TH:i')) }}"
+                                               :disabled="!autoActivate"
+                                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                        <p class="mt-1 text-xs text-gray-500">When content will automatically publish</p>
+                                        @error('activation_date')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Auto Deactivate Toggle -->
+                                    <div class="flex items-center mt-4">
+                                        <input type="checkbox" 
+                                               name="auto_deactivate" 
+                                               id="auto_deactivate" 
+                                               value="1"
+                                               x-model="autoDeactivate"
+                                               {{ old('auto_deactivate', $content->auto_deactivate) ? 'checked' : '' }}
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <label for="auto_deactivate" class="ml-2 block text-sm text-gray-900">
+                                            Auto-deactivate on scheduled date
+                                        </label>
+                                    </div>
+
+                                    <!-- Deactivation Date -->
+                                    <div class="mt-2">
+                                        <label for="deactivation_date" class="block text-sm font-medium text-gray-700">
+                                            Deactivation Date
+                                        </label>
+                                        <input type="datetime-local" 
+                                               name="deactivation_date" 
+                                               id="deactivation_date"
+                                               value="{{ old('deactivation_date', $content->deactivation_date?->format('Y-m-d\TH:i')) }}"
+                                               :disabled="!autoDeactivate"
+                                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                        <p class="mt-1 text-xs text-gray-500">When content will automatically archive</p>
+                                        @error('deactivation_date')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mt-6 pt-4 border-t space-y-3">
                             <button type="submit" 
                                     class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">

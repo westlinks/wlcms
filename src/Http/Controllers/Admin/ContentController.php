@@ -78,10 +78,16 @@ class ContentController extends Controller
             'zones_json' => 'nullable|string',
             'zones' => 'nullable|array',
             'settings_json' => 'nullable|string',
+            'auto_activate' => 'boolean',
+            'auto_deactivate' => 'boolean',
+            'activation_date' => 'nullable|date',
+            'deactivation_date' => 'nullable|date|after:activation_date',
         ]);
 
-        // Convert checkbox value properly
+        // Convert checkbox values properly
         $validated['show_in_menu'] = $request->has('show_in_menu');
+        $validated['auto_activate'] = $request->has('auto_activate');
+        $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 
@@ -180,10 +186,16 @@ class ContentController extends Controller
             'zones_json' => 'nullable|string',
             'zones' => 'nullable|array',
             'settings_json' => 'nullable|string',
+            'auto_activate' => 'boolean',
+            'auto_deactivate' => 'boolean',
+            'activation_date' => 'nullable|date',
+            'deactivation_date' => 'nullable|date|after:activation_date',
         ]);
 
-        // Convert checkbox value properly
+        // Convert checkbox values properly
         $validated['show_in_menu'] = $request->has('show_in_menu');
+        $validated['auto_activate'] = $request->has('auto_activate');
+        $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
 

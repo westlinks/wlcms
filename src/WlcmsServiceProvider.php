@@ -112,8 +112,25 @@ class WlcmsServiceProvider extends ServiceProvider
                 Commands\MigrateContentCommand::class,
                 Commands\MigrateLegacyContentCommand::class,
                 Commands\RegenerateThumbnailsCommand::class,
+                Commands\CheckContentActivations::class,
             ]);
         }
+
+        // Register scheduled tasks
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            
+            // Run content activation check every hour to honor specific activation times
+            $schedule->command('wlcms:check-activations')
+                ->hourly()
+                ->timezone(config('app.timezone', 'UTC'))
+                ->onSuccess(function () {
+                    \Illuminate\Support\Facades\Log::info('WLCMS: Content activation check completed successfully');
+                })
+                ->onFailure(function () {
+                    \Illuminate\Support\Facades\Log::error('WLCMS: Content activation check failed');
+                });
+        });
     }
 
     /**

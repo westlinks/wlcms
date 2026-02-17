@@ -36,6 +36,10 @@ class ContentItem extends Model
         'menu_order',
         'menu_location',
         'published_at',
+        'activation_date',
+        'deactivation_date',
+        'auto_activate',
+        'auto_deactivate',
         'user_id',
         'created_by',
         'updated_by',
@@ -43,6 +47,10 @@ class ContentItem extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'activation_date' => 'datetime',
+        'deactivation_date' => 'datetime',
+        'auto_activate' => 'boolean',
+        'auto_deactivate' => 'boolean',
         'meta' => 'array',
         'sort_order' => 'integer',
         'is_featured' => 'boolean',
