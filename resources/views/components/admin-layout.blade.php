@@ -56,6 +56,10 @@
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('wlcms.admin.media.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 transition duration-150 ease-in-out">
                                 Media
                             </a>
+                            <a href="{{ route('wlcms.admin.form-submissions.index') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('wlcms.admin.form-submissions.*') || request()->routeIs('wlcms.admin.forms.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 transition duration-150 ease-in-out">
+                                Forms
+                            </a>
                             
                             @if(config('wlcms.legacy.enabled', false))
                             <a href="{{ route('wlcms.admin.legacy.index') }}" 

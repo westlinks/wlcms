@@ -125,6 +125,8 @@ class WlcmsServiceProvider extends ServiceProvider
                 Commands\MigrateLegacyContentCommand::class,
                 Commands\RegenerateThumbnailsCommand::class,
                 Commands\CheckContentActivations::class,
+                Commands\PublishTemplatesCommand::class,
+                Commands\ValidateTemplateCommand::class,
             ]);
         }
 
@@ -474,6 +476,15 @@ class WlcmsServiceProvider extends ServiceProvider
                 ],
             ],
         ]);
+
+        // Register custom templates from host application config
+        if (config('wlcms.templates.allow_custom', true)) {
+            $customTemplates = config('wlcms.templates.custom', []);
+            
+            foreach ($customTemplates as $identifier => $config) {
+                \Westlinks\Wlcms\Services\TemplateManager::register($identifier, $config);
+            }
+        }
 
         // Persist registered templates to database
         if (config('wlcms.templates.auto_persist', true)) {

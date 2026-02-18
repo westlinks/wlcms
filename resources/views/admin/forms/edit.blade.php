@@ -1,8 +1,4 @@
-@extends('wlcms::layouts.admin')
-
-@section('title', 'Edit Form Thank You Page')
-
-@section('content')
+<x-admin-layout title="Edit Form Thank You Page">
 <div class="py-6">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Header --}}
@@ -176,4 +172,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-@endsection
+</x-admin-layout>

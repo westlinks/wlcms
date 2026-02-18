@@ -16,6 +16,11 @@
                class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium transition {{ request()->routeIs('wlcms.admin.media.*') ? 'text-blue-600 dark:text-blue-400' : '' }}">
                 Media
             </a>
+            <span class="text-slate-400">|</span>
+            <a href="{{ route('wlcms.admin.form-submissions.index') }}" 
+               class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium transition {{ request()->routeIs('wlcms.admin.form-submissions.*') || request()->routeIs('wlcms.admin.forms.*') ? 'text-blue-600 dark:text-blue-400' : '' }}">
+                Forms
+            </a>
             @if(config('wlcms.legacy.enabled', false))
             <span class="text-slate-400">|</span>
             <a href="{{ route('wlcms.admin.legacy.index') }}" 

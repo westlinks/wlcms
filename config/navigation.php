@@ -53,6 +53,30 @@ return [
             'description' => 'Upload and organize media files'
         ],
         
+        // Forms & Submissions
+        [
+            'label' => 'Forms',
+            'route' => 'wlcms.admin.form-submissions.index',
+            'icon' => 'document-check',
+            'badge' => null,
+            'permission' => 'wlcms.manage_forms',
+            'description' => 'Manage form submissions and configure forms',
+            'children' => [
+                [
+                    'label' => 'Form Submissions',
+                    'route' => 'wlcms.admin.form-submissions.index',
+                    'icon' => 'inbox',
+                    'permission' => 'wlcms.manage_forms'
+                ],
+                [
+                    'label' => 'Form Configuration',
+                    'route' => 'wlcms.admin.forms.index',
+                    'icon' => 'cog-6-tooth',
+                    'permission' => 'wlcms.manage_forms'
+                ]
+            ]
+        ],
+        
         // Legacy Integration (conditionally shown based on config)
         [
             'label' => 'Legacy Integration',

@@ -341,6 +341,31 @@ return [
         
         // Allow custom templates from host application
         'allow_custom' => true,
+        
+        // Custom templates from host application
+        // Register your custom templates here after publishing templates with:
+        // php artisan wlcms:publish-templates
+        //
+        // Example:
+        // 'custom' => [
+        //     'my-custom-template' => [
+        //         'name' => 'My Custom Template',
+        //         'description' => 'Custom template for special pages',
+        //         'view' => 'vendor.wlcms.templates.my-custom-template',
+        //         'preview' => '/images/previews/my-template.png',
+        //         'category' => 'custom',
+        //         'zones' => [
+        //             'content' => [
+        //                 'label' => 'Main Content',
+        //                 'type' => 'rich_text',
+        //                 'required' => true,
+        //             ],
+        //         ],
+        //         'features' => [],
+        //         'settings_schema' => [],
+        //     ],
+        // ],
+        'custom' => [],
     ],
 
 ];
