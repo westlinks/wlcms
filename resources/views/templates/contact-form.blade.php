@@ -53,24 +53,8 @@
 
             {{-- Contact Form --}}
             <div class="form-embed">
-                @if(isset($zones['form']))
-                    @php
-                        $formData = $zones['form'];
-                    @endphp
-                    
-                    @if(isset($formData['type']) && $formData['type'] === 'embed')
-                        {!! $formData['embed_code'] ?? '' !!}
-                    @elseif(isset($formData['form_id']))
-                        {{-- Built-in or custom form rendering --}}
-                        <div class="form-placeholder">
-                            <p>Form ID: {{ $formData['form_id'] }}</p>
-                            <p><em>Form will be rendered here when form system is implemented.</em></p>
-                        </div>
-                    @else
-                        <div class="form-placeholder">
-                            <p><em>No form configured. Please configure a form in the template settings.</em></p>
-                        </div>
-                    @endif
+                @if(!empty($zones['form']))
+                    {!! $zones['form'] !!}
                 @else
                     <div class="form-placeholder">
                         <p><em>Form will appear here once configured.</em></p>
