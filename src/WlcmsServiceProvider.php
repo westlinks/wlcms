@@ -551,6 +551,9 @@ class WlcmsServiceProvider extends ServiceProvider
                 'email_subject' => 'New Contact Form Submission',
             ],
             'success_message' => 'Thank you for contacting us! We will get back to you soon.',
+            'redirect_url' => '/wlcms/forms/contact/thank-you',
+            'thank_you_title' => 'Thank You for Contacting Us!',
+            'thank_you_content' => '<p class="text-lg mb-4">We have received your message and appreciate you reaching out.</p><p>Our team will review your inquiry and get back to you within 24-48 hours.</p>',
         ]);
 
         // Newsletter Signup Form
@@ -583,6 +586,9 @@ class WlcmsServiceProvider extends ServiceProvider
                 'email_subject' => 'New Newsletter Subscription',
             ],
             'success_message' => 'Thank you for subscribing to our newsletter!',
+            'redirect_url' => '/wlcms/forms/newsletter/thank-you',
+            'thank_you_title' => 'Welcome to Our Newsletter!',
+            'thank_you_content' => '<p class="text-lg mb-4">Thank you for subscribing!</p><p>You\'ll receive our latest updates, news, and exclusive content directly in your inbox.</p>',
         ]);
 
         // Feedback Form
@@ -639,6 +645,9 @@ class WlcmsServiceProvider extends ServiceProvider
                 'email_subject' => 'New Feedback Submission',
             ],
             'success_message' => 'Thank you for your feedback!',
+            'redirect_url' => '/wlcms/forms/feedback/thank-you',
+            'thank_you_title' => 'Thank You for Your Feedback!',
+            'thank_you_content' => '<p class="text-lg mb-4">Your feedback is invaluable to us.</p><p>We carefully review all feedback to improve our services and better serve you.</p>',
         ]);
     }
 }

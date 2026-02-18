@@ -33,6 +33,8 @@ class FormRegistry
             'validation' => $config['validation'] ?? [],
             'redirect_url' => $config['redirect_url'] ?? null,
             'success_message' => $config['success_message'] ?? 'Thank you for your submission!',
+            'thank_you_title' => $config['thank_you_title'] ?? 'Thank You!',
+            'thank_you_content' => $config['thank_you_content'] ?? '<p>Your submission has been received. We\'ll get back to you soon.</p>',
             'description' => $config['description'] ?? '',
         ], $config);
     }
@@ -45,7 +47,16 @@ class FormRegistry
      */
     public function get(string $identifier): ?array
     {
-        return $this->forms[$identifier] ?? null;
+        $form = $this->forms[$identifier] ?? null;
+        
+        if (!$form) {
+            return null;
+        }
+        
+        // Check for cached overrides from admin panel
+        $overrides = cache()->get("wlcms.form.{$identifier}.config", []);
+        
+        return array_merge($form, $overrides);
     }
 
     /**

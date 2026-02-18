@@ -6,11 +6,17 @@ use Westlinks\Wlcms\Http\Controllers\Admin\MediaController;
 use Westlinks\Wlcms\Http\Controllers\Admin\DashboardController;
 use Westlinks\Wlcms\Http\Controllers\Admin\LegacyController;
 use Westlinks\Wlcms\Http\Controllers\FormController;
+use Westlinks\Wlcms\Http\Controllers\ThankYouController;
 
 // Form submission route (public)
 Route::post('/wlcms/forms/{form}/submit', [FormController::class, 'submit'])
     ->middleware(['web'])
     ->name('wlcms.forms.submit');
+
+// Form thank you page (public)
+Route::get('/wlcms/forms/{form}/thank-you', [ThankYouController::class, 'show'])
+    ->middleware(['web'])
+    ->name('wlcms.forms.thank-you');
 
 // Test Route for Template Picker (unprotected for easy access)
 Route::get('/wlcms-test-template-picker', function () {
@@ -110,6 +116,12 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
         Route::get('form-submissions/{submission}', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'show'])->name('form-submissions.show');
         Route::patch('form-submissions/{submission}/status', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'updateStatus'])->name('form-submissions.status');
         Route::delete('form-submissions/{submission}', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'destroy'])->name('form-submissions.destroy');
+        
+        // Form Configuration
+        Route::get('forms', [\Westlinks\Wlcms\Http\Controllers\Admin\FormConfigController::class, 'index'])->name('forms.index');
+        Route::get('forms/{form}/edit', [\Westlinks\Wlcms\Http\Controllers\Admin\FormConfigController::class, 'edit'])->name('forms.edit');
+        Route::put('forms/{form}', [\Westlinks\Wlcms\Http\Controllers\Admin\FormConfigController::class, 'update'])->name('forms.update');
+        Route::get('forms/{form}/preview', [\Westlinks\Wlcms\Http\Controllers\Admin\FormConfigController::class, 'preview'])->name('forms.preview');
     });
 
 // Frontend routes (will be registered if enabled in config)

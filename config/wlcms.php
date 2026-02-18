@@ -19,6 +19,9 @@ return [
         // Host layout component for embedded mode (default matches standard Laravel admin layout)
         'host_layout' => env('WLCMS_HOST_LAYOUT', 'layouts.admin-layout'),
         
+        // Public layout component for form submission thank you pages and other public-facing pages
+        'public_layout' => env('WLCMS_PUBLIC_LAYOUT', 'app-layout'),
+        
         // Enable navigation integration for host apps
         'navigation_integration' => env('WLCMS_NAVIGATION_INTEGRATION', false),
         
