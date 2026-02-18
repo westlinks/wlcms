@@ -87,9 +87,17 @@ class TemplateRenderer
             $data = $zonesData[$zoneId] ?? null;
 
             if ($data !== null) {
-                $processed[$zoneId] = $this->zoneProcessor->process(
+                // First process the data (validate/structure)
+                $processedData = $this->zoneProcessor->process(
                     $zoneConfig['type'] ?? 'rich_text',
                     $data,
+                    $zoneConfig
+                );
+                
+                // Then render it to HTML
+                $processed[$zoneId] = $this->zoneProcessor->render(
+                    $zoneConfig['type'] ?? 'rich_text',
+                    $processedData,
                     $zoneConfig
                 );
             } else {

@@ -7,6 +7,23 @@ use Illuminate\Support\Str;
 class ZoneProcessor
 {
     /**
+     * Shortcode parser instance.
+     *
+     * @var ShortcodeParser|null
+     */
+    protected ?ShortcodeParser $shortcodeParser = null;
+
+    /**
+     * Constructor.
+     *
+     * @param ShortcodeParser|null $shortcodeParser
+     */
+    public function __construct(?ShortcodeParser $shortcodeParser = null)
+    {
+        $this->shortcodeParser = $shortcodeParser;
+    }
+
+    /**
      * Process zone data based on zone type.
      *
      * @param string $type Zone type
@@ -72,7 +89,14 @@ class ZoneProcessor
      */
     protected function renderRichText(mixed $data, array $config = []): string
     {
-        return $data ?? '';
+        $content = $data ?? '';
+        
+        // Parse shortcodes if parser is available
+        if ($this->shortcodeParser && $this->shortcodeParser->hasShortcodes($content)) {
+            $content = $this->shortcodeParser->parse($content);
+        }
+        
+        return $content;
     }
 
     /**
@@ -347,16 +371,34 @@ class ZoneProcessor
      */
     protected function renderFormEmbed(mixed $data, array $config = []): string
     {
-        if (!is_array($data) || $data['type'] === 'none') {
+        if (!is_array($data)) {
             return '';
         }
 
-        if ($data['type'] === 'embed') {
-            return $data['embed_code'] ?? '';
+        $embedType = $data['embed_type'] ?? 'built-in';
+        $embedCode = $data['embed_code'] ?? '';
+        $formId = $data['form_id'] ?? '';
+
+        // Handle external embed code (raw HTML/iframe)
+        if ($embedType === 'external' && !empty($embedCode)) {
+            return $embedCode;
         }
 
-        // For built-in and custom forms, return a placeholder or form shortcode
-        return "<!-- Form: {$data['form_id']} -->";
+        // Handle shortcode (either from built-in selector or manual entry)
+        if (!empty($embedCode) && $this->shortcodeParser) {
+            // Check if it's already a shortcode
+            if ($this->shortcodeParser->hasShortcodes($embedCode)) {
+                return $this->shortcodeParser->parse($embedCode);
+            }
+        }
+
+        // Handle built-in form by ID
+        if (!empty($formId)) {
+            $formRenderer = app(\Westlinks\Wlcms\Services\FormRenderer::class);
+            return $formRenderer->render($formId);
+        }
+
+        return '<!-- No form configured -->';
     }
 
     /**

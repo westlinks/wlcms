@@ -5,6 +5,12 @@ use Westlinks\Wlcms\Http\Controllers\Admin\ContentController;
 use Westlinks\Wlcms\Http\Controllers\Admin\MediaController;
 use Westlinks\Wlcms\Http\Controllers\Admin\DashboardController;
 use Westlinks\Wlcms\Http\Controllers\Admin\LegacyController;
+use Westlinks\Wlcms\Http\Controllers\FormController;
+
+// Form submission route (public)
+Route::post('/wlcms/forms/{form}/submit', [FormController::class, 'submit'])
+    ->middleware(['web'])
+    ->name('wlcms.forms.submit');
 
 // Test Route for Template Picker (unprotected for easy access)
 Route::get('/wlcms-test-template-picker', function () {
@@ -97,6 +103,13 @@ Route::middleware(config('wlcms.admin.middleware', ['web', 'auth']))
                 Route::post('/import', [LegacyController::class, 'navigationImport'])->name('import');
             });
         }
+        
+        // Form Submissions
+        Route::get('form-submissions', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'index'])->name('form-submissions.index');
+        Route::get('form-submissions/export', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'export'])->name('form-submissions.export');
+        Route::get('form-submissions/{submission}', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'show'])->name('form-submissions.show');
+        Route::patch('form-submissions/{submission}/status', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'updateStatus'])->name('form-submissions.status');
+        Route::delete('form-submissions/{submission}', [\Westlinks\Wlcms\Http\Controllers\Admin\FormSubmissionController::class, 'destroy'])->name('form-submissions.destroy');
     });
 
 // Frontend routes (will be registered if enabled in config)

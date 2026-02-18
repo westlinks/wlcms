@@ -247,6 +247,15 @@ class ContentController extends Controller
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
             $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
             
+            // Fix any double-encoded JSON strings in zone values
+            if (is_array($zonesData)) {
+                foreach ($zonesData as $key => $value) {
+                    if (is_string($value) && $this->isJsonString($value)) {
+                        $zonesData[$key] = json_decode($value, true);
+                    }
+                }
+            }
+            
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
                 [
@@ -376,5 +385,18 @@ class ContentController extends Controller
                 'zones_json' => 'The following required zones must be filled: ' . implode(', ', $missingZones)
             ]);
         }
+    }
+    
+    /**
+     * Check if a string is valid JSON
+     */
+    private function isJsonString($string): bool
+    {
+        if (!is_string($string) || strlen($string) < 2) {
+            return false;
+        }
+        
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }

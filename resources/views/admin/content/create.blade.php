@@ -51,8 +51,11 @@
                     </div>
                 </div>
 
-                {{-- Content Editor Card --}}
-                <div class="bg-white rounded-lg shadow p-6">
+                {{-- Content Editor Card (hidden when template selected) --}}
+                <div class="bg-white rounded-lg shadow p-6" 
+                     x-data="{ hasTemplate: false }"
+                     @template-selected.window="hasTemplate = !!$event.detail.template"
+                     x-show="!hasTemplate">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Content</h3>
                     
                     @include('wlcms::admin.components.editor', [
@@ -71,7 +74,10 @@
                 <div class="bg-white rounded-lg shadow p-6" 
                      x-data="{ 
                          selectedTemplate: null,
-                         zoneData: {}
+                         zoneData: {},
+                         updateZone(key, value) {
+                             this.zoneData[key] = value;
+                         }
                      }"
                      @template-selected.window="
                          selectedTemplate = $event.detail.template;
@@ -83,7 +89,8 @@
                                  }
                              });
                          }
-                     ">
+                     "
+                     @updateZone="updateZone($event.detail.key, $event.detail.value)">
 
                     @include('wlcms::admin.components.template-picker', [
                         'name' => 'template_identifier',
@@ -101,27 +108,72 @@
                         <p class="text-sm text-gray-600 mb-6">
                             Fill in the content zones for this template. Required zones are marked with <span class="text-red-500">*</span>
                         </p>
+                        <p class="text-sm text-gray-500 mb-6 italic">
+                            Note: Basic editors are shown here. After saving, you'll have access to full-featured editors including TipTap rich text, form selectors, and media galleries in the edit view.
+                        </p>
 
-                        {{-- Dynamic Zone Rendering --}}
-                        <div class="space-y-6" id="template-zones-container">
+                        {{-- Dynamic Zone Rendering with Alpine.js --}}
+                        <div class="space-y-6" id="zones-container">
                             <template x-for="(zoneConfig, zoneKey) in selectedTemplate?.zones || {}" :key="zoneKey">
                                 <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
-                                    <h4 class="text-md font-semibold mb-3">
-                                        <span x-text="zoneConfig.label || zoneKey"></span>
-                                        <span x-show="zoneConfig.required" class="text-red-500"> *</span>
-                                        <span class="text-xs font-normal text-gray-500 ml-2" x-text="'(' + zoneConfig.type + ')'"></span>
+                                    <h4 class="text-md font-semibold mb-3 flex items-center justify-between">
+                                        <span>
+                                            <span x-text="zoneConfig.label || zoneKey"></span>
+                                            <span x-show="zoneConfig.required" class="text-red-500"> *</span>
+                                        </span>
+                                        <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded" x-text="zoneConfig.type"></span>
                                     </h4>
                                     
-                                    {{-- Rich text editor for rich_text zones --}}
-                                    <div x-show="zoneConfig.type === 'rich_text'">
-                                        <div 
-                                            contenteditable="true"
-                                            @input="zoneData[zoneKey] = $el.innerHTML"
-                                            x-init="$el.innerHTML = zoneData[zoneKey] || ''"
-                                            class="prose max-w-none p-4 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            style="border: 1px solid #d1d5db; border-radius: 0.375rem; background: white;"
-                                            :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"></div>
-                                        <p x-show="zoneConfig.required && (!zoneData[zoneKey] || zoneData[zoneKey].trim() === '' || zoneData[zoneKey] === '<br>' || zoneData[zoneKey] === '<p></p>')" class="text-xs text-red-600 mt-1">This field is required</p>
+                                    {{-- Full-featured rich text editor for rich_text zones --}}
+                                    <div x-show="zoneConfig.type === 'rich_text'" class="zone-rich-text">
+                                        <div class="editor-container" style="border: 1px solid #d1d5db; border-radius: 0.375rem; overflow: hidden; background: white;">
+                                            {{-- Full toolbar with all features --}}
+                                            <div class="editor-toolbar" :data-zone="zoneKey" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
+                                                <button type="button" data-action="bold" title="Bold (Ctrl+B)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm font-semibold hover:bg-gray-50 min-w-[36px]">B</button>
+                                                <button type="button" data-action="italic" title="Italic (Ctrl+I)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm italic hover:bg-gray-50 min-w-[36px]">I</button>
+                                                <button type="button" data-action="code" title="Inline Code" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">&lt;/&gt;</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="h1" title="Heading 1" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H1</button>
+                                                <button type="button" data-action="h2" title="Heading 2" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H2</button>
+                                                <button type="button" data-action="h3" title="Heading 3" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H3</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="bullet-list" title="Bullet List" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">•</button>
+                                                <button type="button" data-action="ordered-list" title="Numbered List" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">1.</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="blockquote" title="Blockquote" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">"</button>
+                                                <button type="button" data-action="code-block" title="Code Block" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">{ }</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="undo" title="Undo (Ctrl+Z)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">↶</button>
+                                                <button type="button" data-action="redo" title="Redo (Ctrl+Shift+Z)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">↷</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="source" title="View/Edit HTML Source" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50">HTML</button>
+                                            </div>
+                                            
+                                            {{-- Visual editor --}}
+                                            <div 
+                                                contenteditable="true"
+                                                :data-zone="zoneKey"
+                                                class="zone-editor prose max-w-none p-4 min-h-[200px] focus:outline-none"
+                                                style="background: white;"
+                                                @input="zoneData[zoneKey] = $el.innerHTML"
+                                                x-init="$el.innerHTML = zoneData[zoneKey] || ''"></div>
+                                            
+                                            {{-- HTML Source view (hidden by default) --}}
+                                            <textarea 
+                                                :data-zone="zoneKey"
+                                                class="zone-source hidden w-full min-h-[200px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
+                                                @input="zoneData[zoneKey] = $el.value"></textarea>
+                                        </div>
                                     </div>
                                     
                                     {{-- Plain textarea for other zone types --}}
@@ -130,12 +182,131 @@
                                             x-model="zoneData[zoneKey]"
                                             class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
                                             rows="4"
-                                            :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"></textarea>
-                                        <p x-show="zoneConfig.required && !zoneData[zoneKey]" class="text-xs text-red-600 mt-1">This field is required</p>
+                                            :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"
+                                            :required="zoneConfig.required"></textarea>
+                                        <p class="text-xs text-gray-500 mt-1" x-show="zoneConfig.type === 'repeater'">JSON array format. Full repeater controls available after saving.</p>
+                                        <p class="text-xs text-gray-500 mt-1" x-show="zoneConfig.type === 'form_embed'">Enter form shortcode like [form id="contact"]. Full form selector available after saving.</p>
+                                        <p class="text-xs text-gray-500 mt-1" x-show="zoneConfig.type === 'media_gallery'">Upload images after saving. Enter image URLs for now.</p>
                                     </div>
                                 </div>
                             </template>
                         </div>
+                        
+                        {{-- Rich text editor toolbar handler script --}}
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Setup toolbar handlers for dynamically created editors
+                            const container = document.getElementById('zones-container');
+                            if (!container) return;
+                            
+                            // Use event delegation for toolbar buttons
+                            container.addEventListener('click', function(e) {
+                                const button = e.target.closest('[data-action]');
+                                if (!button) return;
+                                
+                                e.preventDefault();
+                                const action = button.getAttribute('data-action');
+                                const toolbar = button.closest('.editor-toolbar');
+                                const zoneKey = toolbar.getAttribute('data-zone');
+                                const editorDiv = toolbar.nextElementSibling;
+                                const sourceTextarea = editorDiv.nextElementSibling;
+                                
+                                // Focus the appropriate editor
+                                if (sourceTextarea && !sourceTextarea.classList.contains('hidden')) {
+                                    sourceTextarea.focus();
+                                } else {
+                                    editorDiv.focus();
+                                }
+                                
+                                switch(action) {
+                                    case 'bold':
+                                        document.execCommand('bold', false, null);
+                                        toggleActiveClass(button, 'bold');
+                                        break;
+                                    case 'italic':
+                                        document.execCommand('italic', false, null);
+                                        toggleActiveClass(button, 'italic');
+                                        break;
+                                    case 'code':
+                                        const selection = window.getSelection();
+                                        if (selection.toString()) {
+                                            document.execCommand('insertHTML', false, '<code>' + selection.toString() + '</code>');
+                                        }
+                                        break;
+                                    case 'h1':
+                                        document.execCommand('formatBlock', false, '<h1>');
+                                        break;
+                                    case 'h2':
+                                        document.execCommand('formatBlock', false, '<h2>');
+                                        break;
+                                    case 'h3':
+                                        document.execCommand('formatBlock', false, '<h3>');
+                                        break;
+                                    case 'bullet-list':
+                                        document.execCommand('insertUnorderedList', false, null);
+                                        toggleActiveClass(button, 'insertUnorderedList');
+                                        break;
+                                    case 'ordered-list':
+                                        document.execCommand('insertOrderedList', false, null);
+                                        toggleActiveClass(button, 'insertOrderedList');
+                                        break;
+                                    case 'blockquote':
+                                        document.execCommand('formatBlock', false, '<blockquote>');
+                                        break;
+                                    case 'code-block':
+                                        document.execCommand('formatBlock', false, '<pre>');
+                                        break;
+                                    case 'undo':
+                                        document.execCommand('undo', false, null);
+                                        break;
+                                    case 'redo':
+                                        document.execCommand('redo', false, null);
+                                        break;
+                                    case 'source':
+                                        toggleSourceView(editorDiv, sourceTextarea, button);
+                                        break;
+                                }
+                                
+                                // Trigger input event to update Alpine.js data
+                                if (sourceTextarea.classList.contains('hidden')) {
+                                    editorDiv.dispatchEvent(new Event('input'));
+                                } else {
+                                    sourceTextarea.dispatchEvent(new Event('input'));
+                                }
+                            });
+                            
+                            function toggleActiveClass(button, command) {
+                                if (document.queryCommandState(command)) {
+                                    button.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+                                    button.classList.remove('bg-white', 'border-gray-300');
+                                } else {
+                                    button.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+                                    button.classList.add('bg-white', 'border-gray-300');
+                                }
+                            }
+                            
+                            function toggleSourceView(editorDiv, sourceTextarea, button) {
+                                if (sourceTextarea.classList.contains('hidden')) {
+                                    // Switch to source mode
+                                    sourceTextarea.value = editorDiv.innerHTML;
+                                    sourceTextarea.classList.remove('hidden');
+                                    editorDiv.style.display = 'none';
+                                    button.classList.add('bg-green-600', 'text-white', 'border-green-600');
+                                    button.classList.remove('bg-white', 'border-gray-300');
+                                    sourceTextarea.focus();
+                                } else {
+                                    // Switch to visual mode
+                                    editorDiv.innerHTML = sourceTextarea.value;
+                                    sourceTextarea.classList.add('hidden');
+                                    editorDiv.style.display = 'block';
+                                    button.classList.remove('bg-green-600', 'text-white', 'border-green-600');
+                                    button.classList.add('bg-white', 'border-gray-300');
+                                    editorDiv.focus();
+                                    editorDiv.dispatchEvent(new Event('input'));
+                                }
+                            }
+                        });
+                        </script>
 
                         {{-- Hidden input to store all zone data as JSON --}}
                         <input type="hidden" name="zones_json" :value="JSON.stringify(zoneData)">

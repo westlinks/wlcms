@@ -36,8 +36,17 @@ class WlcmsServiceProvider extends ServiceProvider
             );
         });
 
-        // Register Template System services
-        $this->app->singleton(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+        // Register Form System services (Phase 8) - Register these first
+        $this->app->singleton(\Westlinks\Wlcms\Services\FormRegistry::class);
+        $this->app->singleton(\Westlinks\Wlcms\Services\FormRenderer::class);
+        $this->app->singleton(\Westlinks\Wlcms\Services\ShortcodeParser::class);
+        
+        // Register Template System services with dependencies
+        $this->app->singleton(\Westlinks\Wlcms\Services\ZoneProcessor::class, function ($app) {
+            return new \Westlinks\Wlcms\Services\ZoneProcessor(
+                $app->make(\Westlinks\Wlcms\Services\ShortcodeParser::class)
+            );
+        });
         $this->app->singleton(\Westlinks\Wlcms\Services\TemplateRenderer::class);
     }
 
@@ -104,6 +113,9 @@ class WlcmsServiceProvider extends ServiceProvider
 
         // Register default templates
         $this->registerTemplates();
+        
+        // Register default forms
+        $this->registerForms();
 
         // Register commands if running in console
         if ($this->app->runningInConsole()) {
@@ -246,6 +258,11 @@ class WlcmsServiceProvider extends ServiceProvider
             'preview' => null,
             'category' => 'landing',
             'zones' => [
+                'content' => [
+                    'label' => 'Main Content',
+                    'type' => 'rich_text',
+                    'required' => true,
+                ],
                 'hero' => [
                     'label' => 'Hero Section',
                     'type' => 'rich_text',
@@ -255,11 +272,6 @@ class WlcmsServiceProvider extends ServiceProvider
                     'label' => 'Seasonal Banner',
                     'type' => 'conditional',
                     'required' => false,
-                ],
-                'content' => [
-                    'label' => 'Main Content',
-                    'type' => 'rich_text',
-                    'required' => true,
                 ],
                 'features' => [
                     'label' => 'Feature Highlights',
@@ -475,4 +487,159 @@ class WlcmsServiceProvider extends ServiceProvider
             }
         }
     }
+
+    /**
+     * Register default forms.
+     */
+    protected function registerForms(): void
+    {
+        $formRegistry = $this->app->make(\Westlinks\Wlcms\Services\FormRegistry::class);
+
+        // Contact Form
+        $formRegistry->register('contact', [
+            'name' => 'Contact Form',
+            'type' => 'built-in',
+            'description' => 'Basic contact form with name, email, and message fields',
+            'view' => 'wlcms::forms.contact',
+            'fields' => [
+                [
+                    'name' => 'name',
+                    'type' => 'text',
+                    'label' => 'Your Name',
+                    'required' => true,
+                    'placeholder' => 'John Smith',
+                ],
+                [
+                    'name' => 'email',
+                    'type' => 'email',
+                    'label' => 'Email Address',
+                    'required' => true,
+                    'placeholder' => 'john@example.com',
+                ],
+                [
+                    'name' => 'phone',
+                    'type' => 'tel',
+                    'label' => 'Phone Number',
+                    'required' => false,
+                    'placeholder' => '(555) 123-4567',
+                ],
+                [
+                    'name' => 'subject',
+                    'type' => 'text',
+                    'label' => 'Subject',
+                    'required' => false,
+                    'placeholder' => 'How can we help?',
+                ],
+                [
+                    'name' => 'message',
+                    'type' => 'textarea',
+                    'label' => 'Message',
+                    'required' => true,
+                    'placeholder' => 'Tell us more...',
+                    'rows' => 5,
+                ],
+            ],
+            'validation' => [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'nullable|string|max:20',
+                'subject' => 'nullable|string|max:255',
+                'message' => 'required|string|max:5000',
+            ],
+            'settings' => [
+                'notify_email' => config('mail.from.address', 'admin@example.com'),
+                'email_subject' => 'New Contact Form Submission',
+            ],
+            'success_message' => 'Thank you for contacting us! We will get back to you soon.',
+        ]);
+
+        // Newsletter Signup Form
+        $formRegistry->register('newsletter', [
+            'name' => 'Newsletter Signup',
+            'type' => 'built-in',
+            'description' => 'Simple newsletter subscription form',
+            'view' => 'wlcms::forms.newsletter',
+            'fields' => [
+                [
+                    'name' => 'email',
+                    'type' => 'email',
+                    'label' => 'Email Address',
+                    'required' => true,
+                    'placeholder' => 'your@email.com',
+                ],
+                [
+                    'name' => 'consent',
+                    'type' => 'checkbox',
+                    'label' => 'I agree to receive newsletters',
+                    'required' => true,
+                ],
+            ],
+            'validation' => [
+                'email' => 'required|email|max:255',
+                'consent' => 'required|accepted',
+            ],
+            'settings' => [
+                'notify_email' => config('mail.from.address', 'admin@example.com'),
+                'email_subject' => 'New Newsletter Subscription',
+            ],
+            'success_message' => 'Thank you for subscribing to our newsletter!',
+        ]);
+
+        // Feedback Form
+        $formRegistry->register('feedback', [
+            'name' => 'Feedback Form',
+            'type' => 'built-in',
+            'description' => 'Customer feedback and rating form',
+            'view' => 'wlcms::forms.feedback',
+            'fields' => [
+                [
+                    'name' => 'name',
+                    'type' => 'text',
+                    'label' => 'Your Name',
+                    'required' => false,
+                    'placeholder' => 'Anonymous',
+                ],
+                [
+                    'name' => 'email',
+                    'type' => 'email',
+                    'label' => 'Email Address',
+                    'required' => false,
+                    'placeholder' => 'your@email.com',
+                ],
+                [
+                    'name' => 'rating',
+                    'type' => 'select',
+                    'label' => 'Overall Rating',
+                    'required' => true,
+                    'options' => [
+                        '5' => '5 - Excellent',
+                        '4' => '4 - Good',
+                        '3' => '3 - Average',
+                        '2' => '2 - Poor',
+                        '1' => '1 - Very Poor',
+                    ],
+                ],
+                [
+                    'name' => 'feedback',
+                    'type' => 'textarea',
+                    'label' => 'Your Feedback',
+                    'required' => true,
+                    'placeholder' => 'Tell us what you think...',
+                    'rows' => 5,
+                ],
+            ],
+            'validation' => [
+                'name' => 'nullable|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'rating' => 'required|integer|between:1,5',
+                'feedback' => 'required|string|max:5000',
+            ],
+            'settings' => [
+                'notify_email' => config('mail.from.address', 'admin@example.com'),
+                'email_subject' => 'New Feedback Submission',
+            ],
+            'success_message' => 'Thank you for your feedback!',
+        ]);
+    }
 }
+

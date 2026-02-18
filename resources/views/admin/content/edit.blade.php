@@ -23,8 +23,8 @@
                         @enderror
                     </div>
 
-                    <!-- Content -->
-                    <div>
+                    <!-- Content (hidden when template selected) -->
+                    <div x-show="!hasTemplate" x-data="{ hasTemplate: {{ $content->template ? 'true' : 'false' }} }">
                         @include('wlcms::admin.components.editor', [
                             'name' => 'content',
                             'value' => old('content', $content->content),
@@ -45,87 +45,174 @@
                     </div>
 
                     <!-- Template Selection -->
-@php
-    $currentTemplate = $content->template ? \Westlinks\Wlcms\Models\Template::where('identifier', $content->template)->first() : null;
-@endphp
-<div class="bg-gray-50 rounded-lg p-4"
-                         x-data="{ 
-                             selectedTemplate: @js($currentTemplate),
-                             zoneData: @js(old('zones_json') ? json_decode(old('zones_json'), true) : ($content->templateSettings ? $content->templateSettings->getAllZonesData() : (object)[]))
-                         }"
-                         x-init="
-                             console.log('Edit form Alpine initialized');
-                             console.log('Current template:', selectedTemplate);
-                             console.log('Zone data:', zoneData);
-                         "
-                         @template-selected.window="
-                             console.log('Template selected event received:', $event.detail.template);
-                             selectedTemplate = $event.detail.template;
-                             // Initialize zone data object with keys for each zone
-                             if (selectedTemplate && selectedTemplate.zones) {
-                                 Object.keys(selectedTemplate.zones).forEach(key => {
-                                     if (!zoneData[key]) {
-                                         zoneData[key] = '';
-                                     }
-                                 });
-                             }
-                         ">
+                    @php
+                        $currentTemplate = $content->template ? \Westlinks\Wlcms\Models\Template::where('identifier', $content->template)->first() : null;
+                        $existingZones = old('zones_json') ? json_decode(old('zones_json'), true) : ($content->templateSettings ? $content->templateSettings->getAllZonesData() : []);
+                    @endphp
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
                         @include('wlcms::admin.components.template-picker', [
                             'name' => 'template_identifier',
                             'selected' => old('template_identifier', $content->template),
                             'label' => 'Page Template'
                         ])
 
-                        {{-- Zone Editor Section - Shows when template with zones is selected --}}
-                        <div x-show="selectedTemplate && selectedTemplate.zones && Object.keys(selectedTemplate.zones).length > 0" 
-                             x-cloak
-                             class="mt-6 pt-6 border-t border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                                <span class="text-blue-600" x-text="selectedTemplate?.name"></span> Content Zones
-                            </h3>
-                            <p class="text-sm text-gray-600 mb-6">
-                                Fill in the content zones for this template. Required zones are marked with <span class="text-red-500">*</span>
-                            </p>
+                        {{-- Zone Editor Section - Server-Side Rendering --}}
+                        @if($currentTemplate && $currentTemplate->zones && count($currentTemplate->zones) > 0)
+                            <div class="mt-6 pt-6 border-t border-gray-200"
+                                 x-data="{ 
+                                    zonesData: @js($existingZones ?? []),
+                                    updateZone(key, value) { 
+                                        this.zonesData[key] = value;
+                                        if (this.$refs.zones_json) {
+                                            this.$refs.zones_json.value = JSON.stringify(this.zonesData);
+                                        }
+                                    } 
+                                 }"
+                                 x-init="if ($refs.zones_json) $refs.zones_json.value = JSON.stringify(zonesData);"
+                                 @updatezone.window="updateZone($event.detail.key, $event.detail.value)">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                    <span class="text-blue-600">{{ $currentTemplate->name }}</span> Content Zones
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-6">
+                                    Fill in the content zones for this template. Required zones are marked with <span class="text-red-500">*</span>
+                                </p>
 
-                            {{-- Dynamic Zone Rendering --}}
-                            <div class="space-y-6" id="template-zones-container">
-                                <template x-for="(zoneConfig, zoneKey) in selectedTemplate?.zones || {}" :key="zoneKey">
-                                    <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
-                                        <h4 class="text-md font-semibold mb-3">
-                                            <span x-text="zoneConfig.label || zoneKey"></span>
-                                            <span x-show="zoneConfig.required" class="text-red-500"> *</span>
-                                            <span class="text-xs font-normal text-gray-500 ml-2" x-text="'(' + zoneConfig.type + ')'"></span>
-                                        </h4>
-                                        
-                                        {{-- Rich text editor for rich_text zones --}}
-                                        <div x-show="zoneConfig.type === 'rich_text'">
-                                            <div 
-                                                contenteditable="true"
-                                                @input="zoneData[zoneKey] = $el.innerHTML"
-                                                x-init="$el.innerHTML = zoneData[zoneKey] || ''"
-                                                class="prose max-w-none p-4 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                style="border: 1px solid #d1d5db; border-radius: 0.375rem; background: white;"
-                                                :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"></div>
-                                            <p x-show="zoneConfig.required && (!zoneData[zoneKey] || zoneData[zoneKey].trim() === '' || zoneData[zoneKey] === '<br>' || zoneData[zoneKey] === '<p></p>')" class="text-xs text-red-600 mt-1">This field is required</p>
+                                {{-- Server-Side Zone Rendering --}}
+                                <div class="space-y-6">
+                                    @foreach($currentTemplate->zones as $zoneKey => $zoneConfig)
+                                        @php
+                                            $zoneValue = $existingZones[$zoneKey] ?? '';
+                                            $zoneType = $zoneConfig['type'] ?? 'rich_text';
+                                            $zoneLabel = $zoneConfig['label'] ?? ucfirst(str_replace('_', ' ', $zoneKey));
+                                            $isRequired = $zoneConfig['required'] ?? false;
+                                        @endphp
+
+                                        <div class="bg-white border border-gray-300 rounded-lg p-6">
+                                            <h4 class="text-md font-semibold mb-3 flex items-center justify-between">
+                                                <span>
+                                                    {{ $zoneLabel }}
+                                                    @if($isRequired)
+                                                        <span class="text-red-500">*</span>
+                                                    @endif
+                                                </span>
+                                                <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                                    {{ $zoneType }}
+                                                </span>
+                                            </h4>
+                                            
+                                            @switch($zoneType)
+                                                @case('rich_text')
+                                                    {{-- Use TipTap editor component --}}
+                                                    @include('wlcms::admin.components.editor', [
+                                                        'name' => "zones[{$zoneKey}]",
+                                                        'value' => $zoneValue,
+                                                        'label' => false, // Already have label above
+                                                        'required' => $isRequired
+                                                    ])
+                                                    @break
+
+                                                @case('form_embed')
+                                                    {{-- Use form embed zone component --}}
+                                                    @include('wlcms::admin.components.zones.form_embed', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : [],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    @break
+
+                                                @case('repeater')
+                                                    {{-- Use repeater zone component --}}
+                                                    @include('wlcms::admin.components.zones.repeater', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : [],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    <input type="hidden" 
+                                                           name="zones[{{ $zoneKey }}]" 
+                                                           value="{{ json_encode($zoneValue) }}">
+                                                    @break
+
+                                                @case('media_gallery')
+                                                    {{-- Use media gallery zone component --}}
+                                                    @include('wlcms::admin.components.zones.media_gallery', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : [],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    <input type="hidden" 
+                                                           name="zones[{{ $zoneKey }}]" 
+                                                           value="{{ json_encode($zoneValue) }}">
+                                                    @break
+
+                                                @case('file_list')
+                                                    {{-- Use file list zone component --}}
+                                                    @include('wlcms::admin.components.zones.file_list', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : [],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    <input type="hidden" 
+                                                           name="zones[{{ $zoneKey }}]" 
+                                                           value="{{ json_encode($zoneValue) }}">
+                                                    @break
+
+                                                @case('link_list')
+                                                    {{-- Use link list zone component --}}
+                                                    @include('wlcms::admin.components.zones.link_list', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : [],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    <input type="hidden" 
+                                                           name="zones[{{ $zoneKey }}]" 
+                                                           value="{{ json_encode($zoneValue) }}">
+                                                    @break
+
+                                                @case('conditional')
+                                                    {{-- Use conditional zone component --}}
+                                                    @include('wlcms::admin.components.zones.conditional', [
+                                                        'zone' => $zoneConfig,
+                                                        'value' => is_array($zoneValue) ? $zoneValue : ['content' => '', 'conditions' => []],
+                                                        'zoneKey' => $zoneKey,
+                                                        'onUpdate' => 'updateZone'
+                                                    ])
+                                                    <input type="hidden" 
+                                                           name="zones[{{ $zoneKey }}]" 
+                                                           value="{{ json_encode($zoneValue) }}">
+                                                    @break
+
+                                                @default
+                                                    {{-- Fallback: Plain textarea --}}
+                                                    <textarea 
+                                                        name="zones[{{ $zoneKey }}]"
+                                                        id="zone_{{ $zoneKey }}"
+                                                        rows="4"
+                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                                        placeholder="Enter content for {{ $zoneLabel }}"
+                                                        {{ $isRequired ? 'required' : '' }}
+                                                    >{{ $zoneValue }}</textarea>
+                                            @endswitch
+                                            
+                                            @if($isRequired)
+                                                @error("zones.{$zoneKey}")
+                                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                                @enderror
+                                            @endif
                                         </div>
-                                        
-                                        {{-- Plain textarea for other zone types --}}
-                                        <div x-show="zoneConfig.type !== 'rich_text'">
-                                            <textarea 
-                                                x-model="zoneData[zoneKey]"
-                                                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                                                rows="4"
-                                                :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"></textarea>
-                                            <p x-show="zoneConfig.required && !zoneData[zoneKey]" class="text-xs text-red-600 mt-1">This field is required</p>
-                                        </div>
-                                    </div>
-                                </template>
+                                    @endforeach
+                                    
+                                    {{-- Single hidden input for all zones data --}}
+                                    <input type="hidden" name="zones_json" x-ref="zones_json">
+                                </div>
                             </div>
 
-                            {{-- Hidden input to store all zone data as JSON --}}
-                            <input type="hidden" name="zones_json" :value="JSON.stringify(zoneData)">
-                            
-                            {{-- DEBUG: Show what's being passed to template settings --}}
+                            {{-- Template Settings Panel --}}
                             @php
                                 $featuredMediaForSettings = $content->mediaAssets->first(function($media) {
                                     return $media->pivot->type === 'featured';
@@ -134,14 +221,16 @@
                                     (array)($content->templateSettings?->settings ?? []),
                                     ['featured_image' => $featuredMediaForSettings?->id]
                                 ));
-                                \Log::info('VIEW - Settings being passed to panel:', ['settings' => $settingsForPanel]);
                             @endphp
                             
-                            {{-- Template Settings Panel --}}
-                            @include('wlcms::admin.components.template-settings-panel', [
-                                'settings' => $settingsForPanel
-                            ])
-                        </div>
+                            <div class="mt-6 pt-6 border-t border-gray-200">
+                                @include('wlcms::admin.components.template-settings-panel', [
+                                    'settings' => $settingsForPanel
+                                ])
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 italic mt-4">Select a template to configure content zones.</p>
+                        @endif
                     </div>
                 </div>
 
