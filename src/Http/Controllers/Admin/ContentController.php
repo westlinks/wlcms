@@ -135,7 +135,8 @@ class ContentController extends Controller
 
         // Save template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
+            // Prefer zones array over zones_json since zones_json may be stale if JS events failed
+            $zonesData = $request->zones ?? ($request->zones_json ? json_decode($request->zones_json, true) : []);
             
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
@@ -253,7 +254,8 @@ class ContentController extends Controller
 
         // Update template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : $request->zones;
+            // Prefer zones array over zones_json since zones_json may be stale if JS events failed
+            $zonesData = $request->zones ?? ($request->zones_json ? json_decode($request->zones_json, true) : []);
             
             // Fix any double-encoded JSON strings in zone values
             if (is_array($zonesData)) {
