@@ -135,8 +135,17 @@ class ContentController extends Controller
 
         // Save template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            // Prefer zones array over zones_json since zones_json may be stale if JS events failed
-            $zonesData = $request->zones ?? ($request->zones_json ? json_decode($request->zones_json, true) : []);
+            // Merge zones: prefer zones array for text content, but keep zones_json for special zones (like form embeds)
+            $zonesFromJson = $request->zones_json ? json_decode($request->zones_json, true) : [];
+            $zonesFromArray = $request->zones ?? [];
+            
+            // Start with zones_json (has special zones like form embeds)
+            $zonesData = $zonesFromJson;
+            
+            // Override with zones array values (has fresh textarea content)
+            foreach ($zonesFromArray as $key => $value) {
+                $zonesData[$key] = $value;
+            }
             
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
@@ -254,8 +263,17 @@ class ContentController extends Controller
 
         // Update template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            // Prefer zones array over zones_json since zones_json may be stale if JS events failed
-            $zonesData = $request->zones ?? ($request->zones_json ? json_decode($request->zones_json, true) : []);
+            // Merge zones: prefer zones array for text content, but keep zones_json for special zones (like form embeds)
+            $zonesFromJson = $request->zones_json ? json_decode($request->zones_json, true) : [];
+            $zonesFromArray = $request->zones ?? [];
+            
+            // Start with zones_json (has special zones like form embeds)
+            $zonesData = $zonesFromJson;
+            
+            // Override with zones array values (has fresh textarea content)
+            foreach ($zonesFromArray as $key => $value) {
+                $zonesData[$key] = $value;
+            }
             
             // Fix any double-encoded JSON strings in zone values
             if (is_array($zonesData)) {
