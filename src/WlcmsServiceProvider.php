@@ -212,6 +212,24 @@ class WlcmsServiceProvider extends ServiceProvider
             'settings_schema' => [],
         ]);
 
+        // Simple HTML Block Template
+        \Westlinks\Wlcms\Services\TemplateManager::register('simple-html-block', [
+            'name' => 'Simple HTML Block',
+            'description' => 'Reusable HTML content block for embedding in other pages (similar to WordPress custom HTML blocks).',
+            'view' => 'wlcms::templates.simple-html-block',
+            'preview' => null,
+            'category' => 'content',
+            'zones' => [
+                'content' => [
+                    'label' => 'HTML Content',
+                    'type' => 'rich_text',
+                    'required' => true,
+                ],
+            ],
+            'features' => [],
+            'settings_schema' => [],
+        ]);
+
         // Contact Form Template
         \Westlinks\Wlcms\Services\TemplateManager::register('contact-form', [
             'name' => 'Contact Form',

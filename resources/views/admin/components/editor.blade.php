@@ -4,7 +4,8 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
 --}}
 
 @php
-    $editorId = $name ?? 'editor';
+    // Sanitize the name to create a valid CSS ID (remove brackets)
+    $editorId = str_replace(['[', ']'], ['_', ''], $name ?? 'editor');
     $editorValue = $value ?? '';
     $editorLabel = $label ?? 'Content';
     $editorRequired = $required ?? false;
@@ -95,10 +96,10 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
     </div>
     
     <!-- Hidden textarea for form submission -->
-    <textarea name="{{ $editorId }}" 
+    <textarea name="{{ $name }}" 
               id="{{ $editorId }}" 
               class="hidden" 
-              @if($editorRequired) required @endif>{!! old($editorId, $editorValue) !!}
+              @if($editorRequired) required @endif>{!! old($name, $editorValue) !!}
     </textarea>
     
     <!-- Link Modal -->

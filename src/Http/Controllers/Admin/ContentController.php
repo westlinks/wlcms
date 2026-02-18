@@ -168,6 +168,14 @@ class ContentController extends Controller
 
     public function update(Request $request, ContentItem $content)
     {
+        \Log::info('UPDATE - Request Data:', [
+            'template_identifier' => $request->template_identifier,
+            'zones' => $request->zones,
+            'zones_json' => $request->zones_json,
+            'has_zones_json' => $request->has('zones_json'),
+            'zones_json_length' => $request->zones_json ? strlen($request->zones_json) : 0
+        ]);
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:cms_content_items,slug,' . $content->id,

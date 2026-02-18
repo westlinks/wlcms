@@ -14,48 +14,24 @@ export const CustomDiv = Node.create({
     return [
       {
         tag: 'div',
-        // Accept all divs
-        getAttrs: () => null,
+        // Strip all attributes we don't want
+        getAttrs: () => ({}),
       },
     ]
   },
   
-  renderHTML({ HTMLAttributes }) {
-    return ['div', HTMLAttributes, 0]
+  renderHTML() {
+    // Render as plain <div> with NO attributes
+    return ['div', 0]
   },
   
   addAttributes() {
-    return {
-      // Dynamically preserve all attributes
-      class: {
-        default: null,
-        parseHTML: element => element.getAttribute('class'),
-        renderHTML: attributes => {
-          if (!attributes.class) return {}
-          return { class: attributes.class }
-        },
-      },
-      id: {
-        default: null,
-        parseHTML: element => element.getAttribute('id'),
-        renderHTML: attributes => {
-          if (!attributes.id) return {}
-          return { id: attributes.id }
-        },
-      },
-      style: {
-        default: null,
-        parseHTML: element => element.getAttribute('style'),
-        renderHTML: attributes => {
-          if (!attributes.style) return {}
-          return { style: attributes.style }
-        },
-      },
-    }
+    // Return empty object - we don't want ANY attributes preserved
+    return {}
   },
 })
 
-// Custom paragraph extension that preserves classes
+// Custom paragraph extension - STRIPS all unwanted attributes
 export const CustomParagraph = Node.create({
   name: 'paragraph',
   
@@ -66,24 +42,21 @@ export const CustomParagraph = Node.create({
   content: 'inline*',
   
   parseHTML() {
-    return [{ tag: 'p' }]
+    return [{ 
+      tag: 'p',
+      // Strip all attributes we don't want
+      getAttrs: () => ({}),
+    }]
   },
   
-  renderHTML({ HTMLAttributes }) {
-    return ['p', HTMLAttributes, 0]
+  renderHTML() {
+    // Render as plain <p> with NO attributes
+    return ['p', 0]
   },
   
   addAttributes() {
-    return {
-      class: {
-        default: null,
-        parseHTML: element => element.getAttribute('class'),
-        renderHTML: attributes => {
-          if (!attributes.class) return {}
-          return { class: attributes.class }
-        },
-      },
-    }
+    // Return empty object - we don't want ANY attributes preserved
+    return {}
   },
 })
 

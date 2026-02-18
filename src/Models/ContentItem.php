@@ -337,6 +337,47 @@ class ContentItem extends Model
     }
 
     /**
+     * Get content from a specific zone (for simple content blocks)
+     */
+    public function getZoneContent(string $zoneName = 'content'): ?string
+    {
+        if (!$this->templateSettings) {
+            return null;
+        }
+
+        $zonesData = $this->templateSettings->zones_data;
+        
+        // Handle if it's already an array (cast by model) or still JSON string
+        if (is_string($zonesData)) {
+            $zonesData = json_decode($zonesData, true);
+        }
+        
+        return $zonesData[$zoneName] ?? null;
+    }
+
+    /**
+     * Get the main content (shortcut for getZoneContent('content'))
+     */
+    public function getContentAttribute(): ?string
+    {
+        return $this->getZoneContent('content');
+    }
+
+    /**
+     * Static helper to quickly fetch a content block by slug
+     * Usage: ContentItem::block('home-column-1')
+     */
+    public static function block(string $slug): ?string
+    {
+        $item = static::with('templateSettings')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->first();
+
+        return $item?->getZoneContent('content');
+    }
+
+    /**
      * Get the available templates.
      */
     public static function getAvailableTemplates(): array

@@ -22,11 +22,20 @@ let mediaPickerInstance = null;
 // Initialize Tiptap Editor
 function initTiptapEditor(elementId, initialContent = '') {
     console.log('Initializing Tiptap editor for:', elementId);
+    console.log('Initial content length:', initialContent ? initialContent.length : 0);
     
     const editorElement = document.querySelector(`#${elementId}-editor`);
     const textareaElement = document.querySelector(`#${elementId}`);
     const toolbarElement = document.querySelector(`#${elementId}-toolbar`);
     const sourceElement = document.querySelector(`#${elementId}-source`);
+    
+    console.log('Element check:', {
+        editorElement: !!editorElement,
+        textareaElement: !!textareaElement,
+        textareaName: textareaElement?.name,
+        toolbarElement: !!toolbarElement,
+        sourceElement: !!sourceElement
+    });
     
     if (!editorElement) {
         console.error('Editor element not found:', `#${elementId}-editor`);
@@ -49,7 +58,8 @@ function initTiptapEditor(elementId, initialContent = '') {
     }
     
     // Source view toggle state
-    let isSourceMode = false;
+    // Start in source mode if there's existing content to prevent TipTap from corrupting it
+    let isSourceMode = initialContent && initialContent.trim().length > 0;
     
     // Clear the element before TipTap takes over (prevents duplicate content)
     editorElement.innerHTML = '';
@@ -63,39 +73,29 @@ function initTiptapEditor(elementId, initialContent = '') {
                 history: {
                     depth: 50,
                 },
-                // Configure heading to preserve classes
+                // Strip all HTML attributes from StarterKit elements
                 heading: {
-                    HTMLAttributes: {
-                        class: null,
-                    },
+                    HTMLAttributes: {},
                 },
-                // Configure lists to preserve classes
                 bulletList: {
-                    HTMLAttributes: {
-                        class: null,
-                    },
+                    HTMLAttributes: {},
                 },
                 orderedList: {
-                    HTMLAttributes: {
-                        class: null,
-                    },
+                    HTMLAttributes: {},
                 },
                 listItem: {
-                    HTMLAttributes: {
-                        class: null,
-                    },
+                    HTMLAttributes: {},
                 },
                 blockquote: {
-                    HTMLAttributes: {
-                        class: null,
-                    },
+                    HTMLAttributes: {},
                 },
             }),
             CustomParagraph,
             CustomDiv,
             CustomLink,
         ],
-        content: initialContent,
+        // Only pass content to TipTap if starting in visual mode (new content)
+        content: isSourceMode ? '' : initialContent,
         onCreate: ({ editor }) => {
             // Initialize hidden textarea
             textareaElement.value = editor.getHTML();
@@ -119,7 +119,17 @@ function initTiptapEditor(elementId, initialContent = '') {
         onUpdate: ({ editor }) => {
             // Update the hidden textarea
             if (!isSourceMode) {
-                textareaElement.value = editor.getHTML();
+                const html = editor.getHTML();
+                textareaElement.value = html;
+                
+                // Dispatch updatezone event for Alpine.js to update zones_json
+                const nameMatch = textareaElement.name.match(/zones\[([^\]]+)\]/);
+                if (nameMatch) {
+                    const zoneKey = nameMatch[1];
+                    window.dispatchEvent(new CustomEvent('updatezone', {
+                        detail: { key: zoneKey, value: html }
+                    }));
+                }
             }
         },
         onFocus: () => {
@@ -182,10 +192,39 @@ function initTiptapEditor(elementId, initialContent = '') {
     
     // Source View Toggle
     function toggleSourceView() {
-        isSourceMode = !isSourceMode;
         const sourceButton = toolbarElement.querySelector('[data-action="source"]');
         
         if (isSourceMode) {
+            // Switching from source to visual mode
+            // Warn user that HTML will be reformatted
+            if (sourceElement.value.trim().length > 0 && !confirm('Switching to visual mode will reformat your HTML. Any custom formatting, classes, or styles may be removed. Continue?')) {
+                return; // User cancelled
+            }
+            
+            isSourceMode = false;
+            
+            // Switch to visual mode
+            try {
+                editor.commands.setContent(sourceElement.value);
+                textareaElement.value = sourceElement.value;
+            } catch (error) {
+                console.warn('Invalid HTML in source view, reverting:', error);
+                sourceElement.value = editor.getHTML();
+            }
+            
+            editorElement.style.display = 'block';
+            sourceElement.style.display = 'none';
+            sourceElement.classList.add('hidden');
+            sourceButton?.classList.remove('is-active');
+            
+            // Re-enable other toolbar buttons
+            toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])').forEach(btn => {
+                btn.disabled = false;
+            });            
+        } else {
+            // Switching from visual to source mode
+            isSourceMode = true;
+            
             // Switch to source mode
             editorElement.style.display = 'none';
             sourceElement.style.display = 'block';
@@ -202,29 +241,6 @@ function initTiptapEditor(elementId, initialContent = '') {
             
             // Focus on source textarea
             sourceElement.focus();
-            
-        } else {
-            // Switch to visual mode
-            try {
-                editor.commands.setContent(sourceElement.value);
-                textareaElement.value = sourceElement.value;
-            } catch (error) {
-                console.warn('Invalid HTML in source view, reverting:', error);
-                sourceElement.value = editor.getHTML();
-            }
-            
-            editorElement.style.display = 'block';
-            sourceElement.style.display = 'none';
-            sourceElement.classList.add('hidden');
-            sourceButton?.classList.remove('is-active');
-            
-            // Re-enable toolbar buttons
-            toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])').forEach(btn => {
-                btn.disabled = false;
-            });
-            
-            editor.commands.focus();
-            updateToolbarState();
         }
     }
     
@@ -353,8 +369,70 @@ function initTiptapEditor(elementId, initialContent = '') {
     sourceElement.addEventListener('input', () => {
         if (isSourceMode) {
             textareaElement.value = sourceElement.value;
+            
+            // Dispatch updatezone event for Alpine.js to update zones_json
+            // Extract zone key from textarea name (e.g., "zones[content]" -> "content")
+            const nameMatch = textareaElement.name.match(/zones\[([^\]]+)\]/);
+            console.log('Source input changed:', {
+                name: textareaElement.name,
+                nameMatch: nameMatch,
+                value: sourceElement.value.substring(0, 50) + '...'
+            });
+            if (nameMatch) {
+                const zoneKey = nameMatch[1];
+                console.log('Dispatching updatezone event:', zoneKey);
+                window.dispatchEvent(new CustomEvent('updatezone', {
+                    detail: { key: zoneKey, value: sourceElement.value }
+                }));
+            }
         }
     });
+    
+    // Initialize view based on whether we have existing content
+    if (isSourceMode) {
+        // Start in source mode to prevent TipTap from parsing/corrupting existing HTML
+        editorElement.style.display = 'none';
+        sourceElement.style.display = 'block';
+        sourceElement.classList.remove('hidden');
+        sourceElement.value = initialContent;
+        textareaElement.value = initialContent;
+        
+        const sourceButton = toolbarElement.querySelector('[data-action="source"]');
+        sourceButton?.classList.add('is-active');
+        
+        // Disable visual editor buttons
+        toolbarElement.querySelectorAll('button[data-action]:not([data-action="source"])').forEach(btn => {
+            btn.classList.remove('is-active');
+            btn.disabled = true;
+        });
+        
+        // Dispatch initial zone update event
+        const nameMatch = textareaElement.name.match(/zones\[([^\]]+)\]/);
+        if (nameMatch) {
+            const zoneKey = nameMatch[1];
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('updatezone', {
+                    detail: { key: zoneKey, value: initialContent }
+                }));
+            }, 100);
+        }
+    } else {
+        // Start in visual mode for new content
+        editorElement.style.display = 'block';
+        sourceElement.style.display = 'none';
+        sourceElement.classList.add('hidden');
+        
+        // Dispatch initial zone update event for visual mode
+        const nameMatch = textareaElement.name.match(/zones\[([^\]]+)\]/);
+        if (nameMatch) {
+            const zoneKey = nameMatch[1];
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('updatezone', {
+                    detail: { key: zoneKey, value: editor.getHTML() }
+                }));
+            }, 100);
+        }
+    }
     
     // Initial toolbar state
     setTimeout(updateToolbarState, 100);
