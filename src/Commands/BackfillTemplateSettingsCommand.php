@@ -86,17 +86,17 @@ class BackfillTemplateSettingsCommand extends Command
 
     protected function createTemplateSettings(ContentItem $item): void
     {
-        $templateConfig = TemplateManager::get($item->template);
+        $template = TemplateManager::get($item->template);
         
-        if (!$templateConfig) {
-            throw new \Exception("Template '{$item->template}' not found in registry");
+        if (!$template) {
+            throw new \Exception("Template '{$item->template}' not found in database");
         }
 
         // Prepare zones data - migrate content to appropriate zone
-        $zonesData = $this->prepareZonesData($item, $templateConfig);
+        $zonesData = $this->prepareZonesData($item, $template);
 
         // Prepare default settings
-        $settings = $this->prepareDefaultSettings($templateConfig);
+        $settings = $this->prepareDefaultSettings($template);
 
         // Create the template settings record
         ContentTemplateSettings::create([
@@ -106,10 +106,10 @@ class BackfillTemplateSettingsCommand extends Command
         ]);
     }
 
-    protected function prepareZonesData(ContentItem $item, array $templateConfig): array
+    protected function prepareZonesData(ContentItem $item, $template): array
     {
         $zonesData = [];
-        $zones = $templateConfig['zones'] ?? [];
+        $zones = $template->zones ?? [];
 
         // If there's existing content in the content column and template has a 'content' or 'main' zone, migrate it
         if (!empty($item->content)) {
@@ -139,10 +139,10 @@ class BackfillTemplateSettingsCommand extends Command
         return $zonesData;
     }
 
-    protected function prepareDefaultSettings(array $templateConfig): array
+    protected function prepareDefaultSettings($template): array
     {
         $settings = [];
-        $settingsSchema = $templateConfig['settings_schema'] ?? [];
+        $settingsSchema = $template->settings_schema ?? [];
 
         foreach ($settingsSchema as $settingKey => $settingConfig) {
             $settings[$settingKey] = $settingConfig['default'] ?? match($settingConfig['type'] ?? 'text') {
@@ -165,17 +165,17 @@ class BackfillTemplateSettingsCommand extends Command
 
         foreach ($items as $item) {
             $this->line("ID: {$item->id} | Title: {$item->title} | Template: {$item->template}");
-            $templateConfig = TemplateManager::get($item->template);
+            $template = TemplateManager::get($item->template);
             
-            if ($templateConfig) {
-                $zones = array_keys($templateConfig['zones'] ?? []);
+            if ($template) {
+                $zones = array_keys($template->zones ?? []);
                 $this->line("  → Will create zones: " . implode(', ', $zones));
                 if (!empty($item->content)) {
                     $contentPreview = substr(strip_tags($item->content), 0, 60);
                     $this->line("  → Existing content will be migrated: \"{$contentPreview}...\"");
                 }
             } else {
-                $this->warn("  → WARNING: Template not found in registry!");
+                $this->warn("  → WARNING: Template not found in database!");
             }
             $this->newLine();
         }
