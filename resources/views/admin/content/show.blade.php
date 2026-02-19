@@ -37,6 +37,70 @@
                 <div class="prose max-w-none">
                     {!! $content->content ?? '<p class="text-gray-500 italic">No content yet.</p>' !!}
                 </div>
+
+                @if($content->templateSettings)
+                    <!-- Template Zones -->
+                    @php
+                        $zonesData = $content->templateSettings->zones_data;
+                        if (is_string($zonesData)) {
+                            $zonesData = json_decode($zonesData, true);
+                        }
+                    @endphp
+                    
+                    @if($zonesData && count($zonesData) > 0)
+                        <div class="mt-8 border-t pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Zones</h3>
+                            @foreach($zonesData as $zoneName => $zoneContent)
+                                <div class="mb-6 bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">{{ ucwords(str_replace('_', ' ', $zoneName)) }}</h4>
+                                    <div class="prose max-w-none">
+                                        @if(is_array($zoneContent))
+                                            <pre class="text-xs bg-white p-3 rounded border">{{ json_encode($zoneContent, JSON_PRETTY_PRINT) }}</pre>
+                                        @else
+                                            {!! $zoneContent ?: '<p class="text-gray-500 italic">Empty</p>' !!}
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Template Settings -->
+                    @php
+                        $settings = $content->templateSettings->settings;
+                        if (is_string($settings)) {
+                            $settings = json_decode($settings, true);
+                        }
+                    @endphp
+                    
+                    @if($settings && count($settings) > 0)
+                        <div class="mt-8 border-t pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Settings</h3>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <dl class="grid grid-cols-2 gap-4">
+                                    @foreach($settings as $settingName => $settingValue)
+                                        <div>
+                                            <dt class="text-sm font-medium text-gray-600">{{ ucwords(str_replace('_', ' ', $settingName)) }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">
+                                                @if(is_bool($settingValue))
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $settingValue ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                        {{ $settingValue ? 'Yes' : 'No' }}
+                                                    </span>
+                                                @elseif(is_array($settingValue))
+                                                    <pre class="text-xs bg-white p-2 rounded border mt-1">{{ json_encode($settingValue, JSON_PRETTY_PRINT) }}</pre>
+                                                @elseif(is_null($settingValue))
+                                                    <span class="text-gray-400 italic">Not set</span>
+                                                @else
+                                                    {{ $settingValue }}
+                                                @endif
+                                            </dd>
+                                        </div>
+                                    @endforeach
+                                </dl>
+                            </div>
+                        </div>
+                    @endif
+                @endif
             </div>
         </div>
 
