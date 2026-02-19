@@ -174,11 +174,6 @@ class ContentController extends Controller
         $featuredMedia = $content->mediaAssets->first(function($media) {
             return $media->pivot->type === 'featured';
         });
-        \Log::info('EDIT - Loading content:', [
-            'content_id' => $content->id,
-            'featured_media_id' => $featuredMedia?->id,
-            'template_settings' => $content->templateSettings?->settings,
-        ]);
         
         // Get items that are in menu for parent dropdown (excluding current item and its descendants)
         $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('show_in_menu', 1)
