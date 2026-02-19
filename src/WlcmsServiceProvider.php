@@ -127,6 +127,7 @@ class WlcmsServiceProvider extends ServiceProvider
                 Commands\CheckContentActivations::class,
                 Commands\PublishTemplatesCommand::class,
                 Commands\ValidateTemplateCommand::class,
+                Commands\BackfillTemplateSettingsCommand::class,
             ]);
         }
 
