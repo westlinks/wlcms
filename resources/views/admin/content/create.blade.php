@@ -440,6 +440,20 @@
                         </div>
 
                         <div>
+                            <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-2">Parent Menu Item</label>
+                            <select id="parent_id" name="parent_id"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">None (Top Level)</option>
+                                @foreach($potentialParents as $parent)
+                                    <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
+                                        {{ $parent->menu_title ?: $parent->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-gray-600 text-xs mt-1">Select a parent for nested menu structure</p>
+                        </div>
+
+                        <div>
                             <label for="menu_title" class="block text-sm font-medium text-gray-700 mb-2">Menu Title</label>
                             <input type="text" id="menu_title" name="menu_title" value="{{ old('menu_title') }}"
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

@@ -665,13 +665,13 @@ Comprehensive testing and documentation.
 - [x] ✅ Alpine.js form validation and submission handling
 
 ### Phase 9: Publishing & Extensibility
-- [x] ✅ Publish templates command works
-- [x] ✅ Templates publish to vendor directory
-- [x] ✅ Custom templates can be registered
-- [x] ✅ Template validation command works
-- [x] ✅ Documentation is clear and complete
-- [x] ✅ Template creation guide is helpful
-- [x] ✅ Testing utilities work
+- [ ] ✅ Publish templates command works
+- [ ] ✅ Templates publish to vendor directory
+- [ ] ✅ Custom templates can be registered
+- [ ] ✅ Template validation command works
+- [ ] ✅ Documentation is clear and complete
+- [ ] ✅ Template creation guide is helpful
+- [ ] ✅ Testing utilities work
 
 ### Phase 10: Testing & Documentation
 - [ ] ✅ All unit tests pass
@@ -781,47 +781,6 @@ Comprehensive testing and documentation.
 - Git push issue resolved: 3 commits were local-only, now pushed to GitHub
 - Commits: fd14b94 (form embedding + retention), 58a3026 (thank you pages), 7591b23 (template fix)
 - Key features: database persistence, admin CRUD, customizable thank you pages, cache config, email notifications
-
----
-
-**Phase 9 - February 17, 2026:**
-- Created PublishTemplatesCommand for template publishing to host applications
-- Command publishes to: `resources/views/vendor/wlcms/templates/`
-- Options: `--force` to overwrite, `--template=name` for selective publishing
-- Created ValidateTemplateCommand for custom template validation
-- Validation checks: registration, view existence, compilation, zones, settings schema
-- Added custom template registration via `config('wlcms.templates.custom')`
-- Templates auto-load from config in WlcmsServiceProvider::registerTemplates()
-- Respects `allow_custom` config flag (default: true)
-- Created comprehensive developer guide: CUSTOM_TEMPLATE_GUIDE.md
-- Guide includes: quick start, zone types reference, settings schema, examples, troubleshooting
-- Two complete working examples: testimonial and pricing templates
-- Best practices: dynamic layouts, null-safe checks, CSS scoping, accessibility
-- All 7 zone types documented with usage examples
-- All 7 settings schema types documented with examples
-- Commands registered in service provider and available in all host apps
-- No database changes required (uses existing templates table)
-- Backward compatible: existing templates unaffected
-- Host apps can now customize default templates or create new ones
-- Key deliverables: publish command, validate command, config registration, complete docs
-
-**Forms Navigation Improvements (Phase 8 follow-up):**
-- Added Forms to top navigation (Dashboard | Content | Media | Forms | Legacy)
-- Added Forms section to config/navigation.php for host app integration
-- Added Configure Forms button to Form Submissions page
-- Added View Submissions button to Form Configuration page
-- Fixed form views to use <x-admin-layout> component instead of non-existent layouts.admin
-- Improved header spacing on Form Submissions page with proper flex layout
-- Navigation flow: Forms (top nav) → Submissions (default) ↔ Configuration (button)
-- Single-level navigation with cross-links via buttons
-
-**Commit:** 007a060  
-**Files Changed:** 12 files, 1,287 insertions (+), 22 deletions (-)  
-**Key Commands:**
-  ```bash
-  php artisan wlcms:publish-templates [--force] [--template=name]
-  php artisan wlcms:validate-template {identifier} --path={view.path}
-  ```
 
 ---
 
