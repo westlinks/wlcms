@@ -536,14 +536,14 @@ class WlcmsServiceProvider extends ServiceProvider
                     'type' => 'text',
                     'label' => 'Your Name',
                     'required' => true,
-                    'placeholder' => 'John Smith',
+                    'placeholder' => 'Your Name',
                 ],
                 [
                     'name' => 'email',
                     'type' => 'email',
                     'label' => 'Email Address',
                     'required' => true,
-                    'placeholder' => 'john@example.com',
+                    'placeholder' => 'email@example.com',
                 ],
                 [
                     'name' => 'phone',
