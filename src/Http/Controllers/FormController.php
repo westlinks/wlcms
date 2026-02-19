@@ -183,7 +183,7 @@ class FormController extends Controller
         }
 
         $body .= "\n" . str_repeat('-', 50) . "\n";
-        $body .= "View in admin: " . url("/wlcms/admin/form-submissions/{$submission->id}") . "\n";
+        $body .= "View in admin: " . route('wlcms.admin.form-submissions.show', $submission->id) . "\n";
 
         return $body;
     }
