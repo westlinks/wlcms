@@ -111,16 +111,19 @@ class BackfillTemplateSettingsCommand extends Command
         $zonesData = [];
         $zones = $template->zones ?? [];
 
+        // Get the RAW content column (bypassing the accessor which returns zone content)
+        $rawContent = $item->getRawOriginal('content');
+
         // If there's existing content in the content column and template has a 'content' or 'main' zone, migrate it
-        if (!empty($item->content)) {
+        if (!empty($rawContent)) {
             if (isset($zones['content'])) {
-                $zonesData['content'] = $item->content;
+                $zonesData['content'] = $rawContent;
             } elseif (isset($zones['main'])) {
-                $zonesData['main'] = $item->content;
+                $zonesData['main'] = $rawContent;
             } elseif (count($zones) === 1) {
                 // If template has only one zone, put content there
                 $zoneName = array_key_first($zones);
-                $zonesData[$zoneName] = $item->content;
+                $zonesData[$zoneName] = $rawContent;
             }
         }
 
@@ -170,8 +173,9 @@ class BackfillTemplateSettingsCommand extends Command
             if ($template) {
                 $zones = array_keys($template->zones ?? []);
                 $this->line("  → Will create zones: " . implode(', ', $zones));
-                if (!empty($item->content)) {
-                    $contentPreview = substr(strip_tags($item->content), 0, 60);
+                $rawContent = $item->getRawOriginal('content');
+                if (!empty($rawContent)) {
+                    $contentPreview = substr(strip_tags($rawContent), 0, 60);
                     $this->line("  → Existing content will be migrated: \"{$contentPreview}...\"");
                 }
             } else {
