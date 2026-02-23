@@ -84,13 +84,13 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         </div>
         
         <!-- Editor -->
-        <div id="{{ $editorId }}-editor" class="min-h-[300px] p-4 bg-white prose prose-sm max-w-none focus:outline-none">
+        <div id="{{ $editorId }}-editor" class="min-h-[300px] max-h-[500px] overflow-y-auto p-4 bg-white prose prose-sm max-w-none focus:outline-none">
             {!! old($editorId, $editorValue) !!}
         </div>
         
         <!-- Source View Textarea (hidden by default) -->
         <textarea id="{{ $editorId }}-source" 
-                  class="hidden w-full min-h-[300px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
+                  class="hidden w-full min-h-[300px] max-h-[500px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
                   placeholder="HTML source code...">
         </textarea>
     </div>

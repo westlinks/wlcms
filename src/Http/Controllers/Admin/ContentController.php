@@ -98,6 +98,11 @@ class ContentController extends Controller
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+        
+        // Convert empty menu_title to null so it falls back to page title
+        if (isset($validated['menu_title']) && trim($validated['menu_title']) === '') {
+            $validated['menu_title'] = null;
+        }
 
         // Map template_identifier to template column
         if (isset($validated['template_identifier'])) {
@@ -227,6 +232,11 @@ class ContentController extends Controller
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+        
+        // Convert empty menu_title to null so it falls back to page title
+        if (isset($validated['menu_title']) && trim($validated['menu_title']) === '') {
+            $validated['menu_title'] = null;
+        }
 
         // Map template_identifier to template column
         if (isset($validated['template_identifier'])) {
