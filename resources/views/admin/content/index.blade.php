@@ -87,6 +87,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Slug</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Author</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Modified</th>
@@ -97,12 +98,7 @@
                     @foreach($content as $item)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4">
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $item->title }}</div>
-                                    @if($item->slug)
-                                        <div class="text-sm text-gray-500">{{ $item->slug }}</div>
-                                    @endif
-                                </div>
+                                <div class="text-sm font-medium text-gray-900">{{ $item->title }}</div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 <span class="px-2 py-1 text-xs rounded-full
@@ -111,6 +107,9 @@
                                     {{ $item->type === 'article' ? 'bg-purple-100 text-purple-800' : '' }}">
                                     {{ ucfirst($item->type) }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ $item->slug }}
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="px-2 py-1 text-xs rounded-full

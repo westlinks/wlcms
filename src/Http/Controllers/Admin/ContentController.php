@@ -29,6 +29,7 @@ class ContentController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('slug', 'like', '%' . $request->search . '%')
                   ->orWhere('content', 'like', '%' . $request->search . '%')
                   ->orWhere('excerpt', 'like', '%' . $request->search . '%');
             });
