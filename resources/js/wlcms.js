@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 
 // Custom HTML extensions to preserve divs and classes
-import { CustomDiv, CustomParagraph, CustomLink } from './components/custom-html.js'
+import { CustomDiv, CustomParagraph, CustomLink, CustomSVG, CustomSVGPath } from './components/custom-html.js'
 
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
@@ -93,6 +93,8 @@ function initTiptapEditor(elementId, initialContent = '') {
             CustomParagraph,
             CustomDiv,
             CustomLink,
+            CustomSVG,
+            CustomSVGPath,
         ],
         // Only pass content to TipTap if starting in visual mode (new content)
         content: isSourceMode ? '' : initialContent,
