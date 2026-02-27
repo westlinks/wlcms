@@ -150,6 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
             StarterKit,
             Link.configure({
                 openOnClick: false,
+                HTMLAttributes: {
+                    // Don't add any default attributes
+                },
+                autolink: false,
+                linkOnPaste: false,
             }),
         ],
         content: textarea.value,

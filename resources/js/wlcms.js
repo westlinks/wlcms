@@ -288,11 +288,16 @@ function initTiptapEditor(elementId, initialContent = '') {
         const hasSelection = from !== to;
         
         if (text && !hasSelection) {
-            // Insert new link with text
-            editor.chain().focus().insertContent(`<a href="${url}" target="${target}">${text}</a>`).run();
+            // Insert new link with text (only add target if it's _blank)
+            const targetAttr = target === '_blank' ? ` target="${target}"` : '';
+            editor.chain().focus().insertContent(`<a href="${url}"${targetAttr}>${text}</a>`).run();
         } else {
-            // Update existing selection or link
-            editor.chain().focus().extendMarkRange('link').setLink({ href: url, target: target }).run();
+            // Update existing selection or link (only add target if it's _blank)
+            const attrs = { href: url };
+            if (target === '_blank') {
+                attrs.target = target;
+            }
+            editor.chain().focus().extendMarkRange('link').setLink(attrs).run();
         }
         
         closeLinkModal();

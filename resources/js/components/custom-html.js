@@ -77,7 +77,9 @@ export const CustomLink = Node.create({
   },
   
   renderHTML({ HTMLAttributes }) {
-    return ['a', HTMLAttributes, 0]
+    // Filter out rel and target attributes to prevent unwanted additions
+    const { rel, target, ...cleanAttributes } = HTMLAttributes;
+    return ['a', cleanAttributes, 0]
   },
   
   addAttributes() {
@@ -87,9 +89,17 @@ export const CustomLink = Node.create({
       },
       target: {
         default: null,
+        renderHTML: () => {
+          // Don't render target attribute
+          return {}
+        },
       },
       rel: {
         default: null,
+        renderHTML: () => {
+          // Don't render rel attribute
+          return {}
+        },
       },
       class: {
         default: null,
