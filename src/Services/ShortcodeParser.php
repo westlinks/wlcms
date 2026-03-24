@@ -2,6 +2,8 @@
 
 namespace Westlinks\Wlcms\Services;
 
+use Westlinks\Wlcms\Models\ContentItem;
+
 class ShortcodeParser
 {
     /**
@@ -19,13 +21,22 @@ class ShortcodeParser
     protected FormRenderer $formRenderer;
 
     /**
+     * Template renderer instance.
+     *
+     * @var TemplateRenderer|null
+     */
+    protected ?TemplateRenderer $templateRenderer = null;
+
+    /**
      * Constructor.
      *
      * @param FormRenderer $formRenderer
+     * @param TemplateRenderer|null $templateRenderer
      */
-    public function __construct(FormRenderer $formRenderer)
+    public function __construct(FormRenderer $formRenderer, ?TemplateRenderer $templateRenderer = null)
     {
         $this->formRenderer = $formRenderer;
+        $this->templateRenderer = $templateRenderer;
 
         // Register default shortcode handlers
         $this->registerDefaultHandlers();
@@ -84,6 +95,8 @@ class ShortcodeParser
                 $content
             );
         });
+
+        // Content shortcode will be registered via setTemplateRenderer() to avoid circular dependency
     }
 
     /**
@@ -96,6 +109,75 @@ class ShortcodeParser
     public function register(string $name, callable $callback): void
     {
         $this->handlers[$name] = $callback;
+    }
+
+    /**
+     * Set the template renderer (used to resolve circular dependency).
+     *
+     * @param TemplateRenderer $templateRenderer
+     * @return void
+     */
+    public function setTemplateRenderer(TemplateRenderer $templateRenderer): void
+    {
+        $this->templateRenderer = $templateRenderer;
+        
+        // Re-register handlers that depend on TemplateRenderer
+        $this->registerContentShortcode();
+    }
+
+    /**
+     * Register the content shortcode handler.
+     *
+     * @return void
+     */
+    protected function registerContentShortcode(): void
+    {
+        // Content shortcode: [content slug="footer"] or [content id="123"]
+        $this->register('content', function ($attributes) {
+            if (!$this->templateRenderer) {
+                return '<!-- Content embedding requires TemplateRenderer -->';
+            }
+
+            $slug = $attributes['slug'] ?? null;
+            $id = $attributes['id'] ?? null;
+
+            if (!$slug && !$id) {
+                return '<!-- Content shortcode requires either slug or id attribute -->';
+            }
+
+            try {
+                // Load content item with relationships
+                $query = ContentItem::with([
+                    'templateConfig',
+                    'templateSettings',
+                    'mediaAssets',
+                    'parent'
+                ])->where('status', 'published');
+
+                if ($id) {
+                    $contentItem = $query->find($id);
+                } else {
+                    $contentItem = $query->where('slug', $slug)->first();
+                }
+
+                if (!$contentItem) {
+                    return '<!-- Content not found or not published -->';
+                }
+
+                // Render the content item with its template
+                $rendered = $this->templateRenderer->render($contentItem);
+                return $rendered->render();
+
+            } catch (\Exception $e) {
+                \Log::error('Content shortcode rendering failed', [
+                    'slug' => $slug,
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]);
+                
+                return '<!-- Content rendering failed: ' . e($e->getMessage()) . ' -->';
+            }
+        });
     }
 
     /**
