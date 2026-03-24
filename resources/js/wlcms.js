@@ -5,6 +5,10 @@
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
 
 // Custom HTML extensions to preserve divs and classes
 import { CustomDiv, CustomParagraph, CustomLink, CustomSVG, CustomSVGPath } from './components/custom-html.js'
@@ -95,6 +99,23 @@ function initTiptapEditor(elementId, initialContent = '') {
             CustomLink,
             CustomSVG,
             CustomSVGPath,
+            Table.configure({
+                resizable: true,
+                HTMLAttributes: {
+                    class: 'border-collapse border border-gray-300',
+                },
+            }),
+            TableRow,
+            TableHeader.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 bg-gray-100 font-semibold p-2',
+                },
+            }),
+            TableCell.configure({
+                HTMLAttributes: {
+                    class: 'border border-gray-300 p-2',
+                },
+            }),
         ],
         // Only pass content to TipTap if starting in visual mode (new content)
         content: isSourceMode ? '' : initialContent,
@@ -162,6 +183,7 @@ function initTiptapEditor(elementId, initialContent = '') {
         if (editor.isActive('blockquote')) toolbarElement.querySelector('[data-action="blockquote"]')?.classList.add('is-active');
         if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
         if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
+        if (editor.isActive('table')) toolbarElement.querySelector('[data-action="table"]')?.classList.add('is-active');
     }
     
     // Simple HTML formatter for better readability in source view
@@ -349,6 +371,17 @@ function initTiptapEditor(elementId, initialContent = '') {
         'blockquote': () => editor.chain().focus().toggleBlockquote().run(),
         'code-block': () => editor.chain().focus().toggleCodeBlock().run(),
         'link': openLinkModal,
+        'table': () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+        'add-col-before': () => editor.chain().focus().addColumnBefore().run(),
+        'add-col-after': () => editor.chain().focus().addColumnAfter().run(),
+        'delete-col': () => editor.chain().focus().deleteColumn().run(),
+        'add-row-before': () => editor.chain().focus().addRowBefore().run(),
+        'add-row-after': () => editor.chain().focus().addRowAfter().run(),
+        'delete-row': () => editor.chain().focus().deleteRow().run(),
+        'delete-table': () => editor.chain().focus().deleteTable().run(),
+        'merge-cells': () => editor.chain().focus().mergeCells().run(),
+        'split-cell': () => editor.chain().focus().splitCell().run(),
+        'toggle-header-row': () => editor.chain().focus().toggleHeaderRow().run(),
         'undo': () => editor.chain().focus().undo().run(),
         'redo': () => editor.chain().focus().redo().run(),
         'source': toggleSourceView

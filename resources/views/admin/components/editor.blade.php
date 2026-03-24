@@ -60,6 +60,26 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
             
             <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
+            <!-- Tables -->
+            <button type="button" data-action="table" title="Insert Table"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">⊞</button>
+            <button type="button" data-action="add-col-before" title="Add Column Before"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">+│</button>
+            <button type="button" data-action="add-col-after" title="Add Column After"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">│+</button>
+            <button type="button" data-action="delete-col" title="Delete Column"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">-│</button>
+            <button type="button" data-action="add-row-before" title="Add Row Before"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">+─</button>
+            <button type="button" data-action="add-row-after" title="Add Row After"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">─+</button>
+            <button type="button" data-action="delete-row" title="Delete Row"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">-─</button>
+            <button type="button" data-action="delete-table" title="Delete Table"
+                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">⊠</button>
+            
+            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+            
             <!-- Blocks -->
             <button type="button" data-action="blockquote" title="Blockquote"
                     style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">"</button>
