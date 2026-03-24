@@ -28,18 +28,43 @@ class ShortcodeParser
     protected ?TemplateRenderer $templateRenderer = null;
 
     /**
+     * Whether template renderer has been resolved.
+     *
+     * @var bool
+     */
+    protected bool $templateRendererResolved = false;
+
+    /**
      * Constructor.
      *
      * @param FormRenderer $formRenderer
-     * @param TemplateRenderer|null $templateRenderer
      */
-    public function __construct(FormRenderer $formRenderer, ?TemplateRenderer $templateRenderer = null)
+    public function __construct(FormRenderer $formRenderer)
     {
         $this->formRenderer = $formRenderer;
-        $this->templateRenderer = $templateRenderer;
 
         // Register default shortcode handlers
         $this->registerDefaultHandlers();
+    }
+
+    /**
+     * Get the template renderer (lazy loading to avoid circular dependency).
+     *
+     * @return TemplateRenderer|null
+     */
+    protected function getTemplateRenderer(): ?TemplateRenderer
+    {
+        if (!$this->templateRendererResolved) {
+            $this->templateRendererResolved = true;
+            try {
+                $this->templateRenderer = app(\Westlinks\Wlcms\Services\TemplateRenderer::class);
+            } catch (\Exception $e) {
+                // If we can't resolve it (circular dependency during boot), that's okay
+                $this->templateRenderer = null;
+            }
+        }
+        
+        return $this->templateRenderer;
     }
 
     /**
@@ -96,7 +121,8 @@ class ShortcodeParser
             );
         });
 
-        // Content shortcode will be registered via setTemplateRenderer() to avoid circular dependency
+        // Register content shortcode (uses lazy loading for TemplateRenderer)
+        $this->registerContentShortcode();
     }
 
     /**
@@ -112,20 +138,6 @@ class ShortcodeParser
     }
 
     /**
-     * Set the template renderer (used to resolve circular dependency).
-     *
-     * @param TemplateRenderer $templateRenderer
-     * @return void
-     */
-    public function setTemplateRenderer(TemplateRenderer $templateRenderer): void
-    {
-        $this->templateRenderer = $templateRenderer;
-        
-        // Re-register handlers that depend on TemplateRenderer
-        $this->registerContentShortcode();
-    }
-
-    /**
      * Register the content shortcode handler.
      *
      * @return void
@@ -134,7 +146,9 @@ class ShortcodeParser
     {
         // Content shortcode: [content slug="footer"] or [content id="123"]
         $this->register('content', function ($attributes) {
-            if (!$this->templateRenderer) {
+            $templateRenderer = $this->getTemplateRenderer();
+            
+            if (!$templateRenderer) {
                 return '<!-- Content embedding requires TemplateRenderer -->';
             }
 
@@ -165,7 +179,7 @@ class ShortcodeParser
                 }
 
                 // Render the content item with its template
-                $rendered = $this->templateRenderer->render($contentItem);
+                $rendered = $templateRenderer->render($contentItem);
                 return $rendered->render();
 
             } catch (\Exception $e) {

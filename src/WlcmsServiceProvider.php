@@ -146,13 +146,6 @@ class WlcmsServiceProvider extends ServiceProvider
                     \Illuminate\Support\Facades\Log::error('WLCMS: Content activation check failed');
                 });
         });
-
-        // Set TemplateRenderer on ShortcodeParser to enable content embedding (resolves circular dependency)
-        $this->app->booted(function () {
-            $shortcodeParser = $this->app->make(\Westlinks\Wlcms\Services\ShortcodeParser::class);
-            $templateRenderer = $this->app->make(\Westlinks\Wlcms\Services\TemplateRenderer::class);
-            $shortcodeParser->setTemplateRenderer($templateRenderer);
-        });
     }
 
     /**
