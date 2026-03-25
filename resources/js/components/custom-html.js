@@ -8,30 +8,43 @@ export const CustomDiv = Node.create({
   
   group: 'block',
   
-  content: 'block*',
+  content: 'block+',
   
   parseHTML() {
     return [
       {
         tag: 'div',
-        // Strip all attributes we don't want
-        getAttrs: () => ({}),
       },
     ]
   },
   
-  renderHTML() {
-    // Render as plain <div> with NO attributes
-    return ['div', 0]
+  renderHTML({ HTMLAttributes }) {
+    return ['div', HTMLAttributes, 0]
   },
   
   addAttributes() {
-    // Return empty object - we don't want ANY attributes preserved
-    return {}
+    return {
+      class: {
+        default: null,
+        parseHTML: element => element.getAttribute('class'),
+        renderHTML: attributes => {
+          if (!attributes.class) return {}
+          return { class: attributes.class }
+        },
+      },
+      id: {
+        default: null,
+        parseHTML: element => element.getAttribute('id'),
+      },
+      style: {
+        default: null,
+        parseHTML: element => element.getAttribute('style'),
+      },
+    }
   },
 })
 
-// Custom paragraph extension - STRIPS all unwanted attributes
+// Custom paragraph extension - Preserves classes and attributes
 export const CustomParagraph = Node.create({
   name: 'paragraph',
   
@@ -44,19 +57,32 @@ export const CustomParagraph = Node.create({
   parseHTML() {
     return [{ 
       tag: 'p',
-      // Strip all attributes we don't want
-      getAttrs: () => ({}),
     }]
   },
   
-  renderHTML() {
-    // Render as plain <p> with NO attributes
-    return ['p', 0]
+  renderHTML({ HTMLAttributes }) {
+    return ['p', HTMLAttributes, 0]
   },
   
   addAttributes() {
-    // Return empty object - we don't want ANY attributes preserved
-    return {}
+    return {
+      class: {
+        default: null,
+        parseHTML: element => element.getAttribute('class'),
+        renderHTML: attributes => {
+          if (!attributes.class) return {}
+          return { class: attributes.class }
+        },
+      },
+      id: {
+        default: null,
+        parseHTML: element => element.getAttribute('id'),
+      },
+      style: {
+        default: null,
+        parseHTML: element => element.getAttribute('style'),
+      },
+    }
   },
 })
 

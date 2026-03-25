@@ -372,6 +372,16 @@
                         </div>
 
                         <div>
+                            <label for="editor_type" class="block text-sm font-medium text-gray-700 mb-2">Editor Type</label>
+                            <select id="editor_type" name="editor_type"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="wysiwyg" {{ old('editor_type', 'wysiwyg') === 'wysiwyg' ? 'selected' : '' }}>Visual Editor (WYSIWYG)</option>
+                                <option value="code" {{ old('editor_type') === 'code' ? 'selected' : '' }}>Code Editor (HTML)</option>
+                            </select>
+                            <p class="text-gray-600 text-xs mt-1">Choose how you want to edit content</p>
+                        </div>
+
+                        <div>
                             <label for="published_at" class="block text-sm font-medium text-gray-700 mb-2">Publish Date</label>
                             <input type="datetime-local" id="published_at" name="published_at" value="{{ old('published_at') }}"
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">

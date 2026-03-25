@@ -29,7 +29,8 @@
                             'name' => 'content',
                             'value' => old('content', $content->content),
                             'label' => 'Content',
-                            'required' => false
+                            'required' => false,
+                            'editorType' => old('editor_type', $content->editor_type ?? 'wysiwyg')
                         ])
                     </div>
 
@@ -108,7 +109,8 @@
                                                         'name' => "zones[{$zoneKey}]",
                                                         'value' => $zoneValue,
                                                         'label' => false, // Already have label above
-                                                        'required' => $isRequired
+                                                        'required' => $isRequired,
+                                                        'editorType' => old('editor_type', $content->editor_type ?? 'wysiwyg')
                                                     ])
                                                     @break
 
@@ -267,6 +269,20 @@
                                     <option value="event" {{ old('type', $content->type) === 'event' ? 'selected' : '' }}>Event</option>
                                 </select>
                                 @error('type')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Editor Type -->
+                            <div>
+                                <label for="editor_type" class="block text-sm font-medium text-gray-700">Editor Type</label>
+                                <select name="editor_type" id="editor_type" 
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="wysiwyg" {{ old('editor_type', $content->editor_type ?? 'wysiwyg') === 'wysiwyg' ? 'selected' : '' }}>Visual Editor (WYSIWYG)</option>
+                                    <option value="code" {{ old('editor_type', $content->editor_type ?? 'wysiwyg') === 'code' ? 'selected' : '' }}>Code Editor (HTML)</option>
+                                </select>
+                                <p class="mt-1 text-xs text-gray-600">Choose how you want to edit content</p>
+                                @error('editor_type')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>

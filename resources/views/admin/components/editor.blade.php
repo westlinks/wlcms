@@ -9,6 +9,7 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
     $editorValue = $value ?? '';
     $editorLabel = $label ?? 'Content';
     $editorRequired = $required ?? false;
+    $editorType = $editorType ?? 'wysiwyg'; // 'wysiwyg' or 'code'
 @endphp
 
 <div class="tiptap-editor-wrapper">
@@ -19,6 +20,14 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
         @endif
     </label>
     
+    @if($editorType === 'code')
+        {{-- CodeMirror Editor --}}
+        <div id="{{ $editorId }}-codemirror" 
+             class="border border-gray-300 rounded" 
+             style="min-height: 400px; font-family: 'Courier New', Courier, monospace;">
+        </div>
+    @else
+        {{-- TipTap WYSIWYG Editor --}}
     <div class="editor-container" style="border: 1px solid #d1d5db; border-radius: 0.375rem; overflow: hidden; background: white;">
         <!-- Toolbar -->
         <div id="{{ $editorId }}-toolbar" class="editor-toolbar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
@@ -60,23 +69,56 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
             
             <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
-            <!-- Tables -->
-            <button type="button" data-action="table" title="Insert Table"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">⊞</button>
-            <button type="button" data-action="add-col-before" title="Add Column Before"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">+│</button>
-            <button type="button" data-action="add-col-after" title="Add Column After"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">│+</button>
-            <button type="button" data-action="delete-col" title="Delete Column"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">-│</button>
-            <button type="button" data-action="add-row-before" title="Add Row Before"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">+─</button>
-            <button type="button" data-action="add-row-after" title="Add Row After"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">─+</button>
-            <button type="button" data-action="delete-row" title="Delete Row"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">-─</button>
-            <button type="button" data-action="delete-table" title="Delete Table"
-                    style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">⊠</button>
+            <!-- Table Dropdown -->
+            <div style="position: relative; display: inline-block;">
+                <button type="button" id="{{ $editorId }}-table-dropdown-btn" title="Table Options"
+                        style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">
+                    ⊞ ▾
+                </button>
+                <div id="{{ $editorId }}-table-dropdown-menu" 
+                     style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); min-width: 180px; margin-top: 4px;">
+                    <button type="button" data-action="table" title="Insert Table"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        ⊞ Insert Table
+                    </button>
+                    <button type="button" data-action="add-col-before" title="Add Column Before"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        +│ Add Column Before
+                    </button>
+                    <button type="button" data-action="add-col-after" title="Add Column After"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        │+ Add Column After
+                    </button>
+                    <button type="button" data-action="delete-col" title="Delete Column"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        -│ Delete Column
+                    </button>
+                    <button type="button" data-action="add-row-before" title="Add Row Before"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        +─ Add Row Before
+                    </button>
+                    <button type="button" data-action="add-row-after" title="Add Row After"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        ─+ Add Row After
+                    </button>
+                    <button type="button" data-action="delete-row" title="Delete Row"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        -─ Delete Row
+                    </button>
+                    <button type="button" data-action="delete-table" title="Delete Table"
+                            style="display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: white; border: none; font-size: 0.875rem; color: #374151; cursor: pointer;"
+                            onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        ⊠ Delete Table
+                    </button>
+                </div>
+            </div>
             
             <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
             
@@ -114,6 +156,7 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
                   placeholder="HTML source code...">
         </textarea>
     </div>
+    @endif
     
     <!-- Hidden textarea for form submission -->
     <textarea name="{{ $name }}" 
@@ -122,6 +165,7 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
               @if($editorRequired) required @endif>{!! old($name, $editorValue) !!}
     </textarea>
     
+    @if($editorType === 'wysiwyg')
     <!-- Link Modal -->
     <div id="{{ $editorId }}-link-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -166,6 +210,7 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
             </div>
         </div>
     </div>
+    @endif
     
     @error($editorId)
         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -179,30 +224,48 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const editorElement = document.getElementById('{{ $editorId }}-editor');
+    const editorType = '{{ $editorType }}';
     const hiddenTextarea = document.getElementById('{{ $editorId }}');
-    const toolbar = document.getElementById('{{ $editorId }}-toolbar');
     
     console.log('Editor initialization for {{ $editorId }}');
-    console.log('TipTap available:', typeof window.initTiptapEditor === 'function');
+    console.log('Editor type:', editorType);
     
-    if (typeof window.initTiptapEditor === 'function') {
-        // TipTap available - use rich editor
-        try {
-            console.log('Initializing TipTap editor...');
-            initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
-        } catch (error) {
-            console.log('TipTap initialization failed, using fallback:', error);
-            setupFallbackEditor();
+    if (editorType === 'code') {
+        // Initialize CodeMirror editor
+        if (typeof window.initCodeMirrorEditor === 'function') {
+            try {
+                console.log('Initializing CodeMirror editor...');
+                initCodeMirrorEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
+            } catch (error) {
+                console.error('CodeMirror initialization failed:', error);
+            }
+        } else {
+            console.error('CodeMirror not available');
         }
     } else {
-        // TipTap not available - use fallback contenteditable with basic formatting
-        console.log('Using fallback editor');
-        setupFallbackEditor();
-    }
-    
-    function setupFallbackEditor() {
-        console.log('Setting up fallback editor');
+        // Initialize TipTap WYSIWYG editor
+        const editorElement = document.getElementById('{{ $editorId }}-editor');
+        const toolbar = document.getElementById('{{ $editorId }}-toolbar');
+        
+        console.log('TipTap available:', typeof window.initTiptapEditor === 'function');
+        
+        if (typeof window.initTiptapEditor === 'function') {
+            // TipTap available - use rich editor
+            try {
+                console.log('Initializing TipTap editor...');
+                initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
+            } catch (error) {
+                console.log('TipTap initialization failed, using fallback:', error);
+                setupFallbackEditor();
+            }
+        } else {
+            // TipTap not available - use fallback contenteditable with basic formatting
+            console.log('Using fallback editor');
+            setupFallbackEditor();
+        }
+        
+        function setupFallbackEditor() {
+            console.log('Setting up fallback editor');
         
         if (!editorElement || !toolbar || !hiddenTextarea) {
             console.error('Missing editor elements');

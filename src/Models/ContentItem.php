@@ -26,6 +26,7 @@ class ContentItem extends Model
         'excerpt',
         'type',
         'template',
+        'editor_type',
         'status',
         'meta',
         'parent_id',

@@ -45,6 +45,8 @@
                         if (is_string($zonesData)) {
                             $zonesData = json_decode($zonesData, true);
                         }
+                        // Get ZoneProcessor to parse shortcodes
+                        $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
                     @endphp
                     
                     @if($zonesData && count($zonesData) > 0)
@@ -57,7 +59,12 @@
                                         @if(is_array($zoneContent))
                                             <pre class="text-xs bg-white p-3 rounded border">{{ json_encode($zoneContent, JSON_PRETTY_PRINT) }}</pre>
                                         @else
-                                            {!! $zoneContent ?: '<p class="text-gray-500 italic">Empty</p>' !!}
+                                            @php
+                                                // Process shortcodes in zone content
+                                                $processedContent = $zoneProcessor->process('rich_text', $zoneContent);
+                                                $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                                            @endphp
+                                            {!! $renderedContent ?: '<p class="text-gray-500 italic">Empty</p>' !!}
                                         @endif
                                     </div>
                                 </div>

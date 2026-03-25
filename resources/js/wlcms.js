@@ -5,13 +5,16 @@
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
-import Table from '@tiptap/extension-table'
-import TableRow from '@tiptap/extension-table-row'
-import TableCell from '@tiptap/extension-table-cell'
-import TableHeader from '@tiptap/extension-table-header'
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableCell } from '@tiptap/extension-table-cell'
+import { TableHeader } from '@tiptap/extension-table-header'
 
 // Custom HTML extensions to preserve divs and classes
 import { CustomDiv, CustomParagraph, CustomLink, CustomSVG, CustomSVGPath } from './components/custom-html.js'
+
+// CodeMirror Editor imports
+import { initializeCodeMirror } from './components/codemirror-editor.js'
 
 // WLCMS Component imports
 import { MediaModal } from './components/media-modal.js'
@@ -477,6 +480,31 @@ function initTiptapEditor(elementId, initialContent = '') {
     // Initial toolbar state
     setTimeout(updateToolbarState, 100);
     
+    // Table dropdown toggle
+    const tableDropdownBtn = document.getElementById(`${elementId}-table-dropdown-btn`);
+    const tableDropdownMenu = document.getElementById(`${elementId}-table-dropdown-menu`);
+    
+    if (tableDropdownBtn && tableDropdownMenu) {
+        // Toggle dropdown
+        tableDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tableDropdownMenu.style.display = tableDropdownMenu.style.display === 'none' ? 'block' : 'none';
+        });
+        
+        // Close dropdown when clicking outside        document.addEventListener('click', (e) => {
+            if (!tableDropdownBtn.contains(e.target) && !tableDropdownMenu.contains(e.target)) {
+                tableDropdownMenu.style.display = 'none';
+            }
+        });
+        
+        // Close dropdown when clicking a menu item
+        tableDropdownMenu.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                tableDropdownMenu.style.display = 'none';
+            });
+        });
+    }
+    
     // Ensure content is synced before form submission
     const form = textareaElement.closest('form');
     if (form) {
@@ -493,6 +521,62 @@ function initTiptapEditor(elementId, initialContent = '') {
     
     console.log('Tiptap editor initialized successfully');
     return editor;
+}
+
+/**
+ * Initialize CodeMirror Editor
+ */
+function initCodeMirrorEditor(elementId, initialContent = '') {
+    console.log('Initializing CodeMirror editor for:', elementId);
+    console.log('Initial content length:', initialContent ? initialContent.length : 0);
+    
+    const containerElement = document.querySelector(`#${elementId}-codemirror`);
+    const textareaElement = document.querySelector(`#${elementId}`);
+    
+    console.log('Element check:', {
+        containerElement: !!containerElement,
+        textareaElement: !!textareaElement,
+        textareaName: textareaElement?.name
+    });
+    
+    if (!containerElement) {
+        console.error('CodeMirror container element not found:', `#${elementId}-codemirror`);
+        return;
+    }
+    
+    if (!textareaElement) {
+        console.error('Textarea element not found:', `#${elementId}`);
+        return;
+    }
+    
+    // Initialize CodeMirror with update callback to sync with hidden textarea
+    const codeMirrorInstance = initializeCodeMirror(
+        containerElement,
+        initialContent,
+        (newContent) => {
+            textareaElement.value = newContent;
+            
+            // Dispatch updatezone event for Alpine.js to update zones_json
+            const nameMatch = textareaElement.name.match(/zones\[([^\]]+)\]/);
+            if (nameMatch) {
+                const zoneKey = nameMatch[1];
+                window.dispatchEvent(new CustomEvent('updatezone', {
+                    detail: { key: zoneKey, value: newContent }
+                }));
+            }
+        }
+    );
+    
+    // Ensure content is synced before form submission
+    const form = textareaElement.closest('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            textareaElement.value = codeMirrorInstance.getValue();
+        });
+    }
+    
+    console.log('CodeMirror editor initialized successfully');
+    return codeMirrorInstance;
 }
 
 /**
@@ -645,6 +729,7 @@ function initWlcms(config = {}) {
 
 // Global function exports for template usage
 window.initTiptapEditor = initTiptapEditor;
+window.initCodeMirrorEditor = initCodeMirrorEditor;
 window.initMediaModal = initMediaModal;
 window.initFileUpload = initFileUpload;
 window.initFieldOverrideManager = initFieldOverrideManager;
