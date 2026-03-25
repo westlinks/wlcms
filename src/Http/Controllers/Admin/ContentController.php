@@ -73,6 +73,7 @@ class ContentController extends Controller
             'excerpt' => 'nullable|string',
             'type' => 'required|string|in:page,post,article,news,event',
             'status' => 'required|string|in:draft,published,scheduled,archived',
+            'editor_type' => 'nullable|string|in:wysiwyg,code',
             'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
             'meta' => 'nullable|array',
             'show_in_menu' => 'boolean',
@@ -98,6 +99,7 @@ class ContentController extends Controller
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+        $validated['editor_type'] = $validated['editor_type'] ?? 'wysiwyg';
         
         // Convert empty menu_title to null so it falls back to page title
         if (isset($validated['menu_title']) && trim($validated['menu_title']) === '') {
@@ -209,6 +211,7 @@ class ContentController extends Controller
             'type' => 'required|string|in:page,post,article,news,event',
             'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
             'status' => 'required|string|in:draft,published,scheduled,archived',
+            'editor_type' => 'nullable|string|in:wysiwyg,code',
             'meta' => 'nullable|array',
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
@@ -232,6 +235,7 @@ class ContentController extends Controller
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
+        $validated['editor_type'] = $validated['editor_type'] ?? 'wysiwyg';
         
         // Convert empty menu_title to null so it falls back to page title
         if (isset($validated['menu_title']) && trim($validated['menu_title']) === '') {
