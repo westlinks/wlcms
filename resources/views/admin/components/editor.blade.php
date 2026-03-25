@@ -407,5 +407,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hiddenTextarea.value = editorElement.innerHTML;
         }
     }
+    }  // Close the else block for editorType === 'wysiwyg'
 });
 </script>
