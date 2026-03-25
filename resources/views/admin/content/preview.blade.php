@@ -71,9 +71,56 @@
         <!-- Content Body -->
         <div class="p-8">
             <div class="max-w-5xl mx-auto">
+                @php
+                    // Get ZoneProcessor to parse shortcodes
+                    $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                @endphp
+                
                 <div class="prose prose-lg max-w-none">
                     @if($content->content)
-                        {!! $content->content !!}
+                        @php
+                            // Process shortcodes in content
+                            $processedContent = $zoneProcessor->process('rich_text', $content->content);
+                            $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                        @endphp
+                        {!! $renderedContent !!}
+                    @elseif($content->templateSettings && $content->templateSettings->zones_data)
+                        @php
+                            $zonesData = $content->templateSettings->zones_data;
+                            if (is_string($zonesData)) {
+                                $zonesData = json_decode($zonesData, true);
+                            }
+                        @endphp
+                        
+                        @if($zonesData && count($zonesData) > 0)
+                            <div class="space-y-8">
+                                @foreach($zonesData as $zoneName => $zoneContent)
+                                    <div class="mb-6">
+                                        <h3 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b">
+                                            {{ ucwords(str_replace('_', ' ', $zoneName)) }}
+                                        </h3>
+                                        <div>
+                                            @if(is_array($zoneContent))
+                                                <pre class="text-xs bg-gray-100 p-3 rounded border overflow-x-auto">{{ json_encode($zoneContent, JSON_PRETTY_PRINT) }}</pre>
+                                            @else
+                                                @php
+                                                    // Process shortcodes in zone content
+                                                    $processedZone = $zoneProcessor->process('rich_text', $zoneContent);
+                                                    $renderedZone = $zoneProcessor->render('rich_text', $processedZone);
+                                                @endphp
+                                                {!! $renderedZone ?: '<p class="text-gray-500 italic">Empty zone</p>' !!}
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <span class="text-6xl">📄</span>
+                                <p class="text-gray-500 mt-4 text-lg">No content yet.</p>
+                                <p class="text-gray-400">Add some content in the editor to see it here.</p>
+                            </div>
+                        @endif
                     @else
                         <div class="text-center py-12">
                             <span class="text-6xl">📄</span>

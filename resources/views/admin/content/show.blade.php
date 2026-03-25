@@ -34,8 +34,22 @@
                     </div>
                 @endif
 
+                @php
+                    // Get ZoneProcessor to parse shortcodes
+                    $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                @endphp
+
                 <div class="prose max-w-none">
-                    {!! $content->content ?? '<p class="text-gray-500 italic">No content yet.</p>' !!}
+                    @if($content->content)
+                        @php
+                            // Process shortcodes in content
+                            $processedContent = $zoneProcessor->process('rich_text', $content->content);
+                            $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                        @endphp
+                        {!! $renderedContent !!}
+                    @else
+                        <p class="text-gray-500 italic">No content yet.</p>
+                    @endif
                 </div>
 
                 @if($content->templateSettings)
