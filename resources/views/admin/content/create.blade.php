@@ -62,7 +62,8 @@
                         'name' => 'content',
                         'value' => old('content'),
                         'label' => 'Content',
-                        'required' => false
+                        'required' => false,
+                        'editorType' => request('editor_type', old('editor_type', 'wysiwyg'))
                     ])
                     
                     @error('content')
@@ -374,11 +375,12 @@
                         <div>
                             <label for="editor_type" class="block text-sm font-medium text-gray-700 mb-2">Editor Type</label>
                             <select id="editor_type" name="editor_type"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="wysiwyg" {{ old('editor_type', 'wysiwyg') === 'wysiwyg' ? 'selected' : '' }}>Visual Editor (WYSIWYG)</option>
-                                <option value="code" {{ old('editor_type') === 'code' ? 'selected' : '' }}>Code Editor (HTML)</option>
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    onchange="window.location.href = window.location.pathname + '?editor_type=' + this.value">
+                                <option value="wysiwyg" {{ request('editor_type', old('editor_type', 'wysiwyg')) === 'wysiwyg' ? 'selected' : '' }}>Visual Editor (WYSIWYG)</option>
+                                <option value="code" {{ request('editor_type', old('editor_type')) === 'code' ? 'selected' : '' }}>Code Editor (HTML)</option>
                             </select>
-                            <p class="text-gray-600 text-xs mt-1">Choose how you want to edit content</p>
+                            <p class="text-gray-600 text-xs mt-1">Page will reload to switch editor</p>
                         </div>
 
                         <div>
