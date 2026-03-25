@@ -491,7 +491,8 @@ function initTiptapEditor(elementId, initialContent = '') {
             tableDropdownMenu.style.display = tableDropdownMenu.style.display === 'none' ? 'block' : 'none';
         });
         
-        // Close dropdown when clicking outside        document.addEventListener('click', (e) => {
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
             if (!tableDropdownBtn.contains(e.target) && !tableDropdownMenu.contains(e.target)) {
                 tableDropdownMenu.style.display = 'none';
             }
