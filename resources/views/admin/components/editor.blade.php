@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // TipTap available - use rich editor
             try {
                 console.log('Initializing TipTap editor...');
-                initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!});
+                initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!}, '{{ $editorType }}');
             } catch (error) {
                 console.log('TipTap initialization failed, using fallback:', error);
                 setupFallbackEditor();

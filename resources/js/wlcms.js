@@ -27,9 +27,10 @@ let fileUploadInstance = null;
 let mediaPickerInstance = null;
 
 // Initialize Tiptap Editor
-function initTiptapEditor(elementId, initialContent = '') {
+function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg') {
     console.log('Initializing Tiptap editor for:', elementId);
     console.log('Initial content length:', initialContent ? initialContent.length : 0);
+    console.log('Editor type preference:', editorType);
     
     const editorElement = document.querySelector(`#${elementId}-editor`);
     const textareaElement = document.querySelector(`#${elementId}`);
@@ -64,9 +65,8 @@ function initTiptapEditor(elementId, initialContent = '') {
         return;
     }
     
-    // Source view toggle state
-    // Start in source mode if there's existing content to prevent TipTap from corrupting it
-    let isSourceMode = initialContent && initialContent.trim().length > 0;
+    // Source view toggle state - respect the saved editor_type preference
+    let isSourceMode = editorType === 'code';
     
     // Clear the element before TipTap takes over (prevents duplicate content)
     editorElement.innerHTML = '';
