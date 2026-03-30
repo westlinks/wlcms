@@ -103,9 +103,20 @@ export const CustomLink = Node.create({
   },
   
   renderHTML({ HTMLAttributes }) {
-    // Filter out rel and target attributes to prevent unwanted additions
-    const { rel, target, ...cleanAttributes } = HTMLAttributes;
-    return ['a', cleanAttributes, 0]
+    // Only render target and rel if explicitly set
+    const attrs = { ...HTMLAttributes };
+    
+    // Clean up: only add rel if target is _blank
+    if (attrs.target === '_blank' && !attrs.rel) {
+      attrs.rel = 'noopener noreferrer';
+    }
+    
+    // Remove target if it's _self (default browser behavior)
+    if (attrs.target === '_self') {
+      delete attrs.target;
+    }
+    
+    return ['a', attrs, 0]
   },
   
   addAttributes() {

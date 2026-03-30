@@ -288,7 +288,7 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         
         linkUrlInput.value = previousUrl || '';
         linkTextInput.value = selectedText || '';
-        linkTargetSelect.value = previousTarget || '_blank';
+        linkTargetSelect.value = previousTarget || '_self';
         linkRemoveBtn.style.display = previousUrl ? 'block' : 'none';
         
         linkModal.classList.remove('hidden');
@@ -313,13 +313,14 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         const hasSelection = from !== to;
         
         if (text && !hasSelection) {
-            // Insert new link with text (only add target if it's _blank)
-            const targetAttr = target === '_blank' ? ` target="${target}"` : '';
-            editor.chain().focus().insertContent(`<a href="${url}"${targetAttr}>${text}</a>`).run();
+            // Insert new link with text
+            const targetAttr = target !== '_self' ? ` target="${target}"` : '';
+            const relAttr = target === '_blank' ? ' rel="noopener noreferrer"' : '';
+            editor.chain().focus().insertContent(`<a href="${url}"${targetAttr}${relAttr}>${text}</a>`).run();
         } else {
-            // Update existing selection or link (only add target if it's _blank)
+            // Update existing selection or link
             const attrs = { href: url };
-            if (target === '_blank') {
+            if (target !== '_self') {
                 attrs.target = target;
             }
             editor.chain().focus().extendMarkRange('link').setLink(attrs).run();
