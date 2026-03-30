@@ -122,7 +122,8 @@
                                             <span x-text="zoneConfig.label || zoneKey"></span>
                                             <span x-show="zoneConfig.required" class="text-red-500"> *</span>
                                         </span>
-                                        <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded" x-text="zoneConfig.type"></span>
+                                        <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded" 
+                                              x-text="zoneConfig.type === 'rich_text' ? ('{{ request('editor_type', old('editor_type', 'wysiwyg')) }}' === 'wysiwyg' ? 'Visual Editor' : 'Code Editor') : zoneConfig.type"></span>
                                     </h4>
                                     
                                     {{-- Full-featured rich text editor for rich_text zones --}}

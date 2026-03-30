@@ -89,7 +89,8 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Slug</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Author</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created by</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Updated by</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Modified</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -122,6 +123,13 @@
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 @if($item->creator ?? null)
                                     {{ $item->creator_name }}
+                                @else
+                                    System
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                @if($item->updater ?? null)
+                                    {{ $item->updater_name }}
                                 @else
                                     System
                                 @endif

@@ -98,7 +98,11 @@
                                                     @endif
                                                 </span>
                                                 <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                                    {{ $zoneType }}
+                                                    @if($zoneType === 'rich_text')
+                                                        {{ old('editor_type', $content->editor_type ?? 'wysiwyg') === 'wysiwyg' ? 'Visual Editor' : 'Code Editor' }}
+                                                    @else
+                                                        {{ $zoneType }}
+                                                    @endif
                                                 </span>
                                             </h4>
                                             
