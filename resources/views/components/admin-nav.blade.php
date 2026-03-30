@@ -1,6 +1,10 @@
 <!-- WLCMS NAV TEST -->
-<nav class="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600 py-3 w-full">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="margin-top: 135px; margin-bottom: -112px;">
+<nav class="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600 py-3 w-full"
+     x-data="{ isMobile: window.innerWidth < 768 }"
+     x-init="isMobile = window.innerWidth < 768; window.addEventListener('resize', () => { isMobile = window.innerWidth < 768; })">
+    <div class="px-4 sm:px-6 lg:px-8" 
+         :class="{ 'ml-0': isMobile, 'ml-60': !isMobile }"
+         style="margin-top: 135px; margin-bottom: -112px;">
         <div class="flex items-center space-x-6 text-sm">
             <a href="{{ route('wlcms.admin.dashboard') }}" 
                class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium transition {{ request()->routeIs('wlcms.admin.dashboard') ? 'text-blue-600 dark:text-blue-400' : '' }}">
