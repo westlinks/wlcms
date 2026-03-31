@@ -730,7 +730,7 @@ function initWlcms(config = {}) {
 }
 
 // Global function exports for template usage
-window.initTiptapEditor = initTiptapEditor;
+window.initWlcmsTiptapEditor = initTiptapEditor;
 window.initCodeMirrorEditor = initCodeMirrorEditor;
 window.initMediaModal = initMediaModal;
 window.initFileUpload = initFileUpload;

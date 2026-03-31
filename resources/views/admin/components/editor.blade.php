@@ -247,13 +247,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const editorElement = document.getElementById('{{ $editorId }}-editor');
         const toolbar = document.getElementById('{{ $editorId }}-toolbar');
         
-        console.log('TipTap available:', typeof window.initTiptapEditor === 'function');
+        console.log('TipTap available:', typeof window.initWlcmsTiptapEditor === 'function');
         
-        if (typeof window.initTiptapEditor === 'function') {
+        if (typeof window.initWlcmsTiptapEditor === 'function') {
             // TipTap available - use rich editor
             try {
                 console.log('Initializing TipTap editor...');
-                initTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!}, '{{ $editorType }}');
+                initWlcmsTiptapEditor('{{ $editorId }}', {!! json_encode(old($editorId, $editorValue)) !!}, '{{ $editorType }}');
             } catch (error) {
                 console.log('TipTap initialization failed, using fallback:', error);
                 setupFallbackEditor();
