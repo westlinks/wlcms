@@ -3,6 +3,7 @@
     x-data="{
         selectedMedia: {{ $multiple ? '[]' : 'null' }},
         currentValue: '{{ $value ?? '' }}',
+        mediaId: {{ $mediaId ?? 'null' }},
         
         async init() {
             // Initialize from existing value if provided
@@ -12,8 +13,16 @@
                     const paths = this.currentValue.split(',').filter(p => p.trim());
                     this.selectedMedia = await Promise.all(paths.map(path => this.fetchMediaByPath(path.trim())));
                 @else
-                    // For single selection, fetch full media data from path
-                    this.selectedMedia = await this.fetchMediaByPath(this.currentValue);
+                    // For single selection, check if we have mediaId for faster lookup
+                    if (this.mediaId) {
+                        this.selectedMedia = { 
+                            id: this.mediaId, 
+                            path: this.currentValue 
+                        };
+                    } else {
+                        // Fetch full media data from path
+                        this.selectedMedia = await this.fetchMediaByPath(this.currentValue);
+                    }
                 @endif
             }
         },

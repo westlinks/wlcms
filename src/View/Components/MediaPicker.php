@@ -10,6 +10,7 @@ class MediaPicker extends Component
     public string $field;
     public ?string $label;
     public ?string $value;
+    public ?int $mediaId;
     public ?string $type;
     public bool $required;
     public ?string $helpText;
@@ -22,6 +23,7 @@ class MediaPicker extends Component
      * @param string $field The form field name
      * @param string|null $label The label text
      * @param string|null $value The current value (path or comma-separated paths)
+     * @param int|null $mediaId The media ID for preview (optional, improves preview performance)
      * @param string|null $type Filter by media type (image, video, document)
      * @param bool $required Whether the field is required
      * @param string|null $helpText Help text to display
@@ -31,6 +33,7 @@ class MediaPicker extends Component
         string $field,
         ?string $label = null,
         ?string $value = null,
+        ?int $mediaId = null,
         ?string $type = null,
         bool $required = false,
         ?string $helpText = null,
@@ -39,6 +42,7 @@ class MediaPicker extends Component
         $this->field = $field;
         $this->label = $label;
         $this->value = $value;
+        $this->mediaId = $mediaId;
         $this->type = $type;
         $this->required = $required;
         $this->helpText = $helpText;
