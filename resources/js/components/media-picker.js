@@ -221,14 +221,26 @@ export class MediaPicker {
         const folderTemplate = document.getElementById('folder-item-template');
         const mediaTemplate = document.getElementById('media-item-template');
         
+        if (!folderTemplate) {
+            console.error('Folder template not found - check modal is included');
+        }
+        if (!mediaTemplate) {
+            console.error('Media template not found - check modal is included');
+        }
         if (!folderTemplate || !mediaTemplate) {
-            console.error('Templates not found');
+            this.grid.innerHTML = '<div class="col-span-full text-center py-8 text-red-500"><p>Error: Templates not found. Ensure modal is included.</p></div>';
             return;
         }
 
         this.grid.innerHTML = '';
 
         const hasContent = this.foldersData.length > 0 || this.mediaData.length > 0;
+        
+        console.log('Rendering grid:', {
+            folders: this.foldersData.length,
+            media: this.mediaData.length,
+            hasContent
+        });
         
         if (!hasContent) {
             this.grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500"><p>No media found</p></div>';

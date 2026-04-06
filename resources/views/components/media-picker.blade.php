@@ -12,7 +12,7 @@
                     const paths = this.currentValue.split(',').filter(p => p.trim());
                     this.selectedMedia = paths.map(path => ({ path: path.trim() }));
                 @else
-                    // For single selection, store as object
+                    // For single selection, store as object with path
                     this.selectedMedia = { path: this.currentValue };
                 @endif
             }
@@ -23,13 +23,15 @@
                 window.mediaPicker.open(
                     (selected) => {
                         @if($multiple)
-                            // Multiple selection: array of media objects
+                            // Multiple selection: array of media objects with full data
                             this.selectedMedia = selected;
+                            // Store paths for backward compatibility
                             const paths = selected.map(m => m.path).join(',');
                             document.getElementById('{{ $uniqueId }}-input').value = paths;
                         @else
-                            // Single selection: single media object
+                            // Single selection: single media object with full data
                             this.selectedMedia = selected;
+                            // Store path for backward compatibility
                             document.getElementById('{{ $uniqueId }}-input').value = selected.path;
                         @endif
                         
@@ -63,15 +65,22 @@
         },
         
         getPreviewUrl(media) {
-            // Use thumbnail for images, or construct serve URL
+            // If we have the media ID, use the proper serve route
+            if (media.id) {
+                return `/admin/cms/media/${media.id}/serve/small`;
+            }
+            // If media has thumbnail_url from picker, use it
             if (media.thumbnail_url) {
                 return media.thumbnail_url;
             }
+            // If media has url from picker, use it
             if (media.url) {
                 return media.url;
             }
-            // Fallback: try to construct URL from path
-            return media.path;
+            // Fallback for existing data: just the path (may not display)
+            // This shouldn't happen with new selections from the picker
+            console.warn('Media preview: no ID or URL available', media);
+            return media.path || '';
         }
     }"
     class="media-picker-component"

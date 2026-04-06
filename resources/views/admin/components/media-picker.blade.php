@@ -124,9 +124,9 @@
         <div class="aspect-square bg-gray-200 flex items-center justify-center">
             <img src="" alt="" class="media-thumbnail w-full h-full object-cover" loading="lazy">
         </div>
-        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
-            <div class="media-checkbox hidden group-hover:block">
-                <input type="checkbox" class="w-5 h-5 text-blue-600 rounded" onclick="event.stopPropagation()">
+        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
+            <div class="media-checkbox hidden group-hover:flex">
+                <input type="checkbox" class="w-5 h-5 text-blue-600 bg-white rounded" onclick="event.stopPropagation()">
             </div>
         </div>
         <div class="absolute top-2 right-2 hidden selected-badge">
