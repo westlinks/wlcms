@@ -714,11 +714,12 @@ class MediaController extends Controller
             $query->where('type', $request->type);
         }
 
-        // Search by name or alt text
+        // Search by name, alt text, or path
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('alt_text', 'like', '%' . $request->search . '%');
+                  ->orWhere('alt_text', 'like', '%' . $request->search . '%')
+                  ->orWhere('path', 'like', '%' . $request->search . '%');
             });
         }
 

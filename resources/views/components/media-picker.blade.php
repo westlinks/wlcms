@@ -103,10 +103,15 @@
             if (media.url) {
                 return media.url;
             }
-            // Fallback for existing data: just the path (may not display)
-            // This shouldn't happen with new selections from the picker
-            console.warn('Media preview: no ID or URL available', media);
-            return media.path || '';
+            // Fallback for existing data: use path with leading slash
+            if (media.path) {
+                const path = media.path.startsWith('/') ? media.path : '/' + media.path;
+                console.warn('Media preview: using path fallback (no ID):', path);
+                return path;
+            }
+            // No path at all
+            console.warn('Media preview: no ID, URL, or path available', media);
+            return '';
         }
     }"
     class="media-picker-component"
