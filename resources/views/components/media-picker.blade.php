@@ -4,18 +4,44 @@
         selectedMedia: {{ $multiple ? '[]' : 'null' }},
         currentValue: '{{ $value ?? '' }}',
         
-        init() {
+        async init() {
             // Initialize from existing value if provided
             if (this.currentValue) {
                 @if($multiple)
                     // For multiple selection, parse comma-separated paths
                     const paths = this.currentValue.split(',').filter(p => p.trim());
-                    this.selectedMedia = paths.map(path => ({ path: path.trim() }));
+                    this.selectedMedia = await Promise.all(paths.map(path => this.fetchMediaByPath(path.trim())));
                 @else
-                    // For single selection, store as object with path
-                    this.selectedMedia = { path: this.currentValue };
+                    // For single selection, fetch full media data from path
+                    this.selectedMedia = await this.fetchMediaByPath(this.currentValue);
                 @endif
             }
+        },
+        
+        async fetchMediaByPath(path) {
+            try {
+                // Try to fetch the full media object from the API by searching for the path
+                const response = await fetch(`/admin/cms/media/list?search=${encodeURIComponent(path)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Find the media item that exactly matches this path
+                    const media = data.media?.find(m => m.path === path);
+                    if (media) {
+                        return media; // Returns object with id, path, url, thumbnail_url, etc.
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not fetch media data for path:', path, error);
+            }
+            
+            // Fallback: return object with just the path
+            return { path: path };
         },
         
         openPicker() {
