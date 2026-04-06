@@ -110,6 +110,9 @@ class WlcmsServiceProvider extends ServiceProvider
             Blade::componentNamespace('Westlinks\\Wlcms\\View\\Components', 'wlcms');
         }
         // In embedded mode, NO component registration at all - host's components take precedence
+        
+        // Register utility components (available in all modes)
+        Blade::component('wlcms::media-picker', \Westlinks\Wlcms\View\Components\MediaPicker::class);
 
         // Register default templates
         $this->registerTemplates();

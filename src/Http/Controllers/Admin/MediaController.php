@@ -680,7 +680,34 @@ class MediaController extends Controller
      */
     public function listJson(Request $request)
     {
+        $currentFolderId = $request->filled('folder') ? $request->folder : null;
+        
+        // Get folders in current location
+        $foldersQuery = MediaFolder::query();
+        if ($currentFolderId) {
+            $foldersQuery->where('parent_id', $currentFolderId);
+        } else {
+            $foldersQuery->whereNull('parent_id');
+        }
+        
+        $folders = $foldersQuery->orderBy('name')->get()->map(function($folder) {
+            return [
+                'id' => $folder->id,
+                'name' => $folder->name,
+                'type' => 'folder',
+                'file_count' => $folder->mediaAssets()->count(),
+            ];
+        });
+        
+        // Get media files in current folder
         $query = MediaAsset::query();
+
+        // Filter by folder
+        if ($currentFolderId) {
+            $query->where('folder_id', $currentFolderId);
+        } else {
+            $query->whereNull('folder_id');
+        }
 
         // Filter by type
         if ($request->filled('type')) {
@@ -710,10 +737,27 @@ class MediaController extends Controller
                 'mime_type' => $item->mime_type,
             ];
         });
+        
+        // Build breadcrumb path
+        $breadcrumb = [];
+        if ($currentFolderId) {
+            $folder = MediaFolder::find($currentFolderId);
+            if ($folder) {
+                $breadcrumb[] = ['id' => $folder->id, 'name' => $folder->name];
+                $parent = $folder->parent;
+                while ($parent) {
+                    array_unshift($breadcrumb, ['id' => $parent->id, 'name' => $parent->name]);
+                    $parent = $parent->parent;
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,
-            'media' => $media
+            'folders' => $folders,
+            'media' => $media,
+            'breadcrumb' => $breadcrumb,
+            'current_folder_id' => $currentFolderId,
         ]);
     }
 }
