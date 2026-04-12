@@ -251,7 +251,10 @@ class MediaController extends Controller
                 
                 // Create directory path based on type and date
                 $directory = "wlcms/{$type}s/" . date('Y/m');
-                $path = $file->storeAs($directory, $filename, $disk);
+                $path = $file->storeAs($directory, $filename, [
+                    'disk' => $disk,
+                    'visibility' => 'public'
+                ]);
 
                 // Initialize metadata
                 $metadata = [];
@@ -458,9 +461,9 @@ class MediaController extends Controller
                     $resized = $resized->toJpeg($quality);
                     file_put_contents($thumbnailFullPath, (string) $resized);
                 } else {
-                    // S3/remote storage: encode with quality then upload
+                    // S3/remote storage: encode with quality then upload with public visibility
                     $encoded = $resized->toJpeg($quality);
-                    Storage::disk($disk)->put($thumbnailPath, (string) $encoded);
+                    Storage::disk($disk)->put($thumbnailPath, (string) $encoded, 'public');
                 }
                 
                 $thumbnails[$size] = $thumbnailPath;
