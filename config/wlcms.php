@@ -121,7 +121,7 @@ return [
         
         // Image processing settings
         'image' => [
-            'quality' => env('WLCMS_IMAGE_QUALITY', 90), // Increased for better quality
+            'quality' => (int) env('WLCMS_IMAGE_QUALITY', 90), // Increased for better quality
             'generate_thumbnails' => true,
             'extract_exif' => true,
             'thumbnails' => [

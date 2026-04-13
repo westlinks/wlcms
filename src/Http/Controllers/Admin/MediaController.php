@@ -437,7 +437,7 @@ class MediaController extends Controller
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
             
             // Get quality settings from config
-            $quality = config('wlcms.media.image.quality', 90); // Increased default quality
+            $quality = (int) config('wlcms.media.image.quality', 90); // Increased default quality
 
             foreach ($thumbnailSizes as $size => [$width, $height]) {
                 $thumbnailFilename = "{$nameWithoutExt}_{$size}.{$extension}";
