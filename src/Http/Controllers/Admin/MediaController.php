@@ -251,10 +251,23 @@ class MediaController extends Controller
                 
                 // Create directory path based on type and date
                 $directory = "wlcms/{$type}s/" . date('Y/m');
+                
+                // Try with public visibility first (for ACL-enabled buckets)
                 $path = $file->storeAs($directory, $filename, [
                     'disk' => $disk,
                     'visibility' => 'public'
                 ]);
+                
+                // If that failed (ACL-disabled bucket), try without visibility
+                if (!$path || empty($path)) {
+                    Log::info('WLCMS: Upload with visibility failed, retrying without (ACL-disabled bucket)');
+                    $path = $file->storeAs($directory, $filename, $disk);
+                }
+                
+                // Verify upload succeeded
+                if (!$path || empty($path)) {
+                    throw new \Exception('Failed to store file on disk: ' . $disk);
+                }
 
                 // Initialize metadata
                 $metadata = [];
@@ -461,9 +474,14 @@ class MediaController extends Controller
                     $resized = $resized->toJpeg($quality);
                     file_put_contents($thumbnailFullPath, (string) $resized);
                 } else {
-                    // S3/remote storage: encode with quality then upload with public visibility
+                    // S3/remote storage: encode with quality then upload
                     $encoded = $resized->toJpeg($quality);
-                    Storage::disk($disk)->put($thumbnailPath, (string) $encoded, 'public');
+                    
+                    // Try with public visibility first, fallback without if ACLs disabled
+                    $success = Storage::disk($disk)->put($thumbnailPath, (string) $encoded, 'public');
+                    if (!$success) {
+                        $success = Storage::disk($disk)->put($thumbnailPath, (string) $encoded);
+                    }
                 }
                 
                 $thumbnails[$size] = $thumbnailPath;
