@@ -50,10 +50,8 @@ class ContentController extends Controller
 
     public function create()
     {
-        // Get items that are in menu for parent dropdown
-        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('show_in_menu', 1)
-            ->orderBy('menu_title')
-            ->orderBy('title')
+        // Get all items for parent dropdown (not just menu items)
+        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::orderBy('title')
             ->get();
         
         return view('wlcms::admin.content.create', compact('potentialParents'));
@@ -183,10 +181,8 @@ class ContentController extends Controller
             return $media->pivot->type === 'featured';
         });
         
-        // Get items that are in menu for parent dropdown (excluding current item and its descendants)
-        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('show_in_menu', 1)
-            ->where('id', '!=', $content->id)
-            ->orderBy('menu_title')
+        // Get all items for parent dropdown (excluding current item and its descendants)
+        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('id', '!=', $content->id)
             ->orderBy('title')
             ->get();
         
@@ -216,6 +212,7 @@ class ContentController extends Controller
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_order' => 'integer|min:0',
+            'menu_location' => 'nullable|string|in:primary,footer,sidebar',
             'parent_id' => 'nullable|exists:cms_content_items,id',
             'featured_media_id' => 'nullable|exists:cms_media_assets,id',
             'media_ids' => 'nullable|array',
