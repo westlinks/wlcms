@@ -116,7 +116,18 @@ class ContentController extends Controller
         if ($request->filled('template_identifier')) {
             $template = Template::where('identifier', $request->template_identifier)->first();
             if ($template) {
-                $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : ($request->zones ?? []);
+                // Decode zones_json if present, but check if it's actually empty
+                $zonesFromJson = [];
+                if ($request->zones_json && $request->zones_json !== '[]') {
+                    $zonesFromJson = json_decode($request->zones_json, true) ?? [];
+                }
+                
+                // Get zones from regular zones array
+                $zonesFromArray = $request->zones ?? [];
+                
+                // Merge: zones array takes precedence
+                $zonesData = array_merge($zonesFromJson, $zonesFromArray);
+                
                 $this->validateRequiredZones($template, $zonesData);
             }
         }
@@ -150,17 +161,17 @@ class ContentController extends Controller
 
         // Save template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            // Merge zones: prefer zones array for text content, but keep zones_json for special zones (like form embeds)
-            $zonesFromJson = $request->zones_json ? json_decode($request->zones_json, true) : [];
+            // Decode zones_json if present, but check if it's actually empty
+            $zonesFromJson = [];
+            if ($request->zones_json && $request->zones_json !== '[]') {
+                $zonesFromJson = json_decode($request->zones_json, true) ?? [];
+            }
+            
+            // Get zones from regular zones array (has TipTap content)
             $zonesFromArray = $request->zones ?? [];
             
-            // Start with zones_json (has special zones like form embeds)
-            $zonesData = $zonesFromJson;
-            
-            // Override with zones array values (has fresh textarea content)
-            foreach ($zonesFromArray as $key => $value) {
-                $zonesData[$key] = $value;
-            }
+            // Merge: zones array takes precedence for text content
+            $zonesData = array_merge($zonesFromJson, $zonesFromArray);
             
             $content->templateSettings()->updateOrCreate(
                 ['content_id' => $content->id],
@@ -265,13 +276,27 @@ class ContentController extends Controller
         if ($request->filled('template_identifier')) {
             $template = Template::where('identifier', $request->template_identifier)->first();
             if ($template) {
-                $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : ($request->zones ?? []);
+                // Decode zones_json if present, but check if it's actually empty
+                $zonesFromJson = [];
+                if ($request->zones_json && $request->zones_json !== '[]') {
+                    $zonesFromJson = json_decode($request->zones_json, true) ?? [];
+                }
+                
+                // Get zones from regular zones array
+                $zonesFromArray = $request->zones ?? [];
+                
+                // Merge: zones array takes precedence (has the actual content from TipTap)
+                $zonesData = array_merge($zonesFromJson, $zonesFromArray);
+                
                 try {
                     $this->validateRequiredZones($template, $zonesData);
                 } catch (\Illuminate\Validation\ValidationException $e) {
                     \Log::error('Required zones validation failed:', [
                         'errors' => $e->errors(),
-                        'zones_data' => $zonesData
+                        'zones_from_json' => $zonesFromJson,
+                        'zones_from_array' => $zonesFromArray,
+                        'merged_zones' => $zonesData,
+                        'zones_json_raw' => $request->zones_json
                     ]);
                     return redirect()->back()
                         ->withErrors($e->errors())
@@ -312,17 +337,17 @@ class ContentController extends Controller
 
         // Update template zones data and settings
         if ($request->filled('template_identifier') && ($request->filled('zones_json') || $request->filled('zones'))) {
-            // Merge zones: prefer zones array for text content, but keep zones_json for special zones (like form embeds)
-            $zonesFromJson = $request->zones_json ? json_decode($request->zones_json, true) : [];
+            // Decode zones_json if present, but check if it's actually empty
+            $zonesFromJson = [];
+            if ($request->zones_json && $request->zones_json !== '[]') {
+                $zonesFromJson = json_decode($request->zones_json, true) ?? [];
+            }
+            
+            // Get zones from regular zones array (has TipTap content)
             $zonesFromArray = $request->zones ?? [];
             
-            // Start with zones_json (has special zones like form embeds)
-            $zonesData = $zonesFromJson;
-            
-            // Override with zones array values (has fresh textarea content)
-            foreach ($zonesFromArray as $key => $value) {
-                $zonesData[$key] = $value;
-            }
+            // Merge: zones array takes precedence for text content
+            $zonesData = array_merge($zonesFromJson, $zonesFromArray);
             
             // Fix any double-encoded JSON strings in zone values
             if (is_array($zonesData)) {
