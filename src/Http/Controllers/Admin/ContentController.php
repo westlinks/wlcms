@@ -50,8 +50,10 @@ class ContentController extends Controller
 
     public function create()
     {
-        // Get all items for parent dropdown (not just menu items)
-        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::orderBy('title')
+        // Get items that are in menu for parent dropdown
+        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('show_in_menu', 1)
+            ->orderBy('menu_title')
+            ->orderBy('title')
             ->get();
         
         return view('wlcms::admin.content.create', compact('potentialParents'));
@@ -181,8 +183,10 @@ class ContentController extends Controller
             return $media->pivot->type === 'featured';
         });
         
-        // Get all items for parent dropdown (excluding current item and its descendants)
-        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('id', '!=', $content->id)
+        // Get items that are in menu for parent dropdown (excluding current item and its descendants)
+        $potentialParents = \Westlinks\Wlcms\Models\ContentItem::where('show_in_menu', 1)
+            ->where('id', '!=', $content->id)
+            ->orderBy('menu_title')
             ->orderBy('title')
             ->get();
         

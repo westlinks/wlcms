@@ -380,6 +380,56 @@
                         </div>
                     </div>
 
+                    <!-- Collections & Features -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-900 mb-4">📌 Collections & Features</h3>
+                        
+                        <div class="space-y-4">
+                            @php
+                                $collections = config('wlcms.collections', []);
+                                $allowCustom = config('wlcms.allow_custom_collections', true);
+                                $currentCollection = old('meta.collection', $content->meta['collection'] ?? '');
+                                $isCustom = $currentCollection && !array_key_exists($currentCollection, $collections);
+                            @endphp
+                            
+                            <div x-data="{ 
+                                collection: '{{ $currentCollection }}',
+                                isCustom: {{ $isCustom ? 'true' : 'false' }},
+                                showCustomInput() {
+                                    return this.collection === '_custom_' || this.isCustom;
+                                }
+                            }">
+                                <label for="collection" class="block text-sm font-medium text-gray-700 mb-2">Collection</label>
+                                <select id="collection" 
+                                        name="meta[collection]" 
+                                        x-model="collection"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- None --</option>
+                                    @foreach($collections as $key => $label)
+                                        <option value="{{ $key }}" {{ $currentCollection === $key ? 'selected' : '' }}>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                    @if($allowCustom)
+                                        <option value="_custom_" {{ $isCustom && $currentCollection ? 'selected' : '' }}>✏️ Custom...</option>
+                                    @endif
+                                </select>
+                                
+                                @if($allowCustom)
+                                    <div x-show="showCustomInput()" x-cloak class="mt-2">
+                                        <input type="text" 
+                                               id="custom_collection"
+                                               x-model="collection"
+                                               placeholder="Enter custom collection name"
+                                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                @endif
+                                
+                                <p class="text-gray-600 text-xs mt-1">Group content into collections (e.g., whats-new, featured)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Navigation Settings -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="font-medium text-gray-900 mb-4">Navigation Settings</h3>

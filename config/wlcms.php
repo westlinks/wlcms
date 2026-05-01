@@ -95,6 +95,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Collections
+    |--------------------------------------------------------------------------
+    |
+    | Predefined collections for organizing and featuring content.
+    | Host applications can override these in their published config.
+    |
+    */
+    'collections' => [
+        'whats-new' => "What's New",
+        'featured' => 'Featured Content',
+        'archived' => 'Archived',
+    ],
+    
+    // Allow custom collection values not in the predefined list
+    'allow_custom_collections' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Media Settings  
     |--------------------------------------------------------------------------
     |
