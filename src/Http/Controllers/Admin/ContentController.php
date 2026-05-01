@@ -200,10 +200,12 @@ class ContentController extends Controller
             'zones' => $request->zones,
             'zones_json' => $request->zones_json,
             'has_zones_json' => $request->has('zones_json'),
-            'zones_json_length' => $request->zones_json ? strlen($request->zones_json) : 0
+            'zones_json_length' => $request->zones_json ? strlen($request->zones_json) : 0,
+            'all_input' => $request->all(),
         ]);
         
-        $validated = $request->validate([
+        try {
+            $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:cms_content_items,slug,' . $content->id,
             'content' => 'nullable|string',
@@ -229,6 +231,16 @@ class ContentController extends Controller
             'activation_date' => 'nullable|date',
             'deactivation_date' => 'nullable|date|after:activation_date',
         ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed in update:', [
+                'errors' => $e->errors(),
+                'message' => $e->getMessage()
+            ]);
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Validation failed: ' . $e->getMessage());
+        }
 
         // Convert checkbox values properly
         $validated['show_in_menu'] = $request->has('show_in_menu');
@@ -254,7 +266,18 @@ class ContentController extends Controller
             $template = Template::where('identifier', $request->template_identifier)->first();
             if ($template) {
                 $zonesData = $request->zones_json ? json_decode($request->zones_json, true) : ($request->zones ?? []);
-                $this->validateRequiredZones($template, $zonesData);
+                try {
+                    $this->validateRequiredZones($template, $zonesData);
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    \Log::error('Required zones validation failed:', [
+                        'errors' => $e->errors(),
+                        'zones_data' => $zonesData
+                    ]);
+                    return redirect()->back()
+                        ->withErrors($e->errors())
+                        ->withInput()
+                        ->with('error', 'Required template zones must be filled.');
+                }
             }
         }
 
