@@ -144,16 +144,16 @@
                                                 <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
                                                 
                                                 <!-- Alignment -->
-                                                <button type="button" data-action="align-left" title="Align Left">
+                                                <button type="button" data-action="align-left" title="Align Left" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px] flex items-center justify-center">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14"/></svg>
                                                 </button>
-                                                <button type="button" data-action="align-center" title="Align Center">
+                                                <button type="button" data-action="align-center" title="Align Center" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px] flex items-center justify-center">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M5 18h14"/></svg>
                                                 </button>
-                                                <button type="button" data-action="align-right" title="Align Right">
+                                                <button type="button" data-action="align-right" title="Align Right" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px] flex items-center justify-center">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M6 18h14"/></svg>
                                                 </button>
-                                                <button type="button" data-action="align-justify" title="Justify">
+                                                <button type="button" data-action="align-justify" title="Justify" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px] flex items-center justify-center">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                                                 </button>
 
