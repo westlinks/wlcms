@@ -191,10 +191,10 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
         if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
         if (editor.isActive('table')) toolbarElement.querySelector('[data-action="table"]')?.classList.add('is-active');
-        if (editor.isActive('textAlign', { left: true })) toolbarElement.querySelector('[data-action="align-left"]')?.classList.add('is-active');
-        if (editor.isActive('textAlign', { center: true })) toolbarElement.querySelector('[data-action="align-center"]')?.classList.add('is-active');
-        if (editor.isActive('textAlign', { right: true })) toolbarElement.querySelector('[data-action="align-right"]')?.classList.add('is-active');
-        if (editor.isActive('textAlign', { justify: true })) toolbarElement.querySelector('[data-action="align-justify"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'left' })) toolbarElement.querySelector('[data-action="align-left"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'center' })) toolbarElement.querySelector('[data-action="align-center"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'right' })) toolbarElement.querySelector('[data-action="align-right"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'justify' })) toolbarElement.querySelector('[data-action="align-justify"]')?.classList.add('is-active');
     }
     
     // Simple HTML formatter for better readability in source view
@@ -384,6 +384,22 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         'code-block': () => editor.chain().focus().toggleCodeBlock().run(),
         'link': openLinkModal,
         'table': () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+        'align-left': () => editor.chain().focus().setTextAlign('left').run(),
+        'align-center': () => editor.chain().focus().setTextAlign('center').run(),
+        'align-right': () => editor.chain().focus().setTextAlign('right').run(),
+        'align-justify': () => editor.chain().focus().setTextAlign('justify').run(),
+        'add-col-before': () => editor.chain().focus().addColumnBefore().run(),
+        'add-col-after': () => editor.chain().focus().addColumnAfter().run(),
+        'delete-col': () => editor.chain().focus().deleteColumn().run(),
+        'add-row-before': () => editor.chain().focus().addRowBefore().run(),
+        'add-row-after': () => editor.chain().focus().addRowAfter().run(),
+        'delete-row': () => editor.chain().focus().deleteRow().run(),
+        'delete-table': () => editor.chain().focus().deleteTable().run(),
+        'merge-cells': () => editor.chain().focus().mergeCells().run(),
+        'split-cell': () => editor.chain().focus().splitCell().run(),
+        'toggle-header-row': () => editor.chain().focus().toggleHeaderRow().run(),
+        'undo': () => editor.chain().focus().undo().run(),
+        'redo': () => editor.chain().focus().redo().run(),
         'add-col-before': () => editor.chain().focus().addColumnBefore().run(),
         'add-col-after': () => editor.chain().focus().addColumnAfter().run(),
         'delete-col': () => editor.chain().focus().deleteColumn().run(),
