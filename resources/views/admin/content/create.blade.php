@@ -129,8 +129,9 @@
                                     {{-- Full-featured rich text editor for rich_text zones --}}
                                     <div x-show="zoneConfig.type === 'rich_text'" class="zone-rich-text">
                                         <div class="editor-container" style="border: 1px solid #d1d5db; border-radius: 0.375rem; overflow: hidden; background: white;">
-                                            {{-- Full toolbar with all features --}}
-                                            <div class="editor-toolbar" :data-zone="zoneKey" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
+                                            
+                                            {{-- Full toolbar with matching ID pattern expected by wlcms.js --}}
+                                            <div :id="`zone-${zoneKey}-toolbar`" class="editor-toolbar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
                                                 <button type="button" data-action="bold" title="Bold (Ctrl+B)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm font-semibold hover:bg-gray-50 min-w-[36px]">B</button>
                                                 <button type="button" data-action="italic" title="Italic (Ctrl+I)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm italic hover:bg-gray-50 min-w-[36px]">I</button>
                                                 <button type="button" data-action="code" title="Inline Code" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">&lt;/&gt;</button>
@@ -143,7 +144,7 @@
                                                 
                                                 <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
                                                 
-                                                <!-- Alignment -->
+                                                <!-- Alignment Buttons with full Tailwind classes -->
                                                 <button type="button" data-action="align-left" title="Align Left" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px] flex items-center justify-center">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14"/></svg>
                                                 </button>
@@ -177,20 +178,23 @@
                                                 <button type="button" data-action="source" title="View/Edit HTML Source" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50">HTML</button>
                                             </div>
                                             
-                                            {{-- Visual editor --}}
+                                            {{-- Visual editor container (ID matches JS: elementId + '-editor') --}}
                                             <div 
-                                                contenteditable="true"
-                                                :data-zone="zoneKey"
+                                                :id="`zone-${zoneKey}-editor`"
                                                 class="zone-editor prose max-w-none p-4 min-h-[200px] focus:outline-none"
-                                                style="background: white;"
-                                                @input="zoneData[zoneKey] = $el.innerHTML"
-                                                x-init="$el.innerHTML = zoneData[zoneKey] || ''"></div>
+                                                style="background: white;"></div>
                                             
-                                            {{-- HTML Source view (hidden by default) --}}
+                                            {{-- HTML Source view textarea (ID matches JS: elementId + '-source') --}}
                                             <textarea 
-                                                :data-zone="zoneKey"
-                                                class="zone-source hidden w-full min-h-[200px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
-                                                @input="zoneData[zoneKey] = $el.value"></textarea>
+                                                :id="`zone-${zoneKey}-source`"
+                                                class="zone-source hidden w-full min-h-[200px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"></textarea>
+                                            
+                                            {{-- Hidden input used to submit data (ID matches JS: elementId) --}}
+                                            <input 
+                                                type="hidden" 
+                                                :id="`zone-${zoneKey}`" 
+                                                :name="`zones[${zoneKey}]`" 
+                                                x-model="zoneData[zoneKey]">
                                         </div>
                                     </div>
                                     
