@@ -9,6 +9,7 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { TableHeader } from '@tiptap/extension-table-header'
+import { TextAlign } from '@tiptap/extension-text-align'
 
 // Custom HTML extensions to preserve divs and classes
 import { CustomDiv, CustomParagraph, CustomLink, CustomSVG, CustomSVGPath } from './components/custom-html.js'
@@ -119,6 +120,9 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
                     class: 'border border-gray-300 p-2',
                 },
             }),
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
+            }),
         ],
         // Only pass content to TipTap if starting in visual mode (new content)
         content: isSourceMode ? '' : initialContent,
@@ -187,6 +191,10 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
         if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
         if (editor.isActive('table')) toolbarElement.querySelector('[data-action="table"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'left' })) toolbarElement.querySelector('[data-action="align-left"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'center' })) toolbarElement.querySelector('[data-action="align-center"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'right' })) toolbarElement.querySelector('[data-action="align-right"]')?.classList.add('is-active');
+        if (editor.isActive({ textAlign: 'justify' })) toolbarElement.querySelector('[data-action="align-justify"]')?.classList.add('is-active');
     }
     
     // Simple HTML formatter for better readability in source view
