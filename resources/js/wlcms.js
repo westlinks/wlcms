@@ -191,10 +191,10 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         if (editor.isActive('codeBlock')) toolbarElement.querySelector('[data-action="code-block"]')?.classList.add('is-active');
         if (editor.isActive('link')) toolbarElement.querySelector('[data-action="link"]')?.classList.add('is-active');
         if (editor.isActive('table')) toolbarElement.querySelector('[data-action="table"]')?.classList.add('is-active');
-        if (editor.isActive({ textAlign: 'left' })) toolbarElement.querySelector('[data-action="align-left"]')?.classList.add('is-active');
-        if (editor.isActive({ textAlign: 'center' })) toolbarElement.querySelector('[data-action="align-center"]')?.classList.add('is-active');
-        if (editor.isActive({ textAlign: 'right' })) toolbarElement.querySelector('[data-action="align-right"]')?.classList.add('is-active');
-        if (editor.isActive({ textAlign: 'justify' })) toolbarElement.querySelector('[data-action="align-justify"]')?.classList.add('is-active');
+        if (editor.isActive('textAlign', { left: true })) toolbarElement.querySelector('[data-action="align-left"]')?.classList.add('is-active');
+        if (editor.isActive('textAlign', { center: true })) toolbarElement.querySelector('[data-action="align-center"]')?.classList.add('is-active');
+        if (editor.isActive('textAlign', { right: true })) toolbarElement.querySelector('[data-action="align-right"]')?.classList.add('is-active');
+        if (editor.isActive('textAlign', { justify: true })) toolbarElement.querySelector('[data-action="align-justify"]')?.classList.add('is-active');
     }
     
     // Simple HTML formatter for better readability in source view
