@@ -123,17 +123,83 @@
                                             <span x-show="zoneConfig.required" class="text-red-500"> *</span>
                                         </span>
                                         <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded" 
-                                            x-text="zoneConfig.type === 'rich_text' ? ('{{ request('editor_type', old('editor_type', 'wysiwyg')) }}' === 'wysiwyg' ? 'Visual Editor' : 'Code Editor') : zoneConfig.type"></span>
+                                              x-text="zoneConfig.type === 'rich_text' ? ('{{ request('editor_type', old('editor_type', 'wysiwyg')) }}' === 'wysiwyg' ? 'Visual Editor' : 'Code Editor') : zoneConfig.type"></span>
                                     </h4>
                                     
-                                    {{-- Plain textarea for fallback / legacy initial rendering --}}
-                                    <div>
+                                    {{-- Full-featured rich text editor for rich_text zones --}}
+                                    <div x-show="zoneConfig.type === 'rich_text'" class="zone-rich-text">
+                                        <div class="editor-container" style="border: 1px solid #d1d5db; border-radius: 0.375rem; overflow: hidden; background: white;">
+                                            {{-- Full toolbar with all features --}}
+                                            <div class="editor-toolbar" :data-zone="zoneKey" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem; border-bottom: 1px solid #d1d5db; background: #f9fafb;">
+                                                <button type="button" data-action="bold" title="Bold (Ctrl+B)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm font-semibold hover:bg-gray-50 min-w-[36px]">B</button>
+                                                <button type="button" data-action="italic" title="Italic (Ctrl+I)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm italic hover:bg-gray-50 min-w-[36px]">I</button>
+                                                <button type="button" data-action="code" title="Inline Code" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">&lt;/&gt;</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="h1" title="Heading 1" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H1</button>
+                                                <button type="button" data-action="h2" title="Heading 2" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H2</button>
+                                                <button type="button" data-action="h3" title="Heading 3" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">H3</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <!-- Alignment -->
+                                                <button type="button" data-action="align-left" title="Align Left">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14"/></svg>
+                                                </button>
+                                                <button type="button" data-action="align-center" title="Align Center">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M5 18h14"/></svg>
+                                                </button>
+                                                <button type="button" data-action="align-right" title="Align Right">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M6 18h14"/></svg>
+                                                </button>
+                                                <button type="button" data-action="align-justify" title="Justify">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                                </button>
+
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+
+                                                <button type="button" data-action="bullet-list" title="Bullet List" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">•</button>
+                                                <button type="button" data-action="ordered-list" title="Numbered List" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">1.</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="blockquote" title="Blockquote" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">"</button>
+                                                <button type="button" data-action="code-block" title="Code Block" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">{ }</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="undo" title="Undo (Ctrl+Z)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">↶</button>
+                                                <button type="button" data-action="redo" title="Redo (Ctrl+Shift+Z)" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 min-w-[36px]">↷</button>
+                                                
+                                                <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
+                                                
+                                                <button type="button" data-action="source" title="View/Edit HTML Source" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50">HTML</button>
+                                            </div>
+                                            
+                                            {{-- Visual editor --}}
+                                            <div 
+                                                contenteditable="true"
+                                                :data-zone="zoneKey"
+                                                class="zone-editor prose max-w-none p-4 min-h-[200px] focus:outline-none"
+                                                style="background: white;"
+                                                @input="zoneData[zoneKey] = $el.innerHTML"
+                                                x-init="$el.innerHTML = zoneData[zoneKey] || ''"></div>
+                                            
+                                            {{-- HTML Source view (hidden by default) --}}
+                                            <textarea 
+                                                :data-zone="zoneKey"
+                                                class="zone-source hidden w-full min-h-[200px] p-3 border-0 border-t border-gray-300 font-mono text-sm bg-gray-50 focus:outline-none"
+                                                @input="zoneData[zoneKey] = $el.value"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Plain textarea for other zone types --}}
+                                    <div x-show="zoneConfig.type !== 'rich_text'">
                                         <textarea 
-                                            :name="'zones[' + zoneKey + ']'"
-                                            :id="'zone-' + zoneKey"
                                             x-model="zoneData[zoneKey]"
                                             class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                                            rows="5"
+                                            rows="4"
                                             :placeholder="'Enter content for ' + (zoneConfig.label || zoneKey)"
                                             :required="zoneConfig.required"></textarea>
                                         <p class="text-xs text-gray-500 mt-1" x-show="zoneConfig.type === 'repeater'">JSON array format. Full repeater controls available after saving.</p>
@@ -184,6 +250,18 @@
                                         if (selection.toString()) {
                                             document.execCommand('insertHTML', false, '<code>' + selection.toString() + '</code>');
                                         }
+                                        break;
+                                    case 'align-left':
+                                        document.execCommand('justifyLeft', false, null);
+                                        break;
+                                    case 'align-center':
+                                        document.execCommand('justifyCenter', false, null);
+                                        break;
+                                    case 'align-right':
+                                        document.execCommand('justifyRight', false, null);
+                                        break;
+                                    case 'align-justify':
+                                        document.execCommand('justifyFull', false, null);
                                         break;
                                     case 'h1':
                                         document.execCommand('formatBlock', false, '<h1>');
