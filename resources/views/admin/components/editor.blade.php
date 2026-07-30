@@ -75,8 +75,6 @@ Usage: @include('wlcms::admin.components.editor', ['name' => 'content', 'value' 
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
 
-            <div class="separator" style="width: 1px; background: #d1d5db; margin: 0.25rem 0;"></div>
-
             <!-- Lists -->
             <button type="button" data-action="bullet-list" title="Bullet List"
                     style="padding: 0.375rem 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 500; color: #374151; cursor: pointer; min-width: 36px;">•</button>
