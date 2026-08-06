@@ -492,6 +492,32 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Categories/Tags Card --}}
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Organization</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                                <input type="text" id="tags" name="tags" 
+                                    value="{{ old('tags', is_array($content->tags) ? implode(', ', $content->tags) : $content->tags) }}"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Enter tags separated by commas">
+                                <p class="text-gray-600 text-xs mt-1">Separate multiple tags with commas</p>
+                            </div>
+
+                            <div>
+                                <label for="sort_order" class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
+                                <input type="number" id="sort_order" name="sort_order" 
+                                    value="{{ old('sort_order', $content->sort_order ?? 0) }}"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    min="0">
+                                <p class="text-gray-600 text-xs mt-1">Lower numbers appear first</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Featured Image -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="font-medium text-gray-900 mb-4">Featured Image</h3>

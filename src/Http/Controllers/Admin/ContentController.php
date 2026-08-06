@@ -79,6 +79,7 @@ class ContentController extends Controller
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_order' => 'integer|min:0',
+            'sort_order' => 'integer|min:0',
             'menu_location' => 'string|in:primary,footer,sidebar',
             'parent_id' => 'nullable|exists:cms_content_items,id',
             'featured_media_id' => 'nullable|exists:cms_media_assets,id',
@@ -98,6 +99,7 @@ class ContentController extends Controller
         $validated['auto_activate'] = $request->has('auto_activate');
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
         $validated['editor_type'] = $validated['editor_type'] ?? 'wysiwyg';
         
@@ -229,6 +231,7 @@ class ContentController extends Controller
             'show_in_menu' => 'boolean',
             'menu_title' => 'nullable|string|max:255',
             'menu_order' => 'integer|min:0',
+            'sort_order' => 'integer|min:0',
             'menu_location' => 'nullable|string|in:primary,footer,sidebar',
             'parent_id' => 'nullable|exists:cms_content_items,id',
             'featured_media_id' => 'nullable|exists:cms_media_assets,id',
@@ -258,6 +261,7 @@ class ContentController extends Controller
         $validated['auto_activate'] = $request->has('auto_activate');
         $validated['auto_deactivate'] = $request->has('auto_deactivate');
         $validated['menu_order'] = $validated['menu_order'] ?? 0;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
         $validated['menu_location'] = $validated['menu_location'] ?? 'primary';
         $validated['editor_type'] = $validated['editor_type'] ?? 'wysiwyg';
         

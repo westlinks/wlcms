@@ -589,7 +589,7 @@
                             <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}"
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                    min="0">
-                            <p class="text-gray-600 text-xs mt-1">Higher numbers appear first</p>
+                            <p class="text-gray-600 text-xs mt-1">Lower numbers appear first</p>
                         </div>
                     </div>
                 </div>
