@@ -154,6 +154,9 @@
         font-style: italic;
         line-height: 1.6;
     }
+    .chairperson-body-content blockquote p {
+        margin: 0;
+    }
 </style>
 @endpush
 
