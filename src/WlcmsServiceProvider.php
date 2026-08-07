@@ -509,17 +509,26 @@ class WlcmsServiceProvider extends ServiceProvider
         }
 
         // Persist registered templates to database
+        // if (config('wlcms.templates.auto_persist', true)) {
+        //     // Only attempt to persist if the cms_templates table exists
+        //     if (\Illuminate\Support\Facades\Schema::hasTable('cms_templates')) {
+        //         try {
+        //             \Westlinks\Wlcms\Services\TemplateManager::persistRegisteredTemplates();
+        //         } catch (\Exception $e) {
+        //             // Silent fail if any other error occurs
+        //         }
+        //     }
+        // }
         if (config('wlcms.templates.auto_persist', true)) {
-            // Only attempt to persist if the cms_templates table exists
             if (\Illuminate\Support\Facades\Schema::hasTable('cms_templates')) {
                 try {
                     \Westlinks\Wlcms\Services\TemplateManager::persistRegisteredTemplates();
                 } catch (\Exception $e) {
-                    // Silent fail if any other error occurs
+                    \Illuminate\Support\Facades\Log::error('Template Sync Failed: ' . $e->getMessage());
+                    throw $e; // <--- Temporarily throw this so you see the exact error page
                 }
             }
-        }
-        
+        }        
         // Chairperson Message Template
         \Westlinks\Wlcms\Services\TemplateManager::register('chairperson-message', [
             'name' => 'Chairperson Message',
