@@ -519,9 +519,8 @@ class WlcmsServiceProvider extends ServiceProvider
                 }
             }
         }
-    }
-
-    // Chairperson Message Template
+        
+        // Chairperson Message Template
         \Westlinks\Wlcms\Services\TemplateManager::register('chairperson-message', [
             'name' => 'Chairperson Message',
             'description' => 'Editorial letter layout for convention chairpersons with profile header, theme callouts, and sign-off.',
@@ -573,7 +572,10 @@ class WlcmsServiceProvider extends ServiceProvider
                 ],
             ],
         ]);
+    }
+
         
+
     /**
      * Register default forms.
      */
