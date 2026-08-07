@@ -141,6 +141,19 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
+
+    .chairperson-body-content blockquote {
+        background-color: #f1f5f9;
+        border-left: 4px solid #13357d;
+        border-radius: 0 0.5rem 0.5rem 0;
+        padding: 1.25rem 1.5rem;
+        margin: 2rem 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f172a;
+        font-style: italic;
+        line-height: 1.6;
+    }
 </style>
 @endpush
 
