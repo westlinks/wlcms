@@ -521,6 +521,59 @@ class WlcmsServiceProvider extends ServiceProvider
         }
     }
 
+    // Chairperson Message Template
+        \Westlinks\Wlcms\Services\TemplateManager::register('chairperson-message', [
+            'name' => 'Chairperson Message',
+            'description' => 'Editorial letter layout for convention chairpersons with profile header, theme callouts, and sign-off.',
+            'view' => 'wlcms::templates.chairperson-message',
+            'preview' => null,
+            'category' => 'content',
+            'zones' => [
+                'content' => [
+                    'label' => 'Message Body',
+                    'type' => 'rich_text', // TipTap Visual Editor Zone
+                    'required' => true,
+                ],
+            ],
+            'settings_schema' => [
+                'chairperson_name' => [
+                    'type' => 'text',
+                    'label' => 'Chairperson Name',
+                    'default' => 'Ana R.',
+                ],
+                'chairperson_role' => [
+                    'type' => 'text',
+                    'label' => 'Chairperson Role / Title',
+                    'default' => '2027 SFVAAC Chairperson',
+                ],
+                'chairperson_photo' => [
+                    'type' => 'media_picker', // Or 'text'/'media' depending on wlcms field types
+                    'label' => 'Chairperson Photo URL',
+                    'default' => null,
+                ],
+                'badge_text' => [
+                    'type' => 'text',
+                    'label' => 'Badge Header Text',
+                    'default' => 'Welcome Message',
+                ],
+                'convention_theme' => [
+                    'type' => 'text',
+                    'label' => 'Convention Theme',
+                    'default' => 'Together We Recover',
+                ],
+                'theme_label' => [
+                    'type' => 'text',
+                    'label' => 'Theme Banner Label',
+                    'default' => '2027 Convention Theme',
+                ],
+                'footer_badge' => [
+                    'type' => 'text',
+                    'label' => 'Footer Badge Text',
+                    'default' => 'SFVAA 51st Annual Convention',
+                ],
+            ],
+        ]);
+        
     /**
      * Register default forms.
      */
