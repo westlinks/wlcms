@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
-        <div class="lg:col-span-2">
+        {{-- <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow p-6">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $content->title }}</h2>
                 
@@ -123,8 +123,61 @@
                     @endif
                 @endif
             </div>
-        </div>
+        </div> --}}
+        <!-- Main Content Zone -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6">
+                
+                @if($content->templateSettings && $content->templateSettings->template)
+                    {{-- 1. RENDER THE ACTUAL TEMPLATE VIEW IF ONE IS ASSIGNED --}}
+                    @php
+                        $templateView = $content->templateSettings->template->view_path 
+                            ?? 'wlcms::templates.' . $content->templateSettings->template->identifier;
+                        
+                        // Parse zones and settings for the template
+                        $zones = json_decode($content->templateSettings->zones_data ?? '{}', true) ?: [];
+                        $settings = json_decode($content->templateSettings->settings ?? '{}', true) ?: [];
 
+                        // Process rich text in zones
+                        $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                        foreach ($zones as $key => $val) {
+                            if (is_string($val)) {
+                                $zones[$key] = $zoneProcessor->render('rich_text', $zoneProcessor->process('rich_text', $val));
+                            }
+                        }
+                    @endphp
+
+                    @if(view()->exists($templateView))
+                        @include($templateView, [
+                            'contentItem' => $content,
+                            'zones' => $zones,
+                            'settings' => $settings,
+                            'meta' => $content->meta ?? []
+                        ])
+                    @else
+                        <p class="text-red-500">Template view [{{ $templateView }}] not found.</p>
+                    @endif
+
+                @else
+                    {{-- 2. FALLBACK FOR STANDARD PAGES WITHOUT A TEMPLATE --}}
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $content->title }}</h2>
+                    
+                    <div class="prose max-w-none">
+                        @if($content->content)
+                            @php
+                                $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                                $processedContent = $zoneProcessor->process('rich_text', $content->content);
+                                $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                            @endphp
+                            {!! $renderedContent !!}
+                        @else
+                            <p class="text-gray-500 italic">No content yet.</p>
+                        @endif
+                    </div>
+                @endif
+
+            </div>
+        </div>
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Featured Image -->
