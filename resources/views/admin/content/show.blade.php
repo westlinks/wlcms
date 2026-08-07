@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
-        <div class="lg:col-span-2">
+        {{-- <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow p-6">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $content->title }}</h2>
                 
@@ -141,6 +141,141 @@
                         </div>
                     @endif
                 @endif
+            </div>
+        </div> --}}
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6">
+                
+                @php
+                    // Get the active template identifier safely
+                    $templateIdentifier = $content->templateSettings->template_identifier 
+                        ?? $content->templateSettings->template->identifier 
+                        ?? $content->template_identifier 
+                        ?? 'default';
+                @endphp
+
+                <!-- Template-Scoped Styles -->
+                <style>
+                    /* ONLY apply callout styling when the Chairperson template is selected */
+                    .template-scope-chairperson-message .prose blockquote,
+                    .template-scope-chairperson-message blockquote {
+                        background-color: #f1f5f9 !important;
+                        border-left: 4px solid #13357d !important;
+                        border-radius: 0 0.5rem 0.5rem 0 !important;
+                        padding: 1.25rem 1.5rem !important;
+                        margin: 2rem 0 !important;
+                        font-size: 1.125rem !important;
+                        font-weight: 600 !important;
+                        color: #0f172a !important;
+                        font-style: italic !important;
+                        line-height: 1.6 !important;
+                    }
+                    .template-scope-chairperson-message .prose blockquote p {
+                        margin: 0 !important;
+                    }
+                </style>
+
+                <!-- Container Wrapped with Template Identifier Class -->
+                <div class="template-scope-{{ $templateIdentifier }}">
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $content->title }}</h2>
+                    
+                    @if($content->excerpt)
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <h3 class="font-medium text-gray-900 mb-2">Excerpt</h3>
+                            <p class="text-gray-700">{{ $content->excerpt }}</p>
+                        </div>
+                    @endif
+
+                    @php
+                        // Get ZoneProcessor to parse shortcodes
+                        $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                    @endphp
+
+                    <div class="prose max-w-none">
+                        @if($content->content)
+                            @php
+                                // Process shortcodes in content
+                                $processedContent = $zoneProcessor->process('rich_text', $content->content);
+                                $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                            @endphp
+                            {!! $renderedContent !!}
+                        @else
+                            <p class="text-gray-500 italic">No content yet.</p>
+                        @endif
+                    </div>
+
+                    @if($content->templateSettings)
+                        <!-- Template Zones -->
+                        @php
+                            $zonesData = $content->templateSettings->zones_data;
+                            if (is_string($zonesData)) {
+                                $zonesData = json_decode($zonesData, true);
+                            }
+                            $zoneProcessor = app(\Westlinks\Wlcms\Services\ZoneProcessor::class);
+                        @endphp
+                        
+                        @if($zonesData && count($zonesData) > 0)
+                            <div class="mt-8 border-t pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Zones</h3>
+                                @foreach($zonesData as $zoneName => $zoneContent)
+                                    <div class="mb-6 bg-gray-50 rounded-lg p-4">
+                                        <h4 class="font-medium text-gray-700 mb-2">{{ ucwords(str_replace('_', ' ', $zoneName)) }}</h4>
+                                        <div class="prose max-w-none">
+                                            @if(is_array($zoneContent))
+                                                <pre class="text-xs bg-white p-3 rounded border">{{ json_encode($zoneContent, JSON_PRETTY_PRINT) }}</pre>
+                                            @else
+                                                @php
+                                                    $processedContent = $zoneProcessor->process('rich_text', $zoneContent);
+                                                    $renderedContent = $zoneProcessor->render('rich_text', $processedContent);
+                                                @endphp
+                                                {!! $renderedContent ?: '<p class="text-gray-500 italic">Empty</p>' !!}
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <!-- Template Settings -->
+                        @php
+                            $settings = $content->templateSettings->settings;
+                            if (is_string($settings)) {
+                                $settings = json_decode($settings, true);
+                            }
+                        @endphp
+                        
+                        @if($settings && count($settings) > 0)
+                            <div class="mt-8 border-t pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Settings</h3>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <dl class="grid grid-cols-2 gap-4">
+                                        @foreach($settings as $settingName => $settingValue)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-600">{{ ucwords(str_replace('_', ' ', $settingName)) }}</dt>
+                                                <dd class="mt-1 text-sm text-gray-900">
+                                                    @if(is_bool($settingValue))
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $settingValue ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                            {{ $settingValue ? 'Yes' : 'No' }}
+                                                        </span>
+                                                    @elseif(is_array($settingValue))
+                                                        <pre class="text-xs bg-white p-2 rounded border mt-1">{{ json_encode($settingValue, JSON_PRETTY_PRINT) }}</pre>
+                                                    @elseif(is_null($settingValue))
+                                                        <span class="text-gray-400 italic">Not set</span>
+                                                    @else
+                                                        {{ $settingValue }}
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                        @endforeach
+                                    </dl>
+                                </div>
+                            </div>
+                        @endif
+                    @endif
+
+                </div> <!-- /.template-scope-{{ $templateIdentifier }} -->
             </div>
         </div>
 
