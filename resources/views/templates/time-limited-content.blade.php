@@ -1,4 +1,9 @@
-<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
+<x-dynamic-component 
+    :component="$layout ?? 'wlcms::layouts.base'" 
+    :content-item="$contentItem"
+    :settings="$settings"
+    :meta="$meta"
+>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <article class="main-content time-limited-content-template">
         <h1 class="page-title">{{ $contentItem->title }}</h1>

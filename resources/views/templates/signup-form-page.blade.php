@@ -1,4 +1,9 @@
-<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
+<x-dynamic-component 
+    :component="$layout ?? 'wlcms::layouts.base'" 
+    :content-item="$contentItem"
+    :settings="$settings"
+    :meta="$meta"
+>
 <div class="signup-form-page-template min-h-screen flex items-center justify-center p-8" 
      style="background: {{ $settings['background_color'] ?? '#ffffff' }};">
     <div class="max-w-xl w-full bg-white rounded-xl p-12 shadow-2xl">

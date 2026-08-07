@@ -1,4 +1,9 @@
-<x-dynamic-component :component="$layout ?? 'wlcms::layouts.base'">
+<x-dynamic-component 
+    :component="$layout ?? 'wlcms::layouts.base'" 
+    :content-item="$contentItem"
+    :settings="$settings"
+    :meta="$meta"
+>
 @push('styles')
 <style>
     .sidebar-layout {
