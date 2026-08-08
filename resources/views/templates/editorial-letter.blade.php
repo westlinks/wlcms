@@ -6,15 +6,17 @@
 >
 @php
     $resolverClass = config('wlcms.theme.resolver');
-    
+    $configDefaults = config('wlcms.theme.defaults', []);
+
     if ($resolverClass && class_exists($resolverClass) && method_exists($resolverClass, 'resolve')) {
-        $colors = $resolverClass::resolve();
+        $resolved = $resolverClass::resolve();
+        $colors = array_merge($configDefaults, $resolved);
     } else {
-        $colors = config('wlcms.theme.defaults', [
-            'primary' => '#13357d',
-            'accent'  => '#be1c64',
-        ]);
+        $colors = $configDefaults;
     }
+
+    $primaryColor = $colors['primary'] ?? 'currentColor';
+    $accentColor  = $colors['accent'] ?? 'currentColor';
 @endphp
 @push('styles')
 <style>
@@ -24,6 +26,8 @@
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: #334155;
         line-height: 1.8;
+        --brand-primary: {{ $primaryColor }};
+        --brand-accent: {{ $accentColor }};
     }
 
     .editorial-header-card {
@@ -43,8 +47,8 @@
         width: 72px;
         height: 72px;
         border-radius: 50%;
-        background: var(--brand-accent);
-        color: #ffffff;
+        background-color: var(--brand-accent) !important;
+        color: #ffffff !important;
         display: flex;
         align-items: center;
         justify-content: center;
