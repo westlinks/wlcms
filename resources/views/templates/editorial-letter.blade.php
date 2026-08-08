@@ -145,7 +145,7 @@
         margin-top: 0.15rem;
         color: var(--brand-accent);
     } */
-    .editorial-body-content p:first-of-type {
+    /* .editorial-body-content p:first-of-type {
         font-size: 1.25rem;
         font-weight: 500;
         color: #0f172a;
@@ -155,6 +155,40 @@
         border-radius: 0.5rem;
         margin-bottom: 1.75rem;
         border: 1px solid #e2e8f0;
+    } */
+    /* 1. Independent Lead Paragraph Card */
+    .editorial-body-content > p:first-of-type {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #0f172a;
+        line-height: 1.6;
+        background-color: #f8fafc;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.75rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* 2. Independent Blockquote Callout Box */
+    .editorial-body-content blockquote {
+        background-color: #f1f5f9;
+        border-left: 4px solid var(--brand-primary);
+        border-radius: 0 0.5rem 0.5rem 0;
+        padding: 1.25rem 1.5rem;
+        margin: 2rem 0;
+    }
+
+    /* Ensure paragraphs INSIDE blockquotes retain callout styling, not lead card styling */
+    .editorial-body-content blockquote p {
+        background-color: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        font-size: 1.125rem !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+        font-style: italic !important;
+        line-height: 1.6 !important;
+        margin: 0 !important;
     }
     .editorial-body-content h2,
     .editorial-body-content h3 {
