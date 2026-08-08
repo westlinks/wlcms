@@ -25,9 +25,23 @@ Dynamically generates form fields based on template's settings_schema
                     
                     {{-- Text Input --}}
                     <div x-show="field.type === 'text'">
-                        <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+                            
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <input 
                             type="text"
                             :id="'setting_' + key"
@@ -35,14 +49,27 @@ Dynamically generates form fields based on template's settings_schema
                             :placeholder="field.placeholder || ''"
                             class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
                         />
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                     {{-- Number Input --}}
                     <div x-show="field.type === 'number'">
-                        <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <input 
                             type="number"
                             :id="'setting_' + key"
@@ -52,14 +79,27 @@ Dynamically generates form fields based on template's settings_schema
                             :step="field.step || '1'"
                             class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
                         />
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                     {{-- Select/Dropdown --}}
                     <div x-show="field.type === 'select'">
-                        <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <select 
                             :id="'setting_' + key"
                             x-model="settingsData[key]"
@@ -70,28 +110,52 @@ Dynamically generates form fields based on template's settings_schema
                                 <option :value="optionValue" x-text="optionLabel"></option>
                             </template>
                         </select>
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                     {{-- Toggle/Checkbox --}}
                     <div x-show="field.type === 'toggle' || field.type === 'boolean'">
-                        <label class="flex items-center cursor-pointer">
-                            <input 
-                                type="checkbox"
-                                :id="'setting_' + key"
-                                x-model="settingsData[key]"
-                                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <span class="ml-2 text-sm font-medium text-gray-700" x-text="field.label || key"></span>
-                        </label>
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1 ml-6"></p>
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input 
+                                    type="checkbox"
+                                    :id="'setting_' + key"
+                                    x-model="settingsData[key]"
+                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <span class="ml-2 text-sm font-medium text-gray-700" x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Media Picker --}}
                     <div x-show="field.type === 'media'">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
                         
                         {{-- Media Preview --}}
                         <div x-show="settingsData[key] && typeof settingsData[key] === 'number'" class="mb-2">
@@ -118,14 +182,27 @@ Dynamically generates form fields based on template's settings_schema
                             <span x-show="!settingsData[key]">📷 Select Media</span>
                             <span x-show="settingsData[key]">Change Media</span>
                         </button>
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                     {{-- Color Picker --}}
                     <div x-show="field.type === 'color'">
-                        <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex items-center gap-2">
                             <input 
                                 type="color"
@@ -140,21 +217,33 @@ Dynamically generates form fields based on template's settings_schema
                                 class="flex-1 border border-gray-300 rounded px-3 py-2"
                             />
                         </div>
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                     {{-- Date Picker --}}
                     <div x-show="field.type === 'date'">
-                        <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span x-text="field.label || key"></span>
-                        </label>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <label :for="'setting_' + key" class="block text-sm font-medium text-gray-700">
+                                <span x-text="field.label || key"></span>
+                            </label>
+
+                            {{-- Hover Tooltip Icon --}}
+                            <div x-show="field.help || field.description" class="relative flex items-center group cursor-pointer">
+                                <svg class="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center w-64 z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded-md py-1.5 px-2.5 shadow-lg text-center leading-relaxed" x-text="field.help || field.description"></div>
+                                    <div class="w-2 h-2 -mt-1 rotate-45 bg-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <input 
                             type="date"
                             :id="'setting_' + key"
                             x-model="settingsData[key]"
                             class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
                         />
-                        <p x-show="field.description" x-text="field.description" class="text-xs text-gray-500 mt-1"></p>
                     </div>
 
                 </div>
