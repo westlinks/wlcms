@@ -4,6 +4,18 @@
     :settings="$settings"
     :meta="$meta"
 >
+@php
+    $resolverClass = config('wlcms.theme.resolver');
+    
+    if ($resolverClass && class_exists($resolverClass) && method_exists($resolverClass, 'resolve')) {
+        $colors = $resolverClass::resolve();
+    } else {
+        $colors = config('wlcms.theme.defaults', [
+            'primary' => '#13357d',
+            'accent'  => '#be1c64',
+        ]);
+    }
+@endphp
 @push('styles')
 <style>
     .editorial-container {
