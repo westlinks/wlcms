@@ -127,16 +127,16 @@
         line-height: 1.7;
     } */
     /* Keep lead text slightly larger */
-    .editorial-body-content p:first-of-type {
+    /* .editorial-body-content p:first-of-type {
         font-size: 1.1875rem;
         font-weight: 500;
         color: #1e293b;
         line-height: 1.7;
         margin-bottom: 1.5rem;
-    }
+    } */
 
     /* Big Magazine Drop Cap */
-    .editorial-body-content p:first-of-type::first-letter {
+    /* .editorial-body-content p:first-of-type::first-letter {
         font-size: 3.5rem;
         font-weight: 800;
         float: left;
@@ -144,8 +144,18 @@
         margin-right: 0.5rem;
         margin-top: 0.15rem;
         color: var(--brand-accent);
+    } */
+    .editorial-body-content p:first-of-type {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #0f172a;
+        line-height: 1.6;
+        background-color: #f8fafc;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.75rem;
+        border: 1px solid #e2e8f0;
     }
-
     .editorial-body-content h2,
     .editorial-body-content h3 {
         margin: 2.25rem 0 0.75rem 0;
