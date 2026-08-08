@@ -126,14 +126,24 @@
         color: #1e293b;
         line-height: 1.7;
     } */
+    /* Keep lead text slightly larger */
     .editorial-body-content p:first-of-type {
-        font-size: 1.25rem;
+        font-size: 1.1875rem;
         font-weight: 500;
-        color: #0f172a;
-        line-height: 1.6;
-        margin-bottom: 1.75rem;
-        padding-left: 1rem;
-        border-left: 3px solid var(--brand-accent);
+        color: #1e293b;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Big Magazine Drop Cap */
+    .editorial-body-content p:first-of-type::first-letter {
+        font-size: 3.5rem;
+        font-weight: 800;
+        float: left;
+        line-height: 0.8;
+        margin-right: 0.5rem;
+        margin-top: 0.15rem;
+        color: var(--brand-accent);
     }
 
     .editorial-body-content h2,
