@@ -33,28 +33,14 @@
     $primaryColor = $colors['primary'] ?? '#13357d';
     $accentColor  = $colors['accent'] ?? '#be1c64';
 
-    // 2. Resolve Featured Image URL via cms_content_media pivot
-    $authorPhoto = null;
+    // 2. Resolve Featured Image URL
+    $featuredMedia = $contentItem->featured_image_url 
+        ?? $contentItem->mediaAssets->where('pivot.type', 'featured')->first()?->url 
+        ?? $contentItem->mediaAssets->where('pivot.type', 'featured')->first()?->s3_url 
+        ?? $contentItem->mediaAssets->where('pivot.type', 'featured')->first()?->path;
 
-    // Check relationship helpers or direct model attributes
-    if (method_exists($contentItem, 'getFeaturedImageUrl')) {
-        $authorPhoto = $contentItem->getFeaturedImageUrl();
-    } elseif (isset($contentItem->featured_image_url)) {
-        $authorPhoto = $contentItem->featured_image_url;
-    } elseif ($contentItem->relationLoaded('media') || method_exists($contentItem, 'media')) {
-        // Query the media relationship filtered by pivot type 'featured'
-        $featuredMedia = $contentItem->media
-            ->where('pivot.type', 'featured')
-            ->first();
-
-        // Extract S3 URL or path from the media record
-        $authorPhoto = $featuredMedia->url 
-            ?? $featuredMedia->s3_url 
-            ?? $featuredMedia->path 
-            ?? null;
-    }
-
-    $authorPhoto = $contentItem->featured_image_url ?? ($settings['author_photo'] ?? null);
+    // 3. Fallback to settings author_photo if no featured image was picked
+    $authorPhoto = !empty($featuredMedia) ? $featuredMedia : ($settings['author_photo'] ?? null);
 @endphp
 @push('styles')
 <style>
@@ -91,9 +77,8 @@
         width: 72px;
         height: 72px;
         border-radius: 50%;
-        /* Prevents rectangular S3 images from stretching or squeezing */
         object-fit: cover;
-        object-position: center top; /* Centers on faces if portrait orientation */
+        object-position: center top;
         background-color: var(--brand-accent);
         color: #ffffff;
         display: flex;
@@ -305,9 +290,10 @@
         <!-- Header Profile Card -->
         <div class="editorial-header-card">
             {{-- Photo / Initial Avatar --}}
-            @if(!empty($settings['author_photo']))
+            <!-- Header Profile Card Avatar -->
+            @if(!empty($authorPhoto))
                 <img 
-                    src="{{ $settings['author_photo'] }}" 
+                    src="{{ $authorPhoto }}" 
                     alt="{{ $settings['author_name'] ?? $contentItem->title }}" 
                     class="author-avatar"
                 />
