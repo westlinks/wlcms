@@ -278,23 +278,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         loadTemplateSettings(template) {
-            console.log('Loading template settings for:', template?.name);
-            console.log('Current settingsData:', this.settingsData);
-            
             if (!template || !template.settings_schema) {
                 this.settingsSchema = {};
                 return;
             }
 
             this.settingsSchema = template.settings_schema;
-            console.log('Settings schema:', this.settingsSchema);
 
-            // Initialize settings data with defaults only if no value exists
+            // Only apply defaults if the setting key has NEVER been initialized
             Object.keys(this.settingsSchema).forEach(key => {
                 const field = this.settingsSchema[key];
                 
-                // Only set defaults if there's no existing saved value
-                if (this.settingsData[key] === undefined || this.settingsData[key] === null || this.settingsData[key] === '') {
+                if (this.settingsData[key] === undefined) {
                     if (field.default !== undefined) {
                         this.settingsData[key] = field.default;
                     } else if (field.type === 'toggle' || field.type === 'boolean') {
@@ -302,8 +297,6 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
             });
-            
-            console.log('Settings data after initialization:', this.settingsData);
         },
 
         openMediaPicker(settingKey) {
