@@ -114,30 +114,47 @@
     }
 
     /* TipTap Content Zone Styling Overrides */
+    /* Editorial Body Container */
     .editorial-body-content {
         font-size: 1.0625rem;
+        color: #334155;
+        line-height: 1.8;
     }
+
+    /* Base Paragraph Styling */
     .editorial-body-content p {
+        font-size: 1.0625rem;
+        line-height: 1.8;
+        color: #334155;
+        margin-top: 0;
         margin-bottom: 1.25rem;
     }
-    .editorial-body-content p:first-of-type {
+
+    /* Lead Paragraph (First Paragraph from TipTap) */
+    .editorial-body-content > p:first-of-type {
         font-size: 1.1875rem;
         font-weight: 500;
         color: #1e293b;
         line-height: 1.7;
+        margin-bottom: 1.5rem;
     }
+
+    /* Subheadings (h2 / h3 from TipTap) */
     .editorial-body-content h2,
     .editorial-body-content h3 {
         margin: 2.25rem 0 0.75rem 0;
         font-size: 1.25rem;
         font-weight: 700;
-        color: #13357d;
+        color: var(--brand-primary);
         border-bottom: 2px solid #e2e8f0;
         padding-bottom: 0.375rem;
+        line-height: 1.3;
     }
+
+    /* Callout Box (Blockquote from TipTap) */
     .editorial-body-content blockquote {
         background-color: #f1f5f9;
-        border-left: 4px solid #13357d;
+        border-left: 4px solid var(--brand-primary);
         border-radius: 0 0.5rem 0.5rem 0;
         padding: 1.25rem 1.5rem;
         margin: 2rem 0;
@@ -148,31 +165,13 @@
         line-height: 1.6;
     }
 
-    .editorial-footer {
-        border-top: 2px solid #e2e8f0;
-        padding-top: 1.5rem;
-        margin-top: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .editorial-body-content blockquote {
-        background-color: #f1f5f9;
-        border-left: 4px solid #13357d;
-        border-radius: 0 0.5rem 0.5rem 0;
-        padding: 1.25rem 1.5rem;
-        margin: 2rem 0;
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #0f172a;
-        font-style: italic;
-        line-height: 1.6;
-    }
     .editorial-body-content blockquote p {
         margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f172a;
+        font-style: italic;
+        line-height: 1.6;
     }
 </style>
 @endpush
