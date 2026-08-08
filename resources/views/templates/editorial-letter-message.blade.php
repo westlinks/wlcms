@@ -6,7 +6,7 @@
 >
 @push('styles')
 <style>
-    .chairperson-container {
+    .editorial-container {
         max-width: 800px;
         margin: 0 auto;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -14,7 +14,7 @@
         line-height: 1.8;
     }
 
-    .chairperson-header-card {
+    .editorial-header-card {
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 0.75rem;
@@ -27,7 +27,7 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
-    .chairperson-avatar {
+    .editorial-avatar {
         width: 72px;
         height: 72px;
         border-radius: 50%;
@@ -43,7 +43,7 @@
         object-fit: cover;
     }
 
-    .chairperson-badge {
+    .editorial-badge {
         background-color: #fce7f3;
         color: #be1c64;
         font-size: 0.75rem;
@@ -56,7 +56,7 @@
         margin-bottom: 0.375rem;
     }
 
-    .chairperson-title {
+    .editorial-title {
         margin: 0 0 0.25rem 0;
         font-size: 1.625rem;
         font-weight: 800;
@@ -64,7 +64,7 @@
         line-height: 1.2;
     }
 
-    .chairperson-subtitle {
+    .editorial-subtitle {
         margin: 0;
         font-size: 0.9375rem;
         color: #64748b;
@@ -97,20 +97,20 @@
     }
 
     /* TipTap Content Zone Styling Overrides */
-    .chairperson-body-content {
+    .editorial-body-content {
         font-size: 1.0625rem;
     }
-    .chairperson-body-content p {
+    .editorial-body-content p {
         margin-bottom: 1.25rem;
     }
-    .chairperson-body-content p:first-of-type {
+    .editorial-body-content p:first-of-type {
         font-size: 1.1875rem;
         font-weight: 500;
         color: #1e293b;
         line-height: 1.7;
     }
-    .chairperson-body-content h2,
-    .chairperson-body-content h3 {
+    .editorial-body-content h2,
+    .editorial-body-content h3 {
         margin: 2.25rem 0 0.75rem 0;
         font-size: 1.25rem;
         font-weight: 700;
@@ -118,7 +118,7 @@
         border-bottom: 2px solid #e2e8f0;
         padding-bottom: 0.375rem;
     }
-    .chairperson-body-content blockquote {
+    .editorial-body-content blockquote {
         background-color: #f1f5f9;
         border-left: 4px solid #13357d;
         border-radius: 0 0.5rem 0.5rem 0;
@@ -131,7 +131,7 @@
         line-height: 1.6;
     }
 
-    .chairperson-footer {
+    .editorial-footer {
         border-top: 2px solid #e2e8f0;
         padding-top: 1.5rem;
         margin-top: 2rem;
@@ -142,7 +142,7 @@
         gap: 1rem;
     }
 
-    .chairperson-body-content blockquote {
+    .editorial-body-content blockquote {
         background-color: #f1f5f9;
         border-left: 4px solid #13357d;
         border-radius: 0 0.5rem 0.5rem 0;
@@ -154,39 +154,39 @@
         font-style: italic;
         line-height: 1.6;
     }
-    .chairperson-body-content blockquote p {
+    .editorial-body-content blockquote p {
         margin: 0;
     }
 </style>
 @endpush
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <article class="chairperson-container">
+    <article class="editorial-container">
 
         <!-- Header Profile Card -->
-        <div class="chairperson-header-card">
+        <div class="editorial-header-card">
             {{-- Photo / Initial Avatar --}}
-            @if(!empty($settings['chairperson_photo']))
+            @if(!empty($settings['author_photo']))
                 <img 
-                    src="{{ $settings['chairperson_photo'] }}" 
-                    alt="{{ $settings['chairperson_name'] ?? $contentItem->title }}" 
-                    class="chairperson-avatar"
+                    src="{{ $settings['author_photo'] }}" 
+                    alt="{{ $settings['author_name'] ?? $contentItem->title }}" 
+                    class="author-avatar"
                 />
             @else
-                <div class="chairperson-avatar">
-                    {{ strtoupper(substr($settings['chairperson_name'] ?? 'AR', 0, 2)) }}
+                <div class="author-avatar">
+                    {{ strtoupper(substr($settings['author_name'] ?? 'AR', 0, 2)) }}
                 </div>
             @endif
 
             <div style="flex-grow: 1;">
-                <span class="chairperson-badge">
+                <span class="editorial-badge">
                     {{ $settings['badge_text'] ?? 'Welcome Message' }}
                 </span>
-                <h1 class="chairperson-title">
+                <h1 class="editorial-title">
                     {{ $contentItem->title }}
                 </h1>
-                <p class="chairperson-subtitle">
-                    <strong style="color: #13357d;">{{ $settings['chairperson_name'] ?? 'Ana R.' }}</strong> — {{ $settings['chairperson_role'] ?? '2027 SFVAAC Chairperson' }}
+                <p class="editorial-subtitle">
+                    <strong style="color: #13357d;">{{ $settings['author_name'] ?? 'Author' }}</strong> — {{ $settings['author_role'] ?? 'Author Role e.g. Leader' }}
                 </p>
             </div>
         </div>
@@ -204,24 +204,24 @@
         @endif
 
         <!-- Main Content Zone (TipTap Output) -->
-        <div class="content-zone chairperson-body-content">
+        <div class="content-zone editorial-body-content">
             {!! $zones['content'] ?? '' !!}
         </div>
 
         <!-- Sign-off Footer -->
-        <div class="chairperson-footer">
+        <div class="editorial-footer">
             <div>
                 <p style="margin: 0; font-size: 0.9375rem; color: #64748b; font-style: italic;">In love and service,</p>
                 <p style="margin: 0.25rem 0 0 0; font-size: 1.25rem; font-weight: 800; color: #13357d;">
-                    {{ $settings['chairperson_name'] ?? 'Ana R.' }}
+                    {{ $settings['author_name'] ?? 'Author' }}
                 </p>
                 <p style="margin: 0; font-size: 0.875rem; color: #475569; font-weight: 600;">
-                    {{ $settings['chairperson_role'] ?? '2027 SFVAAC Chairperson' }}
+                    {{ $settings['author_role'] ?? 'Leader' }}
                 </p>
             </div>
             <div>
                 <span style="background-color: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 0.875rem; border-radius: 0.375rem; border: 1px solid #cbd5e1; display: inline-block;">
-                    {{ $settings['footer_badge'] ?? 'SFVAA 51st Annual Convention' }}
+                    {{ $settings['footer_badge'] ?? 'Event Name' }}
                 </span>
             </div>
         </div>

@@ -529,58 +529,54 @@ class WlcmsServiceProvider extends ServiceProvider
                 }
             }
         }        
-        // Chairperson Message Template
-        \Westlinks\Wlcms\Services\TemplateManager::register('chairperson-message', [
-            'name' => 'Chairperson Message',
-            'description' => 'Editorial message layout for convention chairpersons with profile header, theme callouts, and sign-off.',
-            'view' => 'wlcms::templates.chairperson-message',
+        // Register as generic 'editorial-letter'
+        $override = config('wlcms.template_overrides.editorial-letter', []);
+        \Westlinks\Wlcms\Services\TemplateManager::register('editorial-letter', array_merge([
+            'name' => 'Editorial Letter',
+            'description' => 'Letter layout with author header badge and pull quotes.',
+            'view' => 'wlcms::templates.editorial-letter',
             'preview' => null,
             'category' => 'content',
             'zones' => [
                 'content' => [
                     'label' => 'Message Body',
-                    'type' => 'rich_text', // TipTap Visual Editor Zone
+                    'type' => 'rich_text',
                     'required' => true,
                 ],
             ],
             'settings_schema' => [
-                'chairperson_name' => [
+                'author_name' => [
                     'type' => 'text',
-                    'label' => 'Chairperson Name',
-                    'default' => 'Ana R.',
+                    'label' => 'Author Name',
+                    'default' => '',
                 ],
-                'chairperson_role' => [
+                'author_role' => [
                     'type' => 'text',
-                    'label' => 'Chairperson Role / Title',
-                    'default' => '2027 SFVAAC Chairperson',
+                    'label' => 'Author Title / Role',
+                    'default' => '',
                 ],
-                'chairperson_photo' => [
-                    'type' => 'media_picker', // Or 'text'/'media' depending on wlcms field types
-                    'label' => 'Chairperson Photo URL',
+                'author_photo' => [
+                    'type' => 'media_picker',
+                    'label' => 'Author Photo',
                     'default' => null,
                 ],
                 'badge_text' => [
                     'type' => 'text',
-                    'label' => 'Badge Header Text',
+                    'label' => 'Header Badge Text',
                     'default' => 'Welcome Message',
                 ],
-                'convention_theme' => [
+                'highlight_text' => [
                     'type' => 'text',
-                    'label' => 'Convention Theme',
-                    'default' => 'Together We Recover',
+                    'label' => 'Featured Highlight / Theme',
+                    'default' => '',
                 ],
-                'theme_label' => [
+                'highlight_label' => [
                     'type' => 'text',
-                    'label' => 'Theme Banner Label',
-                    'default' => '2027 Convention Theme',
-                ],
-                'footer_badge' => [
-                    'type' => 'text',
-                    'label' => 'Footer Badge Text',
-                    'default' => 'SFVAA 51st Annual Convention',
+                    'label' => 'Highlight Banner Label',
+                    'default' => 'Event Theme',
                 ],
             ],
-        ]);
+        ], $override));
     }
 
         
