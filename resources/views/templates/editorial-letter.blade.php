@@ -4,7 +4,7 @@
     :settings="$settings"
     :meta="$meta"
 >
-@php
+{{-- @php
     $resolverClass = config('wlcms.theme.resolver');
     $configDefaults = config('wlcms.theme.defaults', []);
 
@@ -17,6 +17,44 @@
 
     $primaryColor = $colors['primary'] ?? 'currentColor';
     $accentColor  = $colors['accent'] ?? 'currentColor';
+@endphp --}}
+@php
+    // 1. Resolve Theme Colors
+    $resolverClass = config('wlcms.theme.resolver');
+    $configDefaults = config('wlcms.theme.defaults', []);
+
+    if ($resolverClass && class_exists($resolverClass) && method_exists($resolverClass, 'resolve')) {
+        $resolved = $resolverClass::resolve();
+        $colors = array_merge($configDefaults, $resolved);
+    } else {
+        $colors = $configDefaults;
+    }
+
+    $primaryColor = $colors['primary'] ?? '#13357d';
+    $accentColor  = $colors['accent'] ?? '#be1c64';
+
+    // 2. Resolve Featured Image URL via cms_content_media pivot
+    $authorPhoto = null;
+
+    // Check relationship helpers or direct model attributes
+    if (method_exists($contentItem, 'getFeaturedImageUrl')) {
+        $authorPhoto = $contentItem->getFeaturedImageUrl();
+    } elseif (isset($contentItem->featured_image_url)) {
+        $authorPhoto = $contentItem->featured_image_url;
+    } elseif ($contentItem->relationLoaded('media') || method_exists($contentItem, 'media')) {
+        // Query the media relationship filtered by pivot type 'featured'
+        $featuredMedia = $contentItem->media
+            ->where('pivot.type', 'featured')
+            ->first();
+
+        // Extract S3 URL or path from the media record
+        $authorPhoto = $featuredMedia->url 
+            ?? $featuredMedia->s3_url 
+            ?? $featuredMedia->path 
+            ?? null;
+    }
+
+    $authorPhoto = $contentItem->featured_image_url ?? ($settings['author_photo'] ?? null);
 @endphp
 @push('styles')
 <style>
@@ -39,15 +77,24 @@
         display: flex;
         align-items: center;
         gap: 1.5rem;
-        flex-wrap: wrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    @media (max-width: 640px) {
+        .editorial-header-card {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
     }
 
     .author-avatar {
         width: 72px;
         height: 72px;
         border-radius: 50%;
-        background: var(--brand-accent);
+        /* Prevents rectangular S3 images from stretching or squeezing */
+        object-fit: cover;
+        object-position: center top; /* Centers on faces if portrait orientation */
+        background-color: var(--brand-accent);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -55,7 +102,6 @@
         font-size: 1.5rem;
         font-weight: 800;
         flex-shrink: 0;
-        object-fit: cover;
         border: 2px solid #ffffff;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
@@ -267,7 +313,20 @@
                 />
             @else
                 <div class="author-avatar">
-                    {{ strtoupper(substr($settings['author_name'] ?? 'AR', 0, 2)) }}
+                    @php
+                        $name = trim($settings['author_name'] ?? '');
+                        if ($name !== '') {
+                            $words = explode(' ', $name);
+                            if (count($words) >= 2) {
+                                $initials = strtoupper(substr($words[0], 0, 1) . substr(end($words), 0, 1));
+                            } else {
+                                $initials = strtoupper(substr($name, 0, 2));
+                            }
+                        } else {
+                            $initials = 'AR';
+                        }
+                    @endphp
+                    {{ $initials }}
                 </div>
             @endif
 

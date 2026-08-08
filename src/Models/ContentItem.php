@@ -144,13 +144,36 @@ class ContentItem extends Model
     /**
      * Get the media assets used in this content.
      */
-    public function mediaAssets(): BelongsToMany
+    // public function mediaAssets(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(MediaAsset::class, 'cms_content_media', 'content_id', 'media_id')
+    //         ->withPivot('type', 'sort_order', 'metadata')
+    //         ->withTimestamps();
+    // }
+
+    /**
+     * Get specifically the featured media asset.
+     */
+    public function featuredImage(): BelongsToMany
     {
-        return $this->belongsToMany(MediaAsset::class, 'cms_content_media', 'content_id', 'media_id')
-            ->withPivot('type', 'sort_order', 'metadata')
-            ->withTimestamps();
+        return $this->mediaAssets()->wherePivot('type', 'featured');
     }
 
+    /**
+     * Accessor for $contentItem->featured_image_url
+     */
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        // Get the first featured image record
+        $media = $this->featuredImage->first();
+
+        if (!$media) {
+            return null;
+        }
+
+        // Return the S3/public URL depending on your MediaAsset columns
+        return $media->url ?? $media->s3_url ?? $media->path ?? null;
+    }
     /**
      * Get the revisions for this content item.
      */

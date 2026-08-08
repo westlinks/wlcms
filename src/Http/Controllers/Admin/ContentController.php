@@ -136,15 +136,22 @@ class ContentController extends Controller
 
         $content = ContentItem::create($validated);
 
-        // Extract featured_image from template settings if provided
+        // Extract settings data
         $settingsData = $request->settings_json ? json_decode($request->settings_json, true) : [];
-        $featuredMediaId = $settingsData['featured_image'] ?? $request->featured_media_id;
+        
+        // Prioritize request input over template settings JSON so media removal/replace works
+        if ($request->has('featured_media_id')) {
+            $featuredMediaId = $request->input('featured_media_id');
+            $settingsData['featured_image'] = $featuredMediaId;
+        } else {
+            $featuredMediaId = $settingsData['featured_image'] ?? null;
+        }
         
         \Log::info('STORE - Settings Data:', ['settings' => $settingsData]);
-        \Log::info('STORE - Featured Media ID:', ['id' => $featuredMediaId, 'from_settings' => $settingsData['featured_image'] ?? null, 'from_request' => $request->featured_media_id]);
+        \Log::info('STORE - Featured Media ID:', ['id' => $featuredMediaId, 'from_request' => $request->featured_media_id, 'from_settings' => $settingsData['featured_image'] ?? null]);
 
         // Attach featured media
-        if ($featuredMediaId) {
+        if (!empty($featuredMediaId)) {
             $content->mediaAssets()->attach($featuredMediaId, [
                 'type' => 'featured',
                 'sort_order' => 0
@@ -219,32 +226,32 @@ class ContentController extends Controller
         
         try {
             $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_content_items,slug,' . $content->id,
-            'content' => 'nullable|string',
-            'excerpt' => 'nullable|string',
-            'type' => 'required|string|in:page,post,article,news,event',
-            'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
-            'status' => 'required|string|in:draft,published,scheduled,archived',
-            'editor_type' => 'nullable|string|in:wysiwyg,code',
-            'meta' => 'nullable|array',
-            'show_in_menu' => 'boolean',
-            'menu_title' => 'nullable|string|max:255',
-            'menu_order' => 'integer|min:0',
-            'sort_order' => 'integer|min:0',
-            'menu_location' => 'nullable|string|in:primary,footer,sidebar',
-            'parent_id' => 'nullable|exists:cms_content_items,id',
-            'featured_media_id' => 'nullable|exists:cms_media_assets,id',
-            'media_ids' => 'nullable|array',
-            'media_ids.*' => 'exists:cms_media_assets,id',
-            'zones_json' => 'nullable|string',
-            'zones' => 'nullable|array',
-            'settings_json' => 'nullable|string',
-            'auto_activate' => 'boolean',
-            'auto_deactivate' => 'boolean',
-            'activation_date' => 'nullable|date',
-            'deactivation_date' => 'nullable|date|after:activation_date',
-        ]);
+                'title' => 'required|string|max:255',
+                'slug' => 'required|string|max:255|unique:cms_content_items,slug,' . $content->id,
+                'content' => 'nullable|string',
+                'excerpt' => 'nullable|string',
+                'type' => 'required|string|in:page,post,article,news,event',
+                'template_identifier' => 'nullable|string|exists:cms_templates,identifier',
+                'status' => 'required|string|in:draft,published,scheduled,archived',
+                'editor_type' => 'nullable|string|in:wysiwyg,code',
+                'meta' => 'nullable|array',
+                'show_in_menu' => 'boolean',
+                'menu_title' => 'nullable|string|max:255',
+                'menu_order' => 'integer|min:0',
+                'sort_order' => 'integer|min:0',
+                'menu_location' => 'nullable|string|in:primary,footer,sidebar',
+                'parent_id' => 'nullable|exists:cms_content_items,id',
+                'featured_media_id' => 'nullable|exists:cms_media_assets,id',
+                'media_ids' => 'nullable|array',
+                'media_ids.*' => 'exists:cms_media_assets,id',
+                'zones_json' => 'nullable|string',
+                'zones' => 'nullable|array',
+                'settings_json' => 'nullable|string',
+                'auto_activate' => 'boolean',
+                'auto_deactivate' => 'boolean',
+                'activation_date' => 'nullable|date',
+                'deactivation_date' => 'nullable|date|after:activation_date',
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation failed in update:', [
                 'errors' => $e->errors(),
@@ -312,16 +319,23 @@ class ContentController extends Controller
 
         $content->update($validated);
 
-        // Extract featured_image from template settings if provided
+        // Extract settings data
         $settingsData = $request->settings_json ? json_decode($request->settings_json, true) : [];
-        $featuredMediaId = $settingsData['featured_image'] ?? $request->featured_media_id;
+
+        // Prioritize request input over template settings JSON so media removal/replace works
+        if ($request->has('featured_media_id')) {
+            $featuredMediaId = $request->input('featured_media_id');
+            $settingsData['featured_image'] = $featuredMediaId;
+        } else {
+            $featuredMediaId = $settingsData['featured_image'] ?? null;
+        }
         
         \Log::info('UPDATE - Settings Data:', ['settings' => $settingsData]);
-        \Log::info('UPDATE - Featured Media ID:', ['id' => $featuredMediaId, 'from_settings' => $settingsData['featured_image'] ?? null, 'from_request' => $request->featured_media_id]);
+        \Log::info('UPDATE - Featured Media ID:', ['id' => $featuredMediaId, 'from_request' => $request->featured_media_id, 'from_settings' => $settingsData['featured_image'] ?? null]);
 
         // Sync featured media
         $content->mediaAssets()->wherePivot('type', 'featured')->detach();
-        if ($featuredMediaId) {
+        if (!empty($featuredMediaId)) {
             $content->mediaAssets()->attach($featuredMediaId, [
                 'type' => 'featured',
                 'sort_order' => 0
