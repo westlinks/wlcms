@@ -329,14 +329,16 @@
             </div>
         </div>
 
-        <!-- Convention Theme Banner (Optional via Settings/Meta) -->
-        @if(!empty($settings['convention_theme'] ?? 'Together We Recover'))
+        <!-- Event Theme Banner (Optional via Settings) -->
+        @if(!empty($settings['highlight_text']))
             <div class="theme-banner">
-                <div class="theme-banner-label">
-                    {{ $settings['theme_label'] ?? '2027 Convention Theme' }}
-                </div>
+                @if(!empty($settings['highlight_label']))
+                    <div class="theme-banner-label">
+                        {{ $settings['highlight_label'] }}
+                    </div>
+                @endif
                 <div class="theme-banner-text">
-                    “{{ $settings['convention_theme'] ?? 'Together We Recover' }}”
+                    “{{ $settings['highlight_text'] }}”
                 </div>
             </div>
         @endif
