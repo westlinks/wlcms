@@ -39,20 +39,21 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
-    .editorial-avatar {
+    .author-avatar {
         width: 72px;
         height: 72px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #be1c64 0%, #d92b78 100%);
+        background: var(--brand-accent);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 800;
         flex-shrink: 0;
-        box-shadow: 0 4px 10px rgba(190, 28, 100, 0.25);
         object-fit: cover;
+        border: 2px solid #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .editorial-badge {

@@ -575,6 +575,11 @@ class WlcmsServiceProvider extends ServiceProvider
                     'label' => 'Highlight Banner Label',
                     'default' => 'Event Theme',
                 ],
+                'footer_badge' => [ 
+                    'type' => 'text',
+                    'label' => 'Footer Event Badge Text',
+                    'default' => 'Event Name',
+                ],
             ],
         ], $override));
     }
