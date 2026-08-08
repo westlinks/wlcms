@@ -351,19 +351,26 @@
         <!-- Sign-off Footer -->
         <div class="editorial-footer">
             <div>
-                <p style="margin: 0; font-size: 0.9375rem; color: #64748b; font-style: italic;">In love and service,</p>
-                <p style="margin: 0.25rem 0 0 0; font-size: 1.25rem; font-weight: 800; color: #13357d;">
+                @if(!empty($settings['signoff_text']))
+                    <p style="margin: 0; font-size: 0.9375rem; color: #64748b; font-style: italic;">
+                        {{ $settings['signoff_text'] }}
+                    </p>
+                @endif
+                <p style="margin: 0.25rem 0 0 0; font-size: 1.25rem; font-weight: 800; color: var(--brand-primary, #13357d);">
                     {{ $settings['author_name'] ?? 'Author' }}
                 </p>
                 <p style="margin: 0; font-size: 0.875rem; color: #475569; font-weight: 600;">
                     {{ $settings['author_role'] ?? 'Leader' }}
                 </p>
             </div>
-            <div>
-                <span style="background-color: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 0.875rem; border-radius: 0.375rem; border: 1px solid #cbd5e1; display: inline-block;">
-                    {{ $settings['footer_badge'] ?? 'Event Name' }}
-                </span>
-            </div>
+            
+            @if(!empty($settings['footer_badge']))
+                <div>
+                    <span class="editorial-footer-badge" style="background-color: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 0.875rem; border-radius: 0.375rem; border: 1px solid #cbd5e1; display: inline-block;">
+                        {{ $settings['footer_badge'] }}
+                    </span>
+                </div>
+            @endif
         </div>
 
     </article>

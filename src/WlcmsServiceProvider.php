@@ -545,6 +545,12 @@ class WlcmsServiceProvider extends ServiceProvider
                 ],
             ],
             'settings_schema' => [
+                'signoff_text' => [
+                    'type' => 'text',
+                    'label' => 'Sign-off Phrase',
+                    'default' => 'In love and service,',
+                    'help' => 'Closing sign-off phrase above the author name (e.g., In love and service, Sincerely, or In Fellowship,).',
+                ],
                 'author_name' => [
                     'type' => 'text',
                     'label' => 'Author Name',
