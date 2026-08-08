@@ -120,12 +120,22 @@
     .editorial-body-content p {
         margin-bottom: 1.25rem;
     }
-    .editorial-body-content p:first-of-type {
+    /* .editorial-body-content p:first-of-type {
         font-size: 1.1875rem;
         font-weight: 500;
         color: #1e293b;
         line-height: 1.7;
+    } */
+    .editorial-body-content p:first-of-type {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #0f172a;
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+        padding-left: 1rem;
+        border-left: 3px solid var(--brand-accent);
     }
+
     .editorial-body-content h2,
     .editorial-body-content h3 {
         margin: 2.25rem 0 0.75rem 0;
