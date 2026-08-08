@@ -148,36 +148,57 @@
             <div class="bg-white rounded-lg shadow p-6">
                 
                 @php
-                    // Get the active template identifier safely
-                    $templateIdentifier = $content->templateSettings->template_identifier 
-                        ?? $content->templateSettings->template->identifier 
-                        ?? $content->template_identifier 
-                        ?? 'default';
+                    // 1. Thoroughly search for the template identifier string
+                    $rawTemplate = '';
+
+                    if (isset($content->templateSettings)) {
+                        $ts = $content->templateSettings;
+                        $rawTemplate = $ts->template_identifier 
+                            ?? $ts->identifier 
+                            ?? $ts->template_slug 
+                            ?? ($ts->template->identifier ?? '')
+                            ?? ($ts->template->slug ?? '')
+                            ?? $ts->template_id 
+                            ?? '';
+                    }
+
+                    if (!$rawTemplate) {
+                        $rawTemplate = $content->template_identifier ?? $content->template_slug ?? $content->template_id ?? 'default';
+                    }
+
+                    // Convert to a clean CSS class name (e.g. 'chairperson-message')
+                    $templateClass = Str::slug((string) $rawTemplate);
+                    
+                    // Check if this page is using the chairperson template (either by slug or ID)
+                    $isChairpersonTemplate = Str::contains($templateClass, 'chairperson') || $rawTemplate == 'chairperson-message';
                 @endphp
 
                 <!-- Template-Scoped Styles -->
                 <style>
-                    /* ONLY apply callout styling when the Chairperson template is selected */
-                    .template-scope-chairperson-message .prose blockquote,
-                    .template-scope-chairperson-message blockquote {
-                        background-color: #f1f5f9 !important;
-                        border-left: 4px solid #13357d !important;
-                        border-radius: 0 0.5rem 0.5rem 0 !important;
-                        padding: 1.25rem 1.5rem !important;
-                        margin: 2rem 0 !important;
-                        font-size: 1.125rem !important;
-                        font-weight: 600 !important;
-                        color: #0f172a !important;
-                        font-style: italic !important;
-                        line-height: 1.6 !important;
-                    }
-                    .template-scope-chairperson-message .prose blockquote p {
-                        margin: 0 !important;
-                    }
+                    /* Triggered if the template slug contains 'chairperson' OR if the scoped class matches */
+                    @if($isChairpersonTemplate)
+                        .cms-preview-container .prose blockquote,
+                        .cms-preview-container blockquote {
+                            background-color: #f1f5f9 !important;
+                            border-left: 4px solid #13357d !important;
+                            border-radius: 0 0.5rem 0.5rem 0 !important;
+                            padding: 1.25rem 1.5rem !important;
+                            margin: 2rem 0 !important;
+                            font-size: 1.125rem !important;
+                            font-weight: 600 !important;
+                            color: #0f172a !important;
+                            font-style: italic !important;
+                            line-height: 1.6 !important;
+                        }
+                        .cms-preview-container .prose blockquote p,
+                        .cms-preview-container blockquote p {
+                            margin: 0 !important;
+                        }
+                    @endif
                 </style>
 
                 <!-- Container Wrapped with Template Identifier Class -->
-                <div class="template-scope-{{ $templateIdentifier }}">
+                <div class="template-scope-{{ $templateClass }}">
                     
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $content->title }}</h2>
                     
