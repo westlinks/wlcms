@@ -45,6 +45,10 @@
                             {{ request('type') === 'article' ? 'selected' : '' }}>
                         Articles
                     </option>
+                    <option value="{{ route('wlcms.admin.content.index', array_merge(request()->all(), ['type' => 'faq'])) }}"
+                            {{ request('type') === 'faq' ? 'selected' : '' }}>
+                        FAQ
+                    </option>
                 </select>
             </div>
 
@@ -106,6 +110,7 @@
                                     {{ $item->type === 'page' ? 'bg-blue-100 text-blue-800' : '' }}
                                     {{ $item->type === 'post' ? 'bg-green-100 text-green-800' : '' }}
                                     {{ $item->type === 'article' ? 'bg-purple-100 text-purple-800' : '' }}">
+                                    {{ $item->type === 'faq' ? 'bg-purple-100 text-purple-800' : '' }}">
                                     {{ ucfirst($item->type) }}
                                 </span>
                             </td>
