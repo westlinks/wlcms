@@ -398,6 +398,9 @@
                                 <option value="page" {{ old('type') === 'page' ? 'selected' : '' }}>Page</option>
                                 <option value="post" {{ old('type') === 'post' ? 'selected' : '' }}>Post</option>
                                 <option value="article" {{ old('type') === 'article' ? 'selected' : '' }}>Article</option>
+                                <option value="news" {{ old('type') === 'news' ? 'selected' : '' }}>News</option>
+                                <option value="event" {{ old('type') === 'event' ? 'selected' : '' }}>Event</option>
+                                <option value="faq" {{ old('type') === 'faq' ? 'selected' : '' }}>FAQ</option>
                             </select>
                         </div>
 
