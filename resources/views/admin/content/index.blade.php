@@ -109,7 +109,7 @@
                                 <span class="px-2 py-1 text-xs rounded-full
                                     {{ $item->type === 'page' ? 'bg-blue-100 text-blue-800' : '' }}
                                     {{ $item->type === 'post' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $item->type === 'article' ? 'bg-purple-100 text-purple-800' : '' }}">
+                                    {{ $item->type === 'article' ? 'bg-purple-100 text-purple-800' : '' }}
                                     {{ $item->type === 'faq' ? 'bg-purple-100 text-purple-800' : '' }}">
                                     {{ ucfirst($item->type) }}
                                 </span>
