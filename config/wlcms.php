@@ -90,6 +90,7 @@ return [
             'article',
             'news',
             'event',
+            'faq',
         ],
     ],
 
