@@ -271,6 +271,7 @@
                                     <option value="article" {{ old('type', $content->type) === 'article' ? 'selected' : '' }}>Article</option>
                                     <option value="news" {{ old('type', $content->type) === 'news' ? 'selected' : '' }}>News</option>
                                     <option value="event" {{ old('type', $content->type) === 'event' ? 'selected' : '' }}>Event</option>
+                                    <option value="faq" {{ old('type', $content->type) === 'faq' ? 'selected' : '' }}>FAQ</option>
                                 </select>
                                 @error('type')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
