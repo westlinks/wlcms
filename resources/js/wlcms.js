@@ -98,6 +98,40 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
                     HTMLAttributes: {},
                 },
             }),
+            Link.extend({
+                addAttributes() {
+                    return {
+                        ...this.parent?.(),
+                        // Override target attribute logic
+                        target: {
+                            default: null,
+                            parseHTML: element => element.getAttribute('target'),
+                            renderHTML: attributes => {
+                                if (!attributes.target || attributes.target === '_self') {
+                                    return {}
+                                }
+                                return { target: attributes.target }
+                            },
+                        },
+                        // Completely disable automatic rel attribute injection
+                        rel: {
+                            default: null,
+                            parseHTML: element => element.getAttribute('rel'),
+                            renderHTML: attributes => {
+                                if (!attributes.rel) {
+                                    return {}
+                                }
+                                return { rel: attributes.rel }
+                            },
+                        },
+                    }
+                },
+            }).configure({
+                openOnClick: false,
+                autolink: false,
+                linkOnPaste: false,
+                HTMLAttributes: {},
+            }),
             CustomParagraph,
             CustomDiv,
             CustomLink,

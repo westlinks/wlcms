@@ -148,15 +148,14 @@ document.addEventListener('DOMContentLoaded', function() {
         element: editorElement,
         extensions: [
             StarterKit,
-            Link.configure({
-                openOnClick: false,
-                // Setting HTMLAttributes to an empty object strips default 'rel="noopener noreferrer"'
-                HTMLAttributes: {},
-                // Setting target to null prevents TipTap from defaulting or forcing target="_blank"
-                target: null,
-                // Disables automatic target forcing during HTML parsing
-                autolink: false,
-            }),
+            // Link.configure({
+            //     openOnClick: false,
+            //     HTMLAttributes: {
+            //         // Don't add any default attributes
+            //     },
+            //     autolink: false,
+            //     linkOnPaste: false,
+            // }),
         ],
         content: textarea.value,
         editorProps: {
