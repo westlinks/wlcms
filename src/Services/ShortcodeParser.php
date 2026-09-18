@@ -91,7 +91,7 @@ class ShortcodeParser
             $url = $attributes['url'] ?? '#';
             $text = $attributes['text'] ?? 'Button';
             $class = $attributes['class'] ?? 'btn btn-primary';
-            $target = isset($attributes['blank']) ? ' target="_blank" rel="noopener noreferrer"' : '';
+            $target = isset($attributes['blank']) ? ' target="_blank"' : '';
 
             return sprintf(
                 '<a href="%s" class="%s"%s>%s</a>',
