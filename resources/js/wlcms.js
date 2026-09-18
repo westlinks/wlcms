@@ -319,19 +319,37 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
         
         const { from, to } = editor.state.selection;
         const hasSelection = from !== to;
-        
-        if (text && !hasSelection) {
-            // Insert new link with text
-            const targetAttr = target !== '_self' ? ` target="${target}"` : '';
-            const relAttr = target === '_blank' ? ' rel="noopener noreferrer"' : '';
-            editor.chain().focus().insertContent(`<a href="${url}"${targetAttr}${relAttr}>${text}</a>`).run();
+
+        const attrs = { href: url };
+
+        if (target && target !== '_self') {
+            attrs.target = target;
         } else {
-            // Update existing selection or link
-            const attrs = { href: url };
-            if (target !== '_self') {
-                attrs.target = target;
-            }
-            editor.chain().focus().extendMarkRange('link').setLink(attrs).run();
+            attrs.target = null;
+        }
+
+        if (text && !hasSelection) {
+            // Insert text pre-formatted with the link mark directly
+            editor.chain()
+                .focus()
+                .insertContent({
+                    type: 'text',
+                    text: text,
+                    marks: [
+                        {
+                            type: 'link',
+                            attrs: attrs,
+                        },
+                    ],
+                })
+                .run();
+        } else {
+            // Update existing selection or expand over current link
+            editor.chain()
+                .focus()
+                .extendMarkRange('link')
+                .setLink(attrs)
+                .run();
         }
         
         closeLinkModal();
