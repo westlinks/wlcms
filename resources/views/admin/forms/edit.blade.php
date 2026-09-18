@@ -141,39 +141,17 @@ import Link from '@tiptap/extension-link';
 document.addEventListener('DOMContentLoaded', function() {
     const textarea = document.getElementById('thank_you_content');
     const editorElement = document.getElementById('thank_you_content_editor');
-    
+
     if (!editorElement || !textarea) return;
 
-    const editor = new Editor({
-        element: editorElement,
-        extensions: [
-            StarterKit,
-            // Link.configure({
-            //     openOnClick: false,
-            //     HTMLAttributes: {
-            //         // Don't add any default attributes
-            //     },
-            //     autolink: false,
-            //     linkOnPaste: false,
-            // }),
-        ],
-        content: textarea.value,
-        editorProps: {
-            attributes: {
-                class: 'prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4',
-            },
-        },
-        onUpdate: ({ editor }) => {
-            textarea.value = editor.getHTML();
-        },
-    });
+    // Use the central wlcms initializer function instead of instantiating 'new Editor' manually
+    const initFn = window.initWlcmsTiptapEditor || window.initTiptapEditor;
 
-    // Update editor when textarea changes
-    textarea.addEventListener('input', () => {
-        if (editor.getHTML() !== textarea.value) {
-            editor.commands.setContent(textarea.value);
-        }
-    });
+    if (typeof initFn === 'function') {
+        initFn('thank_you_content', textarea.value, 'wysiwyg');
+    } else {
+        console.error('WLCMS Tiptap Editor initialization function not found on window.');
+    }
 });
 </script>
 @endpush
