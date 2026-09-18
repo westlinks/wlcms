@@ -274,7 +274,7 @@ function initTiptapEditor(elementId, initialContent = '', editorType = 'wysiwyg'
             
             // Switch to visual mode
             try {
-                editor.commands.setContent(sourceElement.value);
+                editor.commands.setContent(sourceElement.value, false, { preservePositions: true });
                 textareaElement.value = sourceElement.value;
             } catch (error) {
                 console.warn('Invalid HTML in source view, reverting:', error);
